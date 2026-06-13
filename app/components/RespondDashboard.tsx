@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { missionTimelineDays } from "../../lib/respondClients";
 import type { Category, ClientHealth, ClientRisk, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
@@ -15,6 +15,94 @@ interface DashboardProps {
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
 
 type ThemeMode = "dark" | "light";
+type AppSection = "home" | "tasks";
+type TourTarget =
+  | "mission-header"
+  | "portfolio"
+  | "client-cards"
+  | "saved-lenses"
+  | "attention"
+  | "tasks-header"
+  | "task-board"
+  | "task-inspector"
+  | "filters"
+  | "theme";
+
+interface TourStep {
+  section: AppSection;
+  target: TourTarget;
+  title: string;
+  body: string;
+  clientId?: string;
+}
+
+const tourSteps: TourStep[] = [
+  {
+    section: "home",
+    target: "mission-header",
+    title: "Start with Mission Control",
+    body: "This is the daily command centre for client delivery. Use it to see portfolio health, urgent work, and where each client is in the onboarding path.",
+  },
+  {
+    section: "home",
+    target: "portfolio",
+    title: "Read the portfolio health strip",
+    body: "These metrics show total clients, risk, holds, near-term go-lives, and overall health so the team can quickly decide where attention is needed.",
+  },
+  {
+    section: "home",
+    target: "client-cards",
+    title: "Select a client",
+    body: "Client tiles summarize owner, phase, readiness, health, and go-live timing. Selecting a client narrows the attention view before opening the workflow board.",
+  },
+  {
+    section: "home",
+    target: "saved-lenses",
+    title: "Use saved lenses",
+    body: "The saved lenses are fast filters for daily operating rituals: waiting on client, go-live next 30 days, and high-risk work.",
+  },
+  {
+    section: "home",
+    target: "attention",
+    title: "Review what needs attention",
+    body: "This table turns the portfolio into next actions. Check the issue, owner, last update, next step, risk level, and blocker before standup.",
+  },
+  {
+    section: "tasks",
+    target: "tasks-header",
+    title: "Open the task board",
+    body: "The task area keeps the same client context and shows the master operational checklist for onboarding and delivery work.",
+    clientId: "northlane-health",
+  },
+  {
+    section: "tasks",
+    target: "task-board",
+    title: "Move work through statuses",
+    body: "Drag cards between columns or use the quick actions on each card to mark work done, return it to review, or flag blockers.",
+    clientId: "northlane-health",
+  },
+  {
+    section: "tasks",
+    target: "task-inspector",
+    title: "Use the inspector for details",
+    body: "The inspector is where the selected task gets updated: status, assignee, category, due window, notes, and dependencies.",
+    clientId: "northlane-health",
+  },
+  {
+    section: "tasks",
+    target: "filters",
+    title: "Filter the workflow",
+    body: "Use client, status, owner, and category filters to reduce the board to the exact operational slice you need.",
+    clientId: "northlane-health",
+  },
+  {
+    section: "tasks",
+    target: "theme",
+    title: "Choose the working mode",
+    body: "Dark mode gives the Mission Control feel for delivery reviews. Light mode is available for calmer review sessions or screenshares.",
+    clientId: "northlane-health",
+  },
+];
 
 const clientHealthLabels: Record<ClientHealth, string> = {
   on_track: "On track",
@@ -51,7 +139,8 @@ function Icon({
     | "chart"
     | "clock"
     | "sun"
-    | "moon";
+    | "moon"
+    | "play";
 }) {
   const common = {
     width: 16,
@@ -217,6 +306,14 @@ function Icon({
     );
   }
 
+  if (name === "play") {
+    return (
+      <svg {...common}>
+        <path d="M8 5v14l11-7Z" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="M12 3v18" />
@@ -241,6 +338,58 @@ function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange
         Light
       </button>
     </div>
+  );
+}
+
+function WalkthroughPanel({
+  step,
+  stepIndex,
+  totalSteps,
+  onBack,
+  onNext,
+  onSkip,
+}: {
+  step: TourStep | null;
+  stepIndex: number | null;
+  totalSteps: number;
+  onBack: () => void;
+  onNext: () => void;
+  onSkip: () => void;
+}) {
+  if (!step || stepIndex === null) {
+    return null;
+  }
+
+  const isFirst = stepIndex === 0;
+  const isLast = stepIndex === totalSteps - 1;
+
+  return (
+    <aside className="walkthrough-panel" aria-live="polite" aria-label="Platform walkthrough">
+      <div className="walkthrough-kicker">
+        <span>Walkthrough</span>
+        <strong>
+          Step {stepIndex + 1} of {totalSteps}
+        </strong>
+      </div>
+      <h2>{step.title}</h2>
+      <p>{step.body}</p>
+      <div className="walkthrough-progress" aria-hidden="true">
+        <span style={{ width: `${((stepIndex + 1) / totalSteps) * 100}%` }} />
+      </div>
+      <div className="walkthrough-actions">
+        <button type="button" className="walkthrough-secondary" onClick={onSkip}>
+          Skip
+        </button>
+        <div>
+          <button type="button" className="walkthrough-secondary" onClick={onBack} disabled={isFirst}>
+            Back
+          </button>
+          <button type="button" className="walkthrough-primary" onClick={onNext}>
+            {isLast ? "Finish" : "Next"}
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 }
 
@@ -378,6 +527,9 @@ function MissionControl({
   onOpenTasks,
   theme,
   onThemeChange,
+  tourTarget,
+  onStartTour,
+  walkthroughPanel,
   taskCount,
   completedTasks,
   waitingTasks,
@@ -388,6 +540,9 @@ function MissionControl({
   onOpenTasks: (clientId?: string) => void;
   theme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
+  tourTarget?: TourTarget;
+  onStartTour: () => void;
+  walkthroughPanel: ReactNode;
   taskCount: number;
   completedTasks: number;
   waitingTasks: number;
@@ -455,7 +610,7 @@ function MissionControl({
   }
 
   return (
-    <main className={`mission-shell mission-shell-${theme}`}>
+    <main className={`mission-shell mission-shell-${theme}`} data-tour-target={tourTarget}>
       <aside className="mission-side">
         <div className="mission-brand">
           <span className="mission-brand-mark">R</span>
@@ -506,6 +661,10 @@ function MissionControl({
             </span>
             <span className="mission-date">Jun 13, 2026</span>
             <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
+            <button type="button" className="walkthrough-button" onClick={onStartTour}>
+              <Icon name="play" />
+              Start walkthrough
+            </button>
             <select
               aria-label="Select client"
               value={selectedClientId}
@@ -695,6 +854,7 @@ function MissionControl({
           </div>
         </section>
       </section>
+      {walkthroughPanel}
     </main>
   );
 }
@@ -702,7 +862,7 @@ function MissionControl({
 export default function RespondDashboard({ initialTasks, categories, teamMembers, clients }: DashboardProps) {
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
-  const [activeSection, setActiveSection] = useState<"home" | "tasks">("home");
+  const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [selectedClientId, setSelectedClientId] = useState("all");
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window === "undefined") {
@@ -721,6 +881,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   const [newTaskCategory, setNewTaskCategory] = useState(categories[0]?.name ?? "");
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -892,6 +1053,32 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   );
 
   const selectedClient = clients.find((client) => client.id === selectedClientId);
+  const currentTourStep = tourStepIndex === null ? null : tourSteps[tourStepIndex] ?? null;
+
+  function goToTourStep(index: number) {
+    if (index < 0 || index >= tourSteps.length) {
+      setTourStepIndex(null);
+      return;
+    }
+
+    const step = tourSteps[index];
+    if (step.clientId) {
+      setSelectedClientId(step.clientId);
+    }
+    setActiveSection(step.section);
+    setTourStepIndex(index);
+  }
+
+  const walkthroughPanel = (
+    <WalkthroughPanel
+      step={currentTourStep}
+      stepIndex={tourStepIndex}
+      totalSteps={tourSteps.length}
+      onBack={() => goToTourStep((tourStepIndex ?? 0) - 1)}
+      onNext={() => goToTourStep((tourStepIndex ?? 0) + 1)}
+      onSkip={() => setTourStepIndex(null)}
+    />
+  );
 
   function openTasks(clientId?: string) {
     if (clientId) {
@@ -909,6 +1096,9 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
         onOpenTasks={openTasks}
         theme={theme}
         onThemeChange={setTheme}
+        tourTarget={currentTourStep?.section === "home" ? currentTourStep.target : undefined}
+        onStartTour={() => goToTourStep(0)}
+        walkthroughPanel={walkthroughPanel}
         taskCount={tasks.length}
         completedTasks={metrics.completed}
         waitingTasks={metrics.blocked}
@@ -917,7 +1107,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   }
 
   return (
-    <main className={`dashboard-shell dashboard-shell-${theme}`}>
+    <main className={`dashboard-shell dashboard-shell-${theme}`} data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}>
       <aside className="side-rail">
         <div className="brand">
           <span className="brand-mark">R</span>
@@ -973,6 +1163,10 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
           </div>
           <div className="topbar-actions">
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
+            <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
+              <Icon name="play" />
+              Start walkthrough
+            </button>
             <div className="search-box">
               <Icon name="search" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks, owners, categories" />
@@ -1201,6 +1395,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
           </>
         ) : null}
       </aside>
+      {walkthroughPanel}
     </main>
   );
 }

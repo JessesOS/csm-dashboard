@@ -80,6 +80,148 @@ button:disabled {
   color: #07121f;
 }
 
+.walkthrough-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 40px;
+  border: 1px solid rgba(193, 255, 36, 0.32);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+  padding: 0 13px;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.walkthrough-button:hover {
+  border-color: rgba(193, 255, 36, 0.58);
+  background: rgba(193, 255, 36, 0.16);
+}
+
+.walkthrough-panel {
+  position: fixed;
+  z-index: 90;
+  right: 22px;
+  bottom: 22px;
+  width: min(390px, calc(100vw - 32px));
+  border: 1px solid rgba(193, 255, 36, 0.32);
+  border-radius: 8px;
+  background: #0a2035;
+  color: #e9f2fb;
+  padding: 18px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+.walkthrough-kicker,
+.walkthrough-actions,
+.walkthrough-actions > div {
+  display: flex;
+  align-items: center;
+}
+
+.walkthrough-kicker {
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.walkthrough-kicker span {
+  color: #c9f82b;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.walkthrough-kicker strong {
+  color: #8fa2b7;
+  font-size: 11px;
+  font-weight: 780;
+}
+
+.walkthrough-panel h2 {
+  margin: 0;
+  color: #f8fbff;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: 0;
+}
+
+.walkthrough-panel p {
+  margin: 9px 0 0;
+  color: #b8c7d8;
+  font-size: 13px;
+  line-height: 1.48;
+}
+
+.walkthrough-progress {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.18);
+  margin: 16px 0;
+}
+
+.walkthrough-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #c9f82b;
+}
+
+.walkthrough-actions {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.walkthrough-actions > div {
+  gap: 8px;
+}
+
+.walkthrough-actions button {
+  min-height: 36px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.walkthrough-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  background: transparent;
+  color: #c8d7e8;
+}
+
+.walkthrough-secondary:disabled {
+  opacity: 0.4;
+}
+
+.walkthrough-primary {
+  border: 1px solid rgba(193, 255, 36, 0.45);
+  background: #c9f82b;
+  color: #07121f;
+}
+
+.mission-shell[data-tour-target="mission-header"] .mission-header,
+.mission-shell[data-tour-target="portfolio"] .portfolio-strip,
+.mission-shell[data-tour-target="client-cards"] .mission-client-grid,
+.mission-shell[data-tour-target="saved-lenses"] .mission-side-section,
+.mission-shell[data-tour-target="attention"] .attention-panel,
+.mission-shell[data-tour-target="theme"] .theme-toggle,
+.dashboard-shell[data-tour-target="tasks-header"] .topbar,
+.dashboard-shell[data-tour-target="task-board"] .board,
+.dashboard-shell[data-tour-target="task-inspector"] .inspector,
+.dashboard-shell[data-tour-target="filters"] .filters-row,
+.dashboard-shell[data-tour-target="theme"] .theme-toggle {
+  position: relative;
+  z-index: 50;
+  outline: 2px solid #c9f82b;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 8px rgba(193, 255, 36, 0.08), 0 24px 80px rgba(0, 0, 0, 0.32);
+}
+
 .mission-shell {
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
@@ -864,6 +1006,13 @@ button:disabled {
   color: #475569;
 }
 
+.mission-shell-light .walkthrough-button,
+.dashboard-shell-light .walkthrough-button {
+  border-color: #d5e2f2;
+  background: #eef5ff;
+  color: #174ac9;
+}
+
 .mission-shell-light .theme-toggle button.active {
   background: #172033;
   color: #ffffff;
@@ -964,6 +1113,54 @@ button:disabled {
 
 .mission-shell-light .timeline-marker-milestone {
   color: #76a900;
+}
+
+.mission-shell-light .walkthrough-panel,
+.dashboard-shell-light .walkthrough-panel {
+  border-color: #d9e1ea;
+  background: #ffffff;
+  color: #162033;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+}
+
+.mission-shell-light .walkthrough-kicker span,
+.dashboard-shell-light .walkthrough-kicker span {
+  color: #174ac9;
+}
+
+.mission-shell-light .walkthrough-kicker strong,
+.mission-shell-light .walkthrough-panel p,
+.dashboard-shell-light .walkthrough-kicker strong,
+.dashboard-shell-light .walkthrough-panel p {
+  color: #647084;
+}
+
+.mission-shell-light .walkthrough-panel h2,
+.dashboard-shell-light .walkthrough-panel h2 {
+  color: #0f172a;
+}
+
+.mission-shell-light .walkthrough-progress,
+.dashboard-shell-light .walkthrough-progress {
+  background: #e2e8f0;
+}
+
+.mission-shell-light .walkthrough-progress span,
+.dashboard-shell-light .walkthrough-progress span {
+  background: #245ee8;
+}
+
+.mission-shell-light .walkthrough-secondary,
+.dashboard-shell-light .walkthrough-secondary {
+  border-color: #d6dee8;
+  color: #475569;
+}
+
+.mission-shell-light .walkthrough-primary,
+.dashboard-shell-light .walkthrough-primary {
+  border-color: #245ee8;
+  background: #245ee8;
+  color: #ffffff;
 }
 
 .dashboard-shell {
@@ -2059,6 +2256,29 @@ progress::-webkit-progress-value {
   .mission-panel-head {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .walkthrough-panel {
+    right: 12px;
+    bottom: 12px;
+    width: calc(100vw - 24px);
+    padding: 14px;
+  }
+
+  .walkthrough-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .walkthrough-actions > div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .walkthrough-actions button,
+  .walkthrough-actions > .walkthrough-secondary {
+    width: 100%;
   }
 
   .dashboard-shell {
