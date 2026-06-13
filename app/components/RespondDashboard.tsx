@@ -1,18 +1,54 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import type { Category, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
+import { missionTimelineDays } from "../../lib/respondClients";
+import type { Category, ClientHealth, ClientRisk, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
 
 interface DashboardProps {
   initialTasks: Task[];
   categories: Category[];
   teamMembers: string[];
+  clients: RespondClient[];
 }
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
 
-function Icon({ name }: { name: "search" | "filter" | "plus" | "check" | "link" | "user" | "calendar" | "move" }) {
+const clientHealthLabels: Record<ClientHealth, string> = {
+  on_track: "On track",
+  at_risk: "At risk",
+  off_track: "Off track",
+  on_hold: "On hold",
+};
+
+const clientRiskLabels: Record<ClientRisk, string> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+};
+
+const missionToday = Date.parse("2026-06-13T00:00:00Z");
+const missionThirtyDayLimit = Date.parse("2026-07-13T00:00:00Z");
+
+function Icon({
+  name,
+}: {
+  name:
+    | "search"
+    | "filter"
+    | "plus"
+    | "check"
+    | "link"
+    | "user"
+    | "calendar"
+    | "move"
+    | "home"
+    | "tasks"
+    | "users"
+    | "alert"
+    | "chart"
+    | "clock";
+}) {
   const common = {
     width: 16,
     height: 16,
@@ -86,6 +122,69 @@ function Icon({ name }: { name: "search" | "filter" | "plus" | "check" | "link" 
         <path d="M16 2v4" />
         <path d="M8 2v4" />
         <path d="M3 10h18" />
+      </svg>
+    );
+  }
+
+  if (name === "home") {
+    return (
+      <svg {...common}>
+        <path d="m3 11 9-8 9 8" />
+        <path d="M5 10v10h14V10" />
+        <path d="M9 20v-6h6v6" />
+      </svg>
+    );
+  }
+
+  if (name === "tasks") {
+    return (
+      <svg {...common}>
+        <path d="M8 6h13" />
+        <path d="M8 12h13" />
+        <path d="M8 18h13" />
+        <path d="m3 6 .8.8L5.5 5" />
+        <path d="m3 12 .8.8 1.7-1.8" />
+        <path d="m3 18 .8.8 1.7-1.8" />
+      </svg>
+    );
+  }
+
+  if (name === "users") {
+    return (
+      <svg {...common}>
+        <path d="M16 21a6 6 0 0 0-12 0" />
+        <circle cx="10" cy="8" r="4" />
+        <path d="M22 20a5 5 0 0 0-5-5" />
+        <path d="M17 4a3 3 0 0 1 0 6" />
+      </svg>
+    );
+  }
+
+  if (name === "alert") {
+    return (
+      <svg {...common}>
+        <path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z" />
+        <path d="M12 9v4" />
+        <path d="M12 17h.01" />
+      </svg>
+    );
+  }
+
+  if (name === "chart") {
+    return (
+      <svg {...common}>
+        <path d="M4 19V5" />
+        <path d="M4 19h16" />
+        <path d="m7 15 4-4 3 3 5-7" />
+      </svg>
+    );
+  }
+
+  if (name === "clock") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
       </svg>
     );
   }
@@ -229,9 +328,334 @@ function Metric({ label, value, detail }: { label: string; value: string | numbe
   );
 }
 
-export default function RespondDashboard({ initialTasks, categories, teamMembers }: DashboardProps) {
+function MissionControl({
+  clients,
+  selectedClientId,
+  onSelectClient,
+  onOpenTasks,
+  taskCount,
+  completedTasks,
+  waitingTasks,
+}: {
+  clients: RespondClient[];
+  selectedClientId: string;
+  onSelectClient: (clientId: string) => void;
+  onOpenTasks: (clientId?: string) => void;
+  taskCount: number;
+  completedTasks: number;
+  waitingTasks: number;
+}) {
+  const [activeLens, setActiveLens] = useState<"all" | "waiting" | "golive" | "high">("all");
+  const selectedClient = clients.find((client) => client.id === selectedClientId);
+  const lensLabels = {
+    all: "All clients",
+    waiting: "Waiting on client",
+    golive: "Go-live next 30 days",
+    high: "High risk",
+  };
+  const lensClients = useMemo(() => {
+    if (activeLens === "waiting") {
+      return clients.filter((client) => client.blocker.toLowerCase().includes("waiting"));
+    }
+
+    if (activeLens === "golive") {
+      return clients.filter((client) => {
+        const date = Date.parse(`${client.goLiveDate}T00:00:00Z`);
+        return date >= missionToday && date <= missionThirtyDayLimit;
+      });
+    }
+
+    if (activeLens === "high") {
+      return clients.filter((client) => client.risk === "high" || client.health === "off_track");
+    }
+
+    return clients;
+  }, [activeLens, clients]);
+  const scopedClients = selectedClient ? [selectedClient] : lensClients;
+  const clientCards = selectedClient ? clients : lensClients;
+  const totalClients = clients.length || 1;
+  const portfolioStats = {
+    onTrack: clients.filter((client) => client.health === "on_track").length,
+    atRisk: clients.filter((client) => client.health === "at_risk").length,
+    offTrack: clients.filter((client) => client.health === "off_track").length,
+    onHold: clients.filter((client) => client.health === "on_hold").length,
+  };
+  const goLiveSoon = clients.filter((client) => {
+    const date = Date.parse(`${client.goLiveDate}T00:00:00Z`);
+    return date >= missionToday && date <= missionThirtyDayLimit;
+  }).length;
+  const attentionRows = scopedClients.flatMap((client) =>
+    client.attention.map((item) => ({
+      client,
+      ...item,
+    }))
+  );
+  const timelineClients = scopedClients;
+  const totalAtRisk = portfolioStats.atRisk + portfolioStats.offTrack;
+  const riskPercent = Math.round((totalAtRisk / totalClients) * 100);
+  const riskDegrees = Math.max(8, Math.round((riskPercent / 100) * 360));
+  const overallStatus = portfolioStats.offTrack > 0 ? "At risk" : portfolioStats.atRisk > 0 ? "Watch" : "Healthy";
+  const overallClass: ClientHealth = portfolioStats.offTrack > 0 ? "off_track" : portfolioStats.atRisk > 0 ? "at_risk" : "on_track";
+
+  function chooseLens(lens: "all" | "waiting" | "golive" | "high") {
+    setActiveLens(lens);
+    onSelectClient("all");
+  }
+
+  function chooseClient(clientId: string) {
+    setActiveLens("all");
+    onSelectClient(clientId);
+  }
+
+  return (
+    <main className="mission-shell">
+      <aside className="mission-side">
+        <div className="mission-brand">
+          <span className="mission-brand-mark">R</span>
+          <div>
+            <strong>Respond CSM</strong>
+            <span>Delivery command center</span>
+          </div>
+        </div>
+
+        <nav className="mission-nav" aria-label="Primary views">
+          <button type="button" className="active">
+            <Icon name="home" />
+            Mission Control
+          </button>
+          <button type="button" onClick={() => onOpenTasks(selectedClient?.id)}>
+            <Icon name="tasks" />
+            Tasks
+          </button>
+        </nav>
+
+        <div className="mission-side-section">
+          <span>Saved lenses</span>
+          <button type="button" className={activeLens === "all" && !selectedClient ? "active" : ""} onClick={() => chooseLens("all")}>All clients</button>
+          <button type="button" className={activeLens === "waiting" && !selectedClient ? "active" : ""} onClick={() => chooseLens("waiting")}>Waiting on client</button>
+          <button type="button" className={activeLens === "golive" && !selectedClient ? "active" : ""} onClick={() => chooseLens("golive")}>Go-live next 30 days</button>
+          <button type="button" className={activeLens === "high" && !selectedClient ? "active" : ""} onClick={() => chooseLens("high")}>High risk</button>
+        </div>
+
+        <div className="mission-user">
+          <span className="avatar">JB</span>
+          <div>
+            <strong>Jamie Bennett</strong>
+            <span>CSM lead</span>
+          </div>
+        </div>
+      </aside>
+
+      <section className="mission-main">
+        <header className="mission-header">
+          <div>
+            <h1>Mission Control</h1>
+            <p>Portfolio health across Respond clients.</p>
+          </div>
+          <div className="mission-header-actions">
+            <span className="system-pill">
+              <span />
+              All systems operational
+            </span>
+            <span className="mission-date">Jun 13, 2026</span>
+            <select
+              aria-label="Select client"
+              value={selectedClientId}
+              onChange={(event) => {
+                setActiveLens("all");
+                onSelectClient(event.target.value);
+              }}
+            >
+              <option value="all">All clients</option>
+              {clients.map((client) => (
+                <option key={client.id} value={client.id}>
+                  {client.name}
+                </option>
+              ))}
+            </select>
+            <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)}>
+              <Icon name="tasks" />
+              Open tasks
+            </button>
+          </div>
+        </header>
+
+        <section className="portfolio-strip" aria-label="Portfolio health">
+          <div className="portfolio-kpi">
+            <span>Total clients</span>
+            <strong>{clients.length}</strong>
+            <small>{taskCount} master tasks available</small>
+          </div>
+          <div className="portfolio-kpi">
+            <span>On track</span>
+            <strong>{portfolioStats.onTrack}</strong>
+            <small>{Math.round((portfolioStats.onTrack / totalClients) * 100)}% of portfolio</small>
+          </div>
+          <div className="portfolio-kpi">
+            <span>At risk</span>
+            <strong className="tone-amber">{portfolioStats.atRisk}</strong>
+            <small>{Math.round((portfolioStats.atRisk / totalClients) * 100)}% needs attention</small>
+          </div>
+          <div className="portfolio-kpi">
+            <span>Off track</span>
+            <strong className="tone-red">{portfolioStats.offTrack}</strong>
+            <small>{Math.round((portfolioStats.offTrack / totalClients) * 100)}% escalated</small>
+          </div>
+          <div className="portfolio-kpi">
+            <span>On hold</span>
+            <strong>{portfolioStats.onHold}</strong>
+            <small>Paused or duplicate</small>
+          </div>
+          <div className="portfolio-kpi">
+            <span>Go-live next 30 days</span>
+            <strong className="tone-lime">{goLiveSoon}</strong>
+            <small>Through Jul 13, 2026</small>
+          </div>
+          <div className="portfolio-health">
+            <span className="mission-health-ring" style={{ background: `conic-gradient(#f5b22c 0deg ${riskDegrees}deg, rgba(148, 163, 184, 0.18) ${riskDegrees}deg 360deg)` }} />
+            <div>
+              <span>Overall health</span>
+              <strong className={`client-health-${overallClass}`}>{overallStatus}</strong>
+              <small>{completedTasks} complete, {waitingTasks} waiting</small>
+            </div>
+          </div>
+        </section>
+
+        <section className="mission-client-grid" aria-label="Client portfolio">
+          {clientCards.map((client) => (
+            <button
+              type="button"
+              key={client.id}
+              className={selectedClientId === client.id ? "mission-client-card active" : "mission-client-card"}
+              onClick={() => chooseClient(client.id)}
+            >
+              <span className="mission-client-code">{client.code}</span>
+              <span className="mission-client-name">{client.name}</span>
+              <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
+              <span className="mission-client-meta">{client.phase} - {client.owner}</span>
+              <span className="mission-progress-track">
+                <span style={{ width: `${client.progress}%` }} />
+              </span>
+              <span className="mission-client-foot">
+                <span>{client.progress}% ready</span>
+                <span>{client.goLiveLabel}</span>
+              </span>
+            </button>
+          ))}
+        </section>
+
+        <section className="mission-panel attention-panel">
+          <div className="mission-panel-head">
+            <div>
+              <h2>Needs attention now</h2>
+              <p>{selectedClient ? selectedClient.name : lensLabels[activeLens]} - blockers, approvals, and handoffs.</p>
+            </div>
+            <span>{attentionRows.length}</span>
+          </div>
+
+          <div className="attention-table-wrap">
+            <table className="attention-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Issue / context</th>
+                  <th>Status</th>
+                  <th>Owner</th>
+                  <th>Last update</th>
+                  <th>Next step</th>
+                  <th>Risk</th>
+                  <th>Blocker</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attentionRows.map((row) => (
+                  <tr key={`${row.client.id}-${row.issue}`}>
+                    <td>
+                      <button type="button" className="attention-client" onClick={() => onSelectClient(row.client.id)}>
+                        <span>{row.client.code}</span>
+                        {row.client.name}
+                      </button>
+                    </td>
+                    <td>{row.issue}</td>
+                    <td>
+                      <span className={`status-pill client-health-${row.client.health}`}>{row.status}</span>
+                    </td>
+                    <td>{row.owner}</td>
+                    <td>{row.lastUpdate}</td>
+                    <td>{row.nextStep}</td>
+                    <td>
+                      <span className={`risk-pill risk-${row.risk}`}>{clientRiskLabels[row.risk]}</span>
+                    </td>
+                    <td>{row.blocker}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="mission-panel timeline-panel">
+          <div className="mission-panel-head">
+            <div>
+              <h2>14-day delivery timeline</h2>
+              <p>Current critical path from Jun 13 to Jun 26, 2026.</p>
+            </div>
+            <button type="button" onClick={() => chooseLens("all")}>View all</button>
+          </div>
+
+          <div className="timeline-grid" aria-label="14 day client delivery timeline">
+            <div className="timeline-row timeline-head">
+              <span>Client</span>
+              <span>Phase</span>
+              {missionTimelineDays.map((day) => (
+                <span key={day}>{day}</span>
+              ))}
+              <span>Go-live</span>
+            </div>
+            {timelineClients.map((client) => (
+              <div className="timeline-row" key={client.id}>
+                <div className="timeline-client">
+                  <span>{client.code}</span>
+                  <strong>{client.name}</strong>
+                </div>
+                <span className={`timeline-phase client-health-${client.health}`}>{client.phase}</span>
+                {client.timeline.map((segment) => {
+                  const start = Math.max(0, Math.min(segment.startDay, missionTimelineDays.length - 1));
+                  const span = Math.max(1, Math.min(segment.span, missionTimelineDays.length - start));
+                  const markerColumn = Math.min(start + span + 2, 16);
+
+                  return (
+                    <span
+                      key={segment.label}
+                      className={`timeline-bar timeline-bar-${segment.status}`}
+                      style={{ gridColumn: `${start + 3} / span ${span}` }}
+                    >
+                      {segment.label}
+                      {segment.marker ? (
+                        <span className={`timeline-marker timeline-marker-${segment.marker}`} style={{ gridColumn: `${markerColumn}` }}>
+                          {segment.marker === "milestone" ? "M" : "!"}
+                        </span>
+                      ) : null}
+                    </span>
+                  );
+                })}
+                <span className={`timeline-golive risk-${client.risk}`} style={{ gridColumn: "17" }}>
+                  {client.goLiveLabel}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </section>
+    </main>
+  );
+}
+
+export default function RespondDashboard({ initialTasks, categories, teamMembers, clients }: DashboardProps) {
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
+  const [activeSection, setActiveSection] = useState<"home" | "tasks">("home");
+  const [selectedClientId, setSelectedClientId] = useState("all");
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
@@ -407,6 +831,29 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     [filteredTasks]
   );
 
+  const selectedClient = clients.find((client) => client.id === selectedClientId);
+
+  function openTasks(clientId?: string) {
+    if (clientId) {
+      setSelectedClientId(clientId);
+    }
+    setActiveSection("tasks");
+  }
+
+  if (activeSection === "home") {
+    return (
+      <MissionControl
+        clients={clients}
+        selectedClientId={selectedClientId}
+        onSelectClient={setSelectedClientId}
+        onOpenTasks={openTasks}
+        taskCount={tasks.length}
+        completedTasks={metrics.completed}
+        waitingTasks={metrics.blocked}
+      />
+    );
+  }
+
   return (
     <main className="dashboard-shell">
       <aside className="side-rail">
@@ -417,6 +864,18 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
             <span>Onboarding & delivery</span>
           </div>
         </div>
+
+        <nav className="view-nav" aria-label="Primary views">
+          <button type="button" onClick={() => setActiveSection("home")}>
+            <Icon name="home" />
+            Mission Control
+          </button>
+          <button type="button" className="active">
+            <Icon name="tasks" />
+            Tasks
+          </button>
+        </nav>
+
         <nav className="phase-nav" aria-label="Task categories">
           {phaseOrder.map((phase) => {
             const phaseCategories = categoryStats.filter((category) => category.phase === phase);
@@ -444,8 +903,11 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       <section className="workspace">
         <header className="topbar">
           <div>
-            <h1>Respond workflow board</h1>
-            <p>{tasks.length} operational tasks from the master CSM checklist</p>
+            <h1>{selectedClient ? `${selectedClient.name} workflow board` : "Respond workflow board"}</h1>
+            <p>
+              {tasks.length} operational tasks from the master CSM checklist
+              {selectedClient ? ` - client context: ${selectedClient.phase}, ${clientHealthLabels[selectedClient.health]}` : ""}
+            </p>
           </div>
           <div className="topbar-actions">
             <div className="search-box">
@@ -489,6 +951,14 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
             <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
             <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
           </div>
+          <select aria-label="Selected client" value={selectedClientId} onChange={(event) => setSelectedClientId(event.target.value)}>
+            <option value="all">All clients / template</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}
+              </option>
+            ))}
+          </select>
           <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
             <option value="all">All statuses</option>
             {taskStatuses.map((status) => (

@@ -60,3 +60,57 @@ export interface TaskUpdatePayload {
   dependencies?: string[];
   notes?: string;
 }
+
+export type ClientHealth = "on_track" | "at_risk" | "off_track" | "on_hold";
+
+export type ClientRisk = "low" | "medium" | "high";
+
+export type ClientDeliveryPhase =
+  | "Discovery"
+  | "Onboarding"
+  | "Implementation"
+  | "Handoff"
+  | "Testing"
+  | "Go-Live"
+  | "Support";
+
+export interface ClientTimelineSegment {
+  label: string;
+  phase: ClientDeliveryPhase;
+  startDay: number;
+  span: number;
+  status: ClientHealth;
+  marker?: "milestone" | "risk" | "approval";
+}
+
+export interface ClientAttentionItem {
+  issue: string;
+  status: string;
+  owner: string;
+  lastUpdate: string;
+  nextStep: string;
+  blocker: string;
+  risk: ClientRisk;
+}
+
+export interface RespondClient {
+  id: string;
+  name: string;
+  code: string;
+  industry: string;
+  owner: string;
+  phase: ClientDeliveryPhase;
+  health: ClientHealth;
+  progress: number;
+  currentTask: string;
+  goLiveDate: string;
+  goLiveLabel: string;
+  lastUpdate: string;
+  nextStep: string;
+  blocker: string;
+  risk: ClientRisk;
+  activeTasks: number;
+  completedTasks: number;
+  timeline: ClientTimelineSegment[];
+  attention: ClientAttentionItem[];
+}
