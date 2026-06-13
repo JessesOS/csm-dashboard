@@ -813,24 +813,30 @@ function MissionControl({
 
         <section className="mission-client-grid" aria-label="Client portfolio">
           {clientCards.map((client) => (
-            <button
-              type="button"
+            <article
               key={client.id}
               className={selectedClientId === client.id ? "mission-client-card active" : "mission-client-card"}
-              onClick={() => chooseClient(client.id)}
             >
-              <span className="mission-client-code">{client.code}</span>
-              <span className="mission-client-name">{client.name}</span>
-              <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
-              <span className="mission-client-meta">{client.phase} - {client.owner}</span>
-              <span className="mission-progress-track">
-                <span style={{ width: `${client.progress}%` }} />
-              </span>
-              <span className="mission-client-foot">
-                <span>{client.progress}% ready</span>
-                <span>{client.goLiveLabel}</span>
-              </span>
-            </button>
+              <button type="button" className="mission-client-card-main" onClick={() => chooseClient(client.id)}>
+                <span className="mission-client-code">{client.code}</span>
+                <span className="mission-client-name">{client.name}</span>
+                <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
+                <span className="mission-client-meta">{client.phase} - {client.owner}</span>
+                <span className="mission-progress-track">
+                  <span style={{ width: `${client.progress}%` }} />
+                </span>
+                <span className="mission-client-foot">
+                  <span>{client.progress}% ready</span>
+                  <span>{client.goLiveLabel}</span>
+                </span>
+              </button>
+              {client.portalToken ? (
+                <a className="mission-client-portal-link" href={`/portal/${client.portalToken}`} target="_blank" rel="noreferrer">
+                  <Icon name="link" />
+                  Portal link
+                </a>
+              ) : null}
+            </article>
           ))}
         </section>
 
