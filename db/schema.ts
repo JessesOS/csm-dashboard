@@ -3,6 +3,8 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const tasks = sqliteTable("tasks", {
   id: text("id").primaryKey(),
+  clientId: text("client_id").notNull().default("northlane-health"),
+  templateId: text("template_id").notNull().default(""),
   title: text("title").notNull(),
   category: text("category").notNull(),
   phase: text("phase").notNull(),
@@ -13,6 +15,30 @@ export const tasks = sqliteTable("tasks", {
   dependencies: text("dependencies").notNull().default("[]"),
   notes: text("notes").notNull().default(""),
   sortOrder: integer("sort_order").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const clients = sqliteTable("clients", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  code: text("code").notNull(),
+  industry: text("industry").notNull().default(""),
+  owner: text("owner").notNull().default("Response CSM"),
+  phase: text("phase").notNull().default("Onboarding"),
+  health: text("health").notNull().default("on_track"),
+  progress: integer("progress").notNull().default(0),
+  currentTask: text("current_task").notNull().default("Fresh onboarding template"),
+  goLiveDate: text("go_live_date").notNull().default(""),
+  goLiveLabel: text("go_live_label").notNull().default(""),
+  lastUpdate: text("last_update").notNull().default(""),
+  nextStep: text("next_step").notNull().default("Start onboarding checklist"),
+  blocker: text("blocker").notNull().default("None"),
+  risk: text("risk").notNull().default("low"),
+  activeTasks: integer("active_tasks").notNull().default(0),
+  completedTasks: integer("completed_tasks").notNull().default(0),
+  timeline: text("timeline").notNull().default("[]"),
+  attention: text("attention").notNull().default("[]"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

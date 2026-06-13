@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { missionTimelineDays } from "../../lib/respondClients";
-import type { Category, ClientHealth, ClientRisk, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
+import type { Category, ClientCreatePayload, ClientHealth, ClientRisk, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
 
 interface DashboardProps {
   initialTasks: Task[];
   categories: Category[];
   teamMembers: string[];
-  clients: RespondClient[];
+  initialClients: RespondClient[];
 }
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
@@ -520,11 +520,82 @@ function Metric({ label, value, detail }: { label: string; value: string | numbe
   );
 }
 
+function NewClientPanel({
+  open,
+  saving,
+  theme,
+  onClose,
+  onSubmit,
+}: {
+  open: boolean;
+  saving: boolean;
+  theme: ThemeMode;
+  onClose: () => void;
+  onSubmit: (payload: ClientCreatePayload) => void;
+}) {
+  const [name, setName] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [owner, setOwner] = useState("Response CSM");
+  const [goLiveDate, setGoLiveDate] = useState("");
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div className={`modal-backdrop modal-backdrop-${theme}`} role="presentation">
+      <form
+        className="new-client-panel"
+        aria-label="Create client"
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit({ name, industry, owner, goLiveDate });
+        }}
+      >
+        <div className="new-client-head">
+          <div>
+            <span>New client</span>
+            <h2>Create client workspace</h2>
+          </div>
+          <button type="button" className="icon-button" onClick={onClose} title="Close">
+            x
+          </button>
+        </div>
+        <label>
+          Client name
+          <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Acme Health" autoFocus />
+        </label>
+        <label>
+          Industry
+          <input value={industry} onChange={(event) => setIndustry(event.target.value)} placeholder="Healthcare" />
+        </label>
+        <label>
+          Owner
+          <input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Response CSM" />
+        </label>
+        <label>
+          Target go-live
+          <input type="date" value={goLiveDate} onChange={(event) => setGoLiveDate(event.target.value)} />
+        </label>
+        <div className="new-client-actions">
+          <button type="button" className="walkthrough-secondary" onClick={onClose}>
+            Cancel
+          </button>
+          <button type="submit" className="walkthrough-primary" disabled={!name.trim() || saving}>
+            {saving ? "Creating" : "Create workspace"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 function MissionControl({
   clients,
   selectedClientId,
   onSelectClient,
   onOpenTasks,
+  onCreateClientClick,
   theme,
   onThemeChange,
   tourTarget,
@@ -538,6 +609,7 @@ function MissionControl({
   selectedClientId: string;
   onSelectClient: (clientId: string) => void;
   onOpenTasks: (clientId?: string) => void;
+  onCreateClientClick: () => void;
   theme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
   tourTarget?: TourTarget;
@@ -665,6 +737,10 @@ function MissionControl({
               <Icon name="play" />
               Start walkthrough
             </button>
+            <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
+              <Icon name="plus" />
+              New client
+            </button>
             <select
               aria-label="Select client"
               value={selectedClientId}
@@ -691,7 +767,7 @@ function MissionControl({
           <div className="portfolio-kpi">
             <span>Total clients</span>
             <strong>{clients.length}</strong>
-            <small>{taskCount} master tasks available</small>
+            <small>{taskCount} tasks per client</small>
           </div>
           <div className="portfolio-kpi">
             <span>On track</span>
@@ -859,7 +935,8 @@ function MissionControl({
   );
 }
 
-export default function RespondDashboard({ initialTasks, categories, teamMembers, clients }: DashboardProps) {
+export default function RespondDashboard({ initialTasks, categories, teamMembers, initialClients }: DashboardProps) {
+  const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
   const [activeSection, setActiveSection] = useState<AppSection>("home");
@@ -881,8 +958,19 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   const [newTaskCategory, setNewTaskCategory] = useState(categories[0]?.name ?? "");
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [showNewClientPanel, setShowNewClientPanel] = useState(false);
+  const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const activeTaskClientId = useMemo(() => {
+    const fallbackClientId = clients[0]?.id ?? "northlane-health";
+    if (selectedClientId !== "all" && clients.some((client) => client.id === selectedClientId)) {
+      return selectedClientId;
+    }
+
+    return fallbackClientId;
+  }, [clients, selectedClientId]);
 
   useEffect(() => {
     window.localStorage.setItem("respond-csm-theme", theme);
@@ -891,20 +979,19 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   useEffect(() => {
     let active = true;
 
-    fetch("/api/tasks", { cache: "no-store" })
+    fetch("/api/clients", { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {
-          throw new Error(data.error ?? "Could not load task storage.");
+          throw new Error(data.error ?? "Could not load clients.");
         }
-        return data.tasks as Task[];
+        return data.clients as RespondClient[];
       })
-      .then((remoteTasks) => {
-        if (!active || remoteTasks.length === 0) {
+      .then((remoteClients) => {
+        if (!active || remoteClients.length === 0) {
           return;
         }
-        setTasks(remoteTasks);
-        setSelectedId((current) => current || remoteTasks[0]?.id || "");
+        setClients(remoteClients);
         setStorageNotice("");
       })
       .catch((error: Error) => {
@@ -917,6 +1004,36 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(`/api/tasks?clientId=${encodeURIComponent(activeTaskClientId)}`, { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error ?? "Could not load task storage.");
+        }
+        return data.tasks as Task[];
+      })
+      .then((remoteTasks) => {
+        if (!active || remoteTasks.length === 0) {
+          return;
+        }
+        setTasks(remoteTasks);
+        setSelectedId((current) => (remoteTasks.some((task) => task.id === current) ? current : remoteTasks[0]?.id || ""));
+        setStorageNotice("");
+      })
+      .catch((error: Error) => {
+        if (active) {
+          setStorageNotice(error.message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [activeTaskClientId]);
 
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
@@ -1007,7 +1124,9 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     }
 
     const tempTask: Task = {
-      id: `draft-${Date.now()}`,
+      id: `draft-${activeTaskClientId}-${Date.now()}`,
+      clientId: activeTaskClientId,
+      templateId: `draft-${Date.now()}`,
       title,
       category: newTaskCategory,
       phase: categories.find((category) => category.name === newTaskCategory)?.phase ?? "Onboarding",
@@ -1028,7 +1147,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, category: newTaskCategory }),
+        body: JSON.stringify({ clientId: activeTaskClientId, title, category: newTaskCategory }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -1043,6 +1162,36 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     }
   }
 
+  async function createClientWorkspace(payload: ClientCreatePayload) {
+    setIsCreatingClient(true);
+
+    try {
+      const response = await fetch("/api/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not create client.");
+      }
+
+      const client = data.client as RespondClient;
+      const clientTasks = data.tasks as Task[];
+      setClients((current) => [...current.filter((item) => item.id !== client.id), client]);
+      setSelectedClientId(client.id);
+      setTasks(clientTasks);
+      setSelectedId(clientTasks[0]?.id ?? "");
+      setActiveSection("tasks");
+      setShowNewClientPanel(false);
+      setStorageNotice("");
+    } catch (error) {
+      setStorageNotice(error instanceof Error ? error.message : "Could not create client.");
+    } finally {
+      setIsCreatingClient(false);
+    }
+  }
+
   const statusTasks = useMemo(
     () =>
       taskStatuses.map((status) => ({
@@ -1052,7 +1201,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     [filteredTasks]
   );
 
-  const selectedClient = clients.find((client) => client.id === selectedClientId);
+  const selectedClient = clients.find((client) => client.id === activeTaskClientId);
   const currentTourStep = tourStepIndex === null ? null : tourSteps[tourStepIndex] ?? null;
 
   function goToTourStep(index: number) {
@@ -1081,28 +1230,36 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   );
 
   function openTasks(clientId?: string) {
-    if (clientId) {
-      setSelectedClientId(clientId);
-    }
+    setSelectedClientId(clientId ?? activeTaskClientId);
     setActiveSection("tasks");
   }
 
   if (activeSection === "home") {
     return (
-      <MissionControl
-        clients={clients}
-        selectedClientId={selectedClientId}
-        onSelectClient={setSelectedClientId}
-        onOpenTasks={openTasks}
-        theme={theme}
-        onThemeChange={setTheme}
-        tourTarget={currentTourStep?.section === "home" ? currentTourStep.target : undefined}
-        onStartTour={() => goToTourStep(0)}
-        walkthroughPanel={walkthroughPanel}
-        taskCount={tasks.length}
-        completedTasks={metrics.completed}
-        waitingTasks={metrics.blocked}
-      />
+      <>
+        <MissionControl
+          clients={clients}
+          selectedClientId={selectedClientId}
+          onSelectClient={setSelectedClientId}
+          onOpenTasks={openTasks}
+          onCreateClientClick={() => setShowNewClientPanel(true)}
+          theme={theme}
+          onThemeChange={setTheme}
+          tourTarget={currentTourStep?.section === "home" ? currentTourStep.target : undefined}
+          onStartTour={() => goToTourStep(0)}
+          walkthroughPanel={walkthroughPanel}
+          taskCount={initialTasks.length}
+          completedTasks={metrics.completed}
+          waitingTasks={metrics.blocked}
+        />
+        <NewClientPanel
+          open={showNewClientPanel}
+          saving={isCreatingClient}
+          theme={theme}
+          onClose={() => setShowNewClientPanel(false)}
+          onSubmit={createClientWorkspace}
+        />
+      </>
     );
   }
 
@@ -1157,7 +1314,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
           <div>
             <h1>{selectedClient ? `${selectedClient.name} workflow board` : "Respond workflow board"}</h1>
             <p>
-              {tasks.length} operational tasks from the master CSM checklist
+              {tasks.length} operational tasks in this client workspace
               {selectedClient ? ` - client context: ${selectedClient.phase}, ${clientHealthLabels[selectedClient.health]}` : ""}
             </p>
           </div>
@@ -1166,6 +1323,10 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
             <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
               <Icon name="play" />
               Start walkthrough
+            </button>
+            <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
+              <Icon name="plus" />
+              New client
             </button>
             <div className="search-box">
               <Icon name="search" />
@@ -1208,8 +1369,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
             <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
             <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
           </div>
-          <select aria-label="Selected client" value={selectedClientId} onChange={(event) => setSelectedClientId(event.target.value)}>
-            <option value="all">All clients / template</option>
+          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => setSelectedClientId(event.target.value)}>
             {clients.map((client) => (
               <option key={client.id} value={client.id}>
                 {client.name}
@@ -1395,6 +1555,13 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
           </>
         ) : null}
       </aside>
+      <NewClientPanel
+        open={showNewClientPanel}
+        saving={isCreatingClient}
+        theme={theme}
+        onClose={() => setShowNewClientPanel(false)}
+        onSubmit={createClientWorkspace}
+      />
       {walkthroughPanel}
     </main>
   );

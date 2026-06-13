@@ -35,6 +35,8 @@ export interface Category {
 
 export interface Task {
   id: string;
+  clientId?: string;
+  templateId?: string;
   title: string;
   category: string;
   phase: Phase;
@@ -113,4 +115,11 @@ export interface RespondClient {
   completedTasks: number;
   timeline: ClientTimelineSegment[];
   attention: ClientAttentionItem[];
+}
+
+export interface ClientCreatePayload {
+  name?: string;
+  owner?: string;
+  industry?: string;
+  goLiveDate?: string;
 }

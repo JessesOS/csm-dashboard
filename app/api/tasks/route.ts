@@ -4,9 +4,10 @@ import { categories, sourceDocument, teamMembers } from "../../../lib/respondTas
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const tasks = await listTasks();
+    const { searchParams } = new URL(request.url);
+    const tasks = await listTasks(searchParams.get("clientId") ?? undefined);
     return NextResponse.json({ tasks, categories, teamMembers, sourceDocument });
   } catch (error) {
     return NextResponse.json(
@@ -19,7 +20,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    const task = await createTask(payload);
+    const task = await createTask(payload.clientId, payload);
     return NextResponse.json({ task }, { status: 201 });
   } catch (error) {
     return NextResponse.json({ error: routeErrorMessage(error) }, { status: 400 });

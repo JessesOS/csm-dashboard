@@ -245,6 +245,7 @@ button:disabled {
 .mission-user,
 .mission-nav button,
 .mission-primary,
+.mission-secondary,
 .system-pill,
 .attention-client,
 .open-client-button {
@@ -372,6 +373,10 @@ button:disabled {
   margin-bottom: 18px;
 }
 
+.mission-header > div:first-child {
+  min-width: 260px;
+}
+
 .mission-header h1 {
   margin: 0;
   color: #f8fbff;
@@ -444,6 +449,98 @@ button:disabled {
   padding: 0 14px;
   font-size: 12px;
   font-weight: 850;
+}
+
+.mission-secondary {
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  border: 1px solid rgba(20, 184, 166, 0.42);
+  border-radius: 8px;
+  background: rgba(20, 184, 166, 0.12);
+  color: #67e8f9;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.mission-secondary:hover {
+  border-color: rgba(103, 232, 249, 0.6);
+  background: rgba(20, 184, 166, 0.18);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  background: rgba(3, 10, 18, 0.62);
+  padding: 18px;
+}
+
+.new-client-panel {
+  width: min(460px, calc(100vw - 28px));
+  border: 1px solid rgba(193, 255, 36, 0.26);
+  border-radius: 8px;
+  background: #0a2035;
+  color: #e9f2fb;
+  padding: 18px;
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
+}
+
+.new-client-head,
+.new-client-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.new-client-head {
+  margin-bottom: 16px;
+}
+
+.new-client-head span {
+  color: #c9f82b;
+  font-size: 11px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.new-client-head h2 {
+  margin: 4px 0 0;
+  color: #f8fbff;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.new-client-panel label {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+  color: #8fa2b7;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.new-client-panel input {
+  min-height: 42px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 8px;
+  background: #071a2d;
+  color: #e9f2fb;
+  padding: 0 12px;
+  outline: 0;
+}
+
+.new-client-panel input:focus {
+  border-color: rgba(193, 255, 36, 0.55);
+  box-shadow: 0 0 0 3px rgba(193, 255, 36, 0.12);
+}
+
+.new-client-actions {
+  margin-top: 18px;
 }
 
 .portfolio-strip {
@@ -1037,6 +1134,42 @@ button:disabled {
   border-color: #172033;
   background: #172033;
   color: #ffffff;
+}
+
+.mission-shell-light .mission-secondary,
+.dashboard-shell-light .mission-secondary {
+  border-color: #bae6fd;
+  background: #ecfeff;
+  color: #0369a1;
+}
+
+.modal-backdrop-light {
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.modal-backdrop-light .new-client-panel {
+  border-color: #d9e1ea;
+  background: #ffffff;
+  color: #162033;
+  box-shadow: 0 24px 90px rgba(15, 23, 42, 0.18);
+}
+
+.modal-backdrop-light .new-client-head span {
+  color: #174ac9;
+}
+
+.modal-backdrop-light .new-client-head h2 {
+  color: #0f172a;
+}
+
+.modal-backdrop-light .new-client-panel label {
+  color: #647084;
+}
+
+.modal-backdrop-light .new-client-panel input {
+  border-color: #d6dee8;
+  background: #ffffff;
+  color: #0f172a;
 }
 
 .mission-shell-light .portfolio-strip,
@@ -2231,9 +2364,14 @@ progress::-webkit-progress-value {
     padding: 16px;
   }
 
+  .mission-header > div:first-child {
+    min-width: 0;
+  }
+
   .mission-header-actions,
   .mission-header-actions select,
   .mission-primary,
+  .mission-secondary,
   .system-pill {
     width: 100%;
   }
@@ -2279,6 +2417,21 @@ progress::-webkit-progress-value {
   .walkthrough-actions button,
   .walkthrough-actions > .walkthrough-secondary {
     width: 100%;
+  }
+
+  .modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .new-client-panel {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .new-client-actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
   }
 
   .dashboard-shell {
