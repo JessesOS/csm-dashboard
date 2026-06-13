@@ -14,6 +14,8 @@ interface DashboardProps {
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
 
+type ThemeMode = "dark" | "light";
+
 const clientHealthLabels: Record<ClientHealth, string> = {
   on_track: "On track",
   at_risk: "At risk",
@@ -47,7 +49,9 @@ function Icon({
     | "users"
     | "alert"
     | "chart"
-    | "clock";
+    | "clock"
+    | "sun"
+    | "moon";
 }) {
   const common = {
     width: 16,
@@ -189,6 +193,30 @@ function Icon({
     );
   }
 
+  if (name === "sun") {
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="m4.93 4.93 1.41 1.41" />
+        <path d="m17.66 17.66 1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="m6.34 17.66-1.41 1.41" />
+        <path d="m19.07 4.93-1.41 1.41" />
+      </svg>
+    );
+  }
+
+  if (name === "moon") {
+    return (
+      <svg {...common}>
+        <path d="M20.5 14.4A8.5 8.5 0 0 1 9.6 3.5 8.5 8.5 0 1 0 20.5 14.4Z" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="M12 3v18" />
@@ -198,6 +226,21 @@ function Icon({
       <path d="m7 8-4 4 4 4" />
       <path d="m17 8 4 4-4 4" />
     </svg>
+  );
+}
+
+function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange: (theme: ThemeMode) => void }) {
+  return (
+    <div className="theme-toggle" aria-label="Theme mode">
+      <button type="button" className={theme === "dark" ? "active" : ""} onClick={() => onThemeChange("dark")} title="Use dark mode">
+        <Icon name="moon" />
+        Dark
+      </button>
+      <button type="button" className={theme === "light" ? "active" : ""} onClick={() => onThemeChange("light")} title="Use light mode">
+        <Icon name="sun" />
+        Light
+      </button>
+    </div>
   );
 }
 
@@ -333,6 +376,8 @@ function MissionControl({
   selectedClientId,
   onSelectClient,
   onOpenTasks,
+  theme,
+  onThemeChange,
   taskCount,
   completedTasks,
   waitingTasks,
@@ -341,6 +386,8 @@ function MissionControl({
   selectedClientId: string;
   onSelectClient: (clientId: string) => void;
   onOpenTasks: (clientId?: string) => void;
+  theme: ThemeMode;
+  onThemeChange: (theme: ThemeMode) => void;
   taskCount: number;
   completedTasks: number;
   waitingTasks: number;
@@ -408,7 +455,7 @@ function MissionControl({
   }
 
   return (
-    <main className="mission-shell">
+    <main className={`mission-shell mission-shell-${theme}`}>
       <aside className="mission-side">
         <div className="mission-brand">
           <span className="mission-brand-mark">R</span>
@@ -458,6 +505,7 @@ function MissionControl({
               All systems operational
             </span>
             <span className="mission-date">Jun 13, 2026</span>
+            <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
             <select
               aria-label="Select client"
               value={selectedClientId}
@@ -656,6 +704,14 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
   const [activeSection, setActiveSection] = useState<"home" | "tasks">("home");
   const [selectedClientId, setSelectedClientId] = useState("all");
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === "undefined") {
+      return "dark";
+    }
+
+    const storedTheme = window.localStorage.getItem("respond-csm-theme");
+    return storedTheme === "light" ? "light" : "dark";
+  });
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
@@ -666,6 +722,10 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    window.localStorage.setItem("respond-csm-theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     let active = true;
@@ -847,6 +907,8 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
         selectedClientId={selectedClientId}
         onSelectClient={setSelectedClientId}
         onOpenTasks={openTasks}
+        theme={theme}
+        onThemeChange={setTheme}
         taskCount={tasks.length}
         completedTasks={metrics.completed}
         waitingTasks={metrics.blocked}
@@ -855,7 +917,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   }
 
   return (
-    <main className="dashboard-shell">
+    <main className={`dashboard-shell dashboard-shell-${theme}`}>
       <aside className="side-rail">
         <div className="brand">
           <span className="brand-mark">R</span>
@@ -910,6 +972,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
             </p>
           </div>
           <div className="topbar-actions">
+            <ThemeToggle theme={theme} onThemeChange={setTheme} />
             <div className="search-box">
               <Icon name="search" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks, owners, categories" />

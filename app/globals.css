@@ -48,6 +48,38 @@ button:disabled {
   cursor: default;
 }
 
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: #0a1f33;
+  color: #8fa2b7;
+  padding: 3px;
+}
+
+.theme-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 74px;
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  padding: 0 9px;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.theme-toggle button.active {
+  background: #c9f82b;
+  color: #07121f;
+}
+
 .mission-shell {
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
@@ -756,6 +788,184 @@ button:disabled {
   color: #ff6961;
 }
 
+.mission-shell-light {
+  background: #f7f9fb;
+  color: #162033;
+}
+
+.mission-shell-light .mission-side {
+  border-right-color: #d9e1ea;
+  background: #ffffff;
+}
+
+.mission-shell-light .mission-brand-mark {
+  border-color: transparent;
+  background: #172033;
+  color: #ffffff;
+}
+
+.mission-shell-light .mission-brand strong,
+.mission-shell-light .mission-user strong,
+.mission-shell-light .mission-header h1,
+.mission-shell-light .mission-panel-head h2,
+.mission-shell-light .mission-client-name,
+.mission-shell-light .timeline-client strong {
+  color: #0f172a;
+}
+
+.mission-shell-light .mission-brand > div span,
+.mission-shell-light .mission-user span,
+.mission-shell-light .mission-header p,
+.mission-shell-light .portfolio-kpi span,
+.mission-shell-light .portfolio-kpi small,
+.mission-shell-light .portfolio-health span,
+.mission-shell-light .portfolio-health small,
+.mission-shell-light .mission-client-meta,
+.mission-shell-light .mission-client-foot,
+.mission-shell-light .mission-panel-head p,
+.mission-shell-light .timeline-head {
+  color: #647084;
+}
+
+.mission-shell-light .mission-nav button {
+  color: #475569;
+}
+
+.mission-shell-light .mission-nav button.active,
+.mission-shell-light .mission-nav button:hover:not(:disabled) {
+  border-color: #d5e2f2;
+  background: #eef5ff;
+  color: #174ac9;
+}
+
+.mission-shell-light .mission-side-section,
+.mission-shell-light .mission-user {
+  border-top-color: #d9e1ea;
+}
+
+.mission-shell-light .mission-side-section span {
+  color: #8791a2;
+}
+
+.mission-shell-light .mission-side-section button {
+  color: #344054;
+}
+
+.mission-shell-light .mission-side-section button:hover,
+.mission-shell-light .mission-side-section button.active {
+  background: #eef5ff;
+  color: #174ac9;
+}
+
+.mission-shell-light .mission-header-actions select,
+.mission-shell-light .theme-toggle {
+  border-color: #d6dee8;
+  background: #ffffff;
+  color: #475569;
+}
+
+.mission-shell-light .theme-toggle button.active {
+  background: #172033;
+  color: #ffffff;
+}
+
+.mission-shell-light .system-pill {
+  border-color: rgba(16, 185, 129, 0.22);
+  background: #e8f5f1;
+  color: #087f5b;
+}
+
+.mission-shell-light .system-pill span {
+  background: #10b981;
+}
+
+.mission-shell-light .mission-date {
+  border-left-color: #d9e1ea;
+  color: #647084;
+}
+
+.mission-shell-light .mission-primary {
+  border-color: #172033;
+  background: #172033;
+  color: #ffffff;
+}
+
+.mission-shell-light .portfolio-strip,
+.mission-shell-light .mission-panel {
+  border-color: #d9e1ea;
+  background: #d9e1ea;
+  box-shadow: 0 14px 40px rgba(28, 38, 58, 0.08);
+}
+
+.mission-shell-light .portfolio-kpi,
+.mission-shell-light .portfolio-health,
+.mission-shell-light .mission-client-card,
+.mission-shell-light .mission-panel,
+.mission-shell-light .mission-health-ring::after,
+.mission-shell-light .timeline-marker {
+  background: #ffffff;
+}
+
+.mission-shell-light .portfolio-kpi strong,
+.mission-shell-light .portfolio-health strong {
+  color: #0f172a;
+}
+
+.mission-shell-light .mission-client-card {
+  border-color: #d9e1ea;
+  color: #162033;
+  box-shadow: 0 12px 30px rgba(28, 38, 58, 0.08);
+}
+
+.mission-shell-light .mission-client-card:hover,
+.mission-shell-light .mission-client-card.active {
+  border-color: #8fb3f8;
+  background: #f5f9fd;
+}
+
+.mission-shell-light .mission-client-code,
+.mission-shell-light .attention-client span,
+.mission-shell-light .timeline-client span {
+  border-color: #dbe4ee;
+  background: #eef5ff;
+  color: #174ac9;
+}
+
+.mission-shell-light .mission-progress-track {
+  background: #dbe4ee;
+}
+
+.mission-shell-light .mission-panel-head {
+  border-bottom-color: #d9e1ea;
+}
+
+.mission-shell-light .mission-panel-head button {
+  border-color: #d5e2f2;
+  color: #174ac9;
+}
+
+.mission-shell-light .attention-table th,
+.mission-shell-light .attention-table td,
+.mission-shell-light .timeline-row {
+  border-bottom-color: #d9e1ea;
+}
+
+.mission-shell-light .attention-table th {
+  color: #8791a2;
+}
+
+.mission-shell-light .attention-table td {
+  color: #263445;
+}
+
+.mission-shell-light .attention-client {
+  color: #0f172a;
+}
+
+.mission-shell-light .timeline-marker-milestone {
+  color: #76a900;
+}
+
 .dashboard-shell {
   display: grid;
   grid-template-columns: 284px minmax(0, 1fr) 360px;
@@ -901,10 +1111,9 @@ button:disabled {
 }
 
 .topbar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
   margin-bottom: 18px;
 }
 
@@ -925,14 +1134,18 @@ button:disabled {
 .topbar-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
+  width: 100%;
 }
 
 .search-box {
   display: flex;
+  flex: 1 1 280px;
   align-items: center;
   gap: 9px;
-  width: min(420px, 34vw);
+  width: auto;
+  max-width: 620px;
   height: 42px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -963,7 +1176,7 @@ button:disabled {
 
 .command-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(120px, 1fr)) minmax(300px, 1.4fr);
+  grid-template-columns: repeat(4, minmax(120px, 1fr));
   gap: 12px;
   margin-bottom: 14px;
 }
@@ -1000,6 +1213,7 @@ button:disabled {
 
 .new-task {
   display: grid;
+  grid-column: 1 / -1;
   grid-template-columns: minmax(0, 1fr) 150px auto;
   align-items: center;
   gap: 8px;
@@ -1477,6 +1691,261 @@ progress::-webkit-progress-value {
 
 .saving.active {
   color: var(--cobalt);
+}
+
+.dashboard-shell-dark {
+  --background: #061321;
+  --foreground: #e9f2fb;
+  --muted: #8fa2b7;
+  --border: rgba(148, 163, 184, 0.18);
+  --panel: #0a2035;
+  --panel-soft: #0f263d;
+  --ink: #f8fbff;
+  --cobalt: #c9f82b;
+  --mint: #2dd4bf;
+  --amber: #f5b22c;
+  --red: #ff6961;
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+  background: #061321;
+  color: #e9f2fb;
+}
+
+.dashboard-shell-dark .side-rail {
+  border-right-color: rgba(148, 163, 184, 0.18);
+  background: #05101d;
+}
+
+.dashboard-shell-dark .brand-mark {
+  border: 1px solid rgba(193, 255, 36, 0.55);
+  border-radius: 50%;
+  background: #102333;
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .brand strong,
+.dashboard-shell-dark .topbar h1,
+.dashboard-shell-dark .column-header strong,
+.dashboard-shell-dark .task-card h3,
+.dashboard-shell-dark .category-panel-head strong,
+.dashboard-shell-dark .inspector h2,
+.dashboard-shell-dark .inspector-section-title,
+.dashboard-shell-dark .dependency-list button span {
+  color: #f8fbff;
+}
+
+.dashboard-shell-dark .brand span,
+.dashboard-shell-dark .topbar p,
+.dashboard-shell-dark .metric span,
+.dashboard-shell-dark .metric small,
+.dashboard-shell-dark .task-meta-line,
+.dashboard-shell-dark .category-panel-head span,
+.dashboard-shell-dark .inspector p,
+.dashboard-shell-dark .dependency-list button em,
+.dashboard-shell-dark .saving {
+  color: #8fa2b7;
+}
+
+.dashboard-shell-dark .view-nav,
+.dashboard-shell-dark .inspector-head,
+.dashboard-shell-dark .dependency-list,
+.dashboard-shell-dark .inspector-footer {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.dashboard-shell-dark .view-nav button,
+.dashboard-shell-dark .category-link,
+.dashboard-shell-dark .segmented button,
+.dashboard-shell-dark .status-grid button,
+.dashboard-shell-dark .task-actions button {
+  color: #c8d7e8;
+}
+
+.dashboard-shell-dark .view-nav button:hover,
+.dashboard-shell-dark .view-nav button.active,
+.dashboard-shell-dark .category-link:hover,
+.dashboard-shell-dark .category-link.active {
+  border-color: rgba(193, 255, 36, 0.32);
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .phase-label,
+.dashboard-shell-dark .category-link strong {
+  color: #71849a;
+}
+
+.dashboard-shell-dark .workspace {
+  background: #061321;
+}
+
+.dashboard-shell-dark .theme-toggle,
+.dashboard-shell-dark .search-box,
+.dashboard-shell-dark .icon-button,
+.dashboard-shell-dark .new-task input,
+.dashboard-shell-dark .new-task select,
+.dashboard-shell-dark .filters-row select,
+.dashboard-shell-dark .inspector input,
+.dashboard-shell-dark .inspector select,
+.dashboard-shell-dark .inspector textarea {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: #0a1f33;
+  color: #eaf2fb;
+}
+
+.dashboard-shell-dark .search-box {
+  box-shadow: none;
+}
+
+.dashboard-shell-dark .search-box input {
+  color: #f8fbff;
+}
+
+.dashboard-shell-dark .search-box input::placeholder,
+.dashboard-shell-dark .new-task input::placeholder,
+.dashboard-shell-dark .inspector textarea::placeholder {
+  color: #71849a;
+}
+
+.dashboard-shell-dark .icon-button {
+  color: #c9d6e5;
+}
+
+.dashboard-shell-dark .theme-toggle button.active,
+.dashboard-shell-dark .new-task button,
+.dashboard-shell-dark .inspector-footer button {
+  background: #c9f82b;
+  color: #07121f;
+}
+
+.dashboard-shell-dark .metric,
+.dashboard-shell-dark .new-task,
+.dashboard-shell-dark .storage-notice,
+.dashboard-shell-dark .category-panel,
+.dashboard-shell-dark .inspector {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #0a2035;
+  box-shadow: var(--shadow);
+}
+
+.dashboard-shell-dark .metric strong {
+  color: #f8fbff;
+}
+
+.dashboard-shell-dark .segmented {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #0a1f33;
+}
+
+.dashboard-shell-dark .segmented button.active,
+.dashboard-shell-dark .status-grid button.active {
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .storage-notice {
+  color: #f5b22c;
+}
+
+.dashboard-shell-dark .board-column {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #071827;
+}
+
+.dashboard-shell-dark .column-header {
+  border-bottom-color: rgba(148, 163, 184, 0.16);
+}
+
+.dashboard-shell-dark .column-header span {
+  background: #14334c;
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .task-card {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #0a2035;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.dashboard-shell-dark .task-card:hover,
+.dashboard-shell-dark .task-card-active {
+  border-color: rgba(193, 255, 36, 0.55);
+  background: #0c263d;
+}
+
+.dashboard-shell-dark .avatar {
+  background: #c9f82b;
+  color: #07121f;
+}
+
+.dashboard-shell-dark .mini-meta,
+.dashboard-shell-dark .dependency-chip {
+  background: rgba(148, 163, 184, 0.14);
+  color: #a8b8ca;
+}
+
+.dashboard-shell-dark .dependency-open {
+  background: rgba(245, 178, 44, 0.14);
+  color: #f5b22c;
+}
+
+.dashboard-shell-dark .task-actions button {
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .priority-low,
+.dashboard-shell-dark .priority-normal {
+  border: 1px solid rgba(193, 255, 36, 0.38);
+  background: rgba(193, 255, 36, 0.09);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .priority-high {
+  border: 1px solid rgba(245, 178, 44, 0.42);
+  background: rgba(245, 178, 44, 0.12);
+  color: #f5b22c;
+}
+
+.dashboard-shell-dark .priority-critical {
+  border: 1px solid rgba(255, 105, 97, 0.42);
+  background: rgba(255, 105, 97, 0.12);
+  color: #ff6961;
+}
+
+.dashboard-shell-dark progress {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.dashboard-shell-dark progress::-webkit-progress-bar {
+  background: rgba(148, 163, 184, 0.18);
+}
+
+.dashboard-shell-dark .category-panel-head b {
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .category-task-list button,
+.dashboard-shell-dark .dependency-list button,
+.dashboard-shell-dark .status-grid button {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #0f2a43;
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .category-task-list em {
+  color: #a8b8ca;
+}
+
+.dashboard-shell-dark .inspector {
+  border-left-color: rgba(148, 163, 184, 0.18);
+}
+
+.dashboard-shell-dark .inspector label {
+  color: #a8b8ca;
+}
+
+.dashboard-shell-dark .inspector-footer {
+  background: transparent;
 }
 
 @media (max-width: 1280px) {
