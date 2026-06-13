@@ -1,4 +1,5 @@
 import { getD1 } from "../db";
+import { portalDefaultsForTask } from "./portalDefaults";
 import { respondClients } from "./respondClients";
 import { categories, seedTasks, teamMembers } from "./respondTasks";
 import {
@@ -16,10 +17,13 @@ import {
   type TaskUpdatePayload,
 } from "./types";
 
-type TaskRow = Omit<Task, "dependencies" | "clientId" | "templateId"> & {
+type TaskRow = Omit<Task, "dependencies" | "clientId" | "templateId" | "portalVisible" | "portalActionRequired" | "portalConfigured"> & {
   clientId: string;
   templateId: string;
   dependencies: string;
+  portalVisible: number;
+  portalActionRequired: number;
+  portalConfigured: number;
 };
 
 type ClientRow = Omit<RespondClient, "timeline" | "attention"> & {
@@ -35,6 +39,8 @@ type ClientCountRow = {
 };
 
 const defaultClientId = respondClients[0]?.id ?? "northlane-health";
+const taskSelectFields =
+  "id, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -48,6 +54,7 @@ const validClientPhases = new Set<ClientDeliveryPhase>([
 ]);
 const validClientHealth = new Set<ClientHealth>(["on_track", "at_risk", "off_track", "on_hold"]);
 const validClientRisk = new Set<ClientRisk>(["low", "medium", "high"]);
+let storageReadyPromise: Promise<void> | null = null;
 
 function parseJsonArray<T>(value: string | null | undefined, guard: (item: unknown) => item is T) {
   if (!value) {
@@ -105,6 +112,9 @@ function fromRow(row: TaskRow): Task {
   return {
     ...row,
     dependencies: parseDependencies(row.dependencies),
+    portalVisible: Boolean(row.portalVisible),
+    portalActionRequired: Boolean(row.portalActionRequired),
+    portalConfigured: Boolean(row.portalConfigured),
   };
 }
 
@@ -294,6 +304,26 @@ async function ensureTaskColumns() {
   if (!columns.has("template_id")) {
     await d1.prepare("ALTER TABLE tasks ADD COLUMN template_id TEXT NOT NULL DEFAULT ''").run();
   }
+
+  if (!columns.has("portal_visible")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_visible INTEGER NOT NULL DEFAULT 0").run();
+  }
+
+  if (!columns.has("portal_title")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_title TEXT NOT NULL DEFAULT ''").run();
+  }
+
+  if (!columns.has("portal_note")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_note TEXT NOT NULL DEFAULT ''").run();
+  }
+
+  if (!columns.has("portal_action_required")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_action_required INTEGER NOT NULL DEFAULT 0").run();
+  }
+
+  if (!columns.has("portal_configured")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_configured INTEGER NOT NULL DEFAULT 0").run();
+  }
 }
 
 async function ensureClientColumns() {
@@ -404,26 +434,68 @@ async function seedTemplateTasksForClient(clientId: string, useTemplateState: bo
             priority,
             dependencies,
             notes,
+            portal_visible,
+            portal_title,
+            portal_note,
+            portal_action_required,
+            portal_configured,
             sort_order
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
-        .bind(
-          scopedTaskId(clientId, item.id),
-          clientId,
-          item.id,
-          item.title,
-          item.category,
-          item.phase,
-          useTemplateState ? item.status : "queued",
-          item.assignee,
-          item.dueWindow,
-          item.priority,
-          JSON.stringify(item.dependencies.map((dependencyId) => scopedTaskId(clientId, dependencyId))),
-          useTemplateState ? item.notes : "",
-          item.sortOrder
-        )
+        .bind(...taskInsertValues(clientId, item, useTemplateState))
     )
   );
+}
+
+function taskInsertValues(clientId: string, item: Task, useTemplateState: boolean) {
+  const portalDefaults = portalDefaultsForTask(item);
+
+  return [
+    scopedTaskId(clientId, item.id),
+    clientId,
+    item.id,
+    item.title,
+    item.category,
+    item.phase,
+    useTemplateState ? item.status : "queued",
+    item.assignee,
+    item.dueWindow,
+    item.priority,
+    JSON.stringify(item.dependencies.map((dependencyId) => scopedTaskId(clientId, dependencyId))),
+    useTemplateState ? item.notes : "",
+    item.portalVisible ? 1 : portalDefaults.portalVisible ? 1 : 0,
+    item.portalTitle || portalDefaults.portalTitle,
+    item.portalNote || portalDefaults.portalNote,
+    item.portalActionRequired ? 1 : portalDefaults.portalActionRequired ? 1 : 0,
+    item.portalConfigured ? 1 : 0,
+    item.sortOrder,
+  ];
+}
+
+async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string) {
+  const d1 = getD1();
+  const result = clientId
+    ? await d1
+        .prepare(
+          "SELECT id, title, category FROM tasks WHERE portal_configured = 0 AND portal_visible = 0 AND portal_title = '' AND portal_note = '' AND portal_action_required = 0 AND client_id = ?"
+        )
+        .bind(clientId)
+        .all<Pick<Task, "id" | "title" | "category">>()
+    : await d1
+        .prepare(
+          "SELECT id, title, category FROM tasks WHERE portal_configured = 0 AND portal_visible = 0 AND portal_title = '' AND portal_note = '' AND portal_action_required = 0"
+        )
+        .all<Pick<Task, "id" | "title" | "category">>();
+
+  for (const task of result.results ?? []) {
+    const defaults = portalDefaultsForTask(task);
+    await d1
+      .prepare(
+        "UPDATE tasks SET portal_visible = ?, portal_title = ?, portal_note = ?, portal_action_required = ? WHERE id = ? AND portal_configured = 0"
+      )
+      .bind(defaults.portalVisible ? 1 : 0, defaults.portalTitle, defaults.portalNote, defaults.portalActionRequired ? 1 : 0, task.id)
+      .run();
+  }
 }
 
 async function seedTaskWorkspaces() {
@@ -434,7 +506,7 @@ async function seedTaskWorkspaces() {
   }
 }
 
-export async function ensureTaskStorage() {
+async function prepareTaskStorage() {
   const d1 = getD1();
 
   await d1.batch([
@@ -478,6 +550,11 @@ export async function ensureTaskStorage() {
         priority TEXT NOT NULL DEFAULT 'normal',
         dependencies TEXT NOT NULL DEFAULT '[]',
         notes TEXT NOT NULL DEFAULT '',
+        portal_visible INTEGER NOT NULL DEFAULT 0,
+        portal_title TEXT NOT NULL DEFAULT '',
+        portal_note TEXT NOT NULL DEFAULT '',
+        portal_action_required INTEGER NOT NULL DEFAULT 0,
+        portal_configured INTEGER NOT NULL DEFAULT 0,
         sort_order INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -495,6 +572,7 @@ export async function ensureTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_client_idx ON tasks (client_id)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_client_status_idx ON tasks (client_id, status)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_client_template_idx ON tasks (client_id, template_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS tasks_client_portal_idx ON tasks (client_id, portal_visible)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_category_idx ON tasks (category)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_assignee_idx ON tasks (assignee)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_sort_order_idx ON tasks (sort_order)"),
@@ -504,6 +582,16 @@ export async function ensureTaskStorage() {
 
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
+  await applyPortalDefaultsToUnconfiguredTasks();
+}
+
+export async function ensureTaskStorage() {
+  storageReadyPromise ??= prepareTaskStorage().catch((error) => {
+    storageReadyPromise = null;
+    throw error;
+  });
+
+  return storageReadyPromise;
 }
 
 function applyClientCounts(client: RespondClient, counts: ClientCountRow | undefined): RespondClient {
@@ -555,15 +643,14 @@ async function requireClient(clientId: string) {
   }
 
   await seedTemplateTasksForClient(clientId, false);
+  await applyPortalDefaultsToUnconfiguredTasks(clientId);
   return client.id;
 }
 
 export async function listTasks(clientId = defaultClientId) {
   const scopedClientId = await requireClient(clientId === "all" ? defaultClientId : clientId);
   const result = await getD1()
-    .prepare(
-      "SELECT id, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt FROM tasks WHERE client_id = ? ORDER BY sort_order ASC"
-    )
+    .prepare(`SELECT ${taskSelectFields} FROM tasks WHERE client_id = ? ORDER BY sort_order ASC`)
     .bind(scopedClientId)
     .all<TaskRow>();
 
@@ -604,8 +691,13 @@ export async function createTask(clientId: string | undefined, payload: Partial<
         priority,
         dependencies,
         notes,
+        portal_visible,
+        portal_title,
+        portal_note,
+        portal_action_required,
+        portal_configured,
         sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       id,
@@ -620,6 +712,11 @@ export async function createTask(clientId: string | undefined, payload: Partial<
       priority,
       JSON.stringify(payload.dependencies ?? []),
       payload.notes?.trim() ?? "",
+      payload.portalVisible ? 1 : 0,
+      payload.portalTitle?.trim() ?? "",
+      payload.portalNote?.trim() ?? "",
+      payload.portalActionRequired ? 1 : 0,
+      payload.portalVisible || payload.portalTitle || payload.portalNote || payload.portalActionRequired ? 1 : 0,
       nextOrder?.nextOrder ?? seedTasks.length + 1
     )
     .run();
@@ -630,9 +727,7 @@ export async function createTask(clientId: string | undefined, payload: Partial<
 export async function getTask(id: string) {
   await ensureTaskStorage();
   const row = await getD1()
-    .prepare(
-      "SELECT id, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt FROM tasks WHERE id = ?"
-    )
+    .prepare(`SELECT ${taskSelectFields} FROM tasks WHERE id = ?`)
     .bind(id)
     .first<TaskRow>();
 
@@ -648,6 +743,7 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   const d1 = getD1();
   const updates: string[] = [];
   const values: unknown[] = [];
+  let touchedPortalFields = false;
 
   if (typeof payload.title === "string") {
     const title = payload.title.trim();
@@ -702,8 +798,37 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
     values.push(payload.notes.trim());
   }
 
+  if (typeof payload.portalVisible === "boolean") {
+    updates.push("portal_visible = ?");
+    values.push(payload.portalVisible ? 1 : 0);
+    touchedPortalFields = true;
+  }
+
+  if (typeof payload.portalTitle === "string") {
+    updates.push("portal_title = ?");
+    values.push(payload.portalTitle.trim());
+    touchedPortalFields = true;
+  }
+
+  if (typeof payload.portalNote === "string") {
+    updates.push("portal_note = ?");
+    values.push(payload.portalNote.trim());
+    touchedPortalFields = true;
+  }
+
+  if (typeof payload.portalActionRequired === "boolean") {
+    updates.push("portal_action_required = ?");
+    values.push(payload.portalActionRequired ? 1 : 0);
+    touchedPortalFields = true;
+  }
+
   if (updates.length === 0) {
     return getTask(id);
+  }
+
+  if (touchedPortalFields) {
+    updates.push("portal_configured = ?");
+    values.push(1);
   }
 
   updates.push("updated_at = CURRENT_TIMESTAMP");
@@ -768,6 +893,7 @@ export async function createClient(payload: ClientCreatePayload) {
     .run();
 
   await seedTemplateTasksForClient(client.id, false);
+  await applyPortalDefaultsToUnconfiguredTasks(client.id);
 
   return {
     client,

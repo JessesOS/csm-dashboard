@@ -488,6 +488,7 @@ function TaskCard({
           <Icon name="link" />
           {dependencyState.dependencies.length}
         </span>
+        {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
       </div>
       <div className="task-actions" onClick={(event) => event.stopPropagation()}>
         {isDone ? (
@@ -1142,6 +1143,11 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       priority: "normal",
       dependencies: [],
       notes: "",
+      portalVisible: false,
+      portalTitle: "",
+      portalNote: "",
+      portalActionRequired: false,
+      portalConfigured: false,
       sortOrder: tasks.length + 1,
     };
 
@@ -1536,6 +1542,54 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
               Notes
               <textarea aria-label="Notes" value={selectedTask.notes} onChange={(event) => updateTask(selectedTask.id, { notes: event.target.value })} placeholder="Add context for the team" />
             </label>
+
+            <div className="portal-editor">
+              <div className="inspector-section-title">
+                <Icon name="link" />
+                Client portal
+              </div>
+              <label className="portal-toggle">
+                <input
+                  type="checkbox"
+                  checked={selectedTask.portalVisible}
+                  onChange={(event) => updateTask(selectedTask.id, { portalVisible: event.target.checked })}
+                />
+                <span>
+                  Show in portal
+                  <small>Make this item visible on the private client link.</small>
+                </span>
+              </label>
+              <label className="portal-toggle">
+                <input
+                  type="checkbox"
+                  checked={selectedTask.portalActionRequired}
+                  disabled={!selectedTask.portalVisible}
+                  onChange={(event) => updateTask(selectedTask.id, { portalActionRequired: event.target.checked })}
+                />
+                <span>
+                  Client action required
+                  <small>Place it in the client action list.</small>
+                </span>
+              </label>
+              <label>
+                Client-facing title
+                <input
+                  aria-label="Client-facing title"
+                  value={selectedTask.portalTitle}
+                  onChange={(event) => updateTask(selectedTask.id, { portalTitle: event.target.value })}
+                  placeholder={selectedTask.title}
+                />
+              </label>
+              <label>
+                Client-facing note
+                <textarea
+                  aria-label="Client-facing note"
+                  value={selectedTask.portalNote}
+                  onChange={(event) => updateTask(selectedTask.id, { portalNote: event.target.value })}
+                  placeholder="Add a short note the client will see"
+                />
+              </label>
+            </div>
 
             <div className="dependency-list">
               <div className="inspector-section-title">

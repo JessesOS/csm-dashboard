@@ -46,6 +46,11 @@ export interface Task {
   priority: Priority;
   dependencies: string[];
   notes: string;
+  portalVisible: boolean;
+  portalTitle: string;
+  portalNote: string;
+  portalActionRequired: boolean;
+  portalConfigured: boolean;
   sortOrder: number;
   createdAt?: string;
   updatedAt?: string;
@@ -61,6 +66,10 @@ export interface TaskUpdatePayload {
   priority?: Priority;
   dependencies?: string[];
   notes?: string;
+  portalVisible?: boolean;
+  portalTitle?: string;
+  portalNote?: string;
+  portalActionRequired?: boolean;
 }
 
 export type ClientHealth = "on_track" | "at_risk" | "off_track" | "on_hold";

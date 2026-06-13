@@ -1759,7 +1759,8 @@ button:disabled {
 }
 
 .mini-meta,
-.dependency-chip {
+.dependency-chip,
+.portal-chip {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -1775,6 +1776,12 @@ button:disabled {
 .dependency-open {
   background: #fff4dd;
   color: #9a5b00;
+}
+
+.portal-chip {
+  border: 1px solid rgba(36, 94, 232, 0.18);
+  background: #edf4ff;
+  color: #1d4ed8;
 }
 
 .task-actions {
@@ -1974,6 +1981,46 @@ progress::-webkit-progress-value {
   gap: 8px;
   border-top: 1px solid var(--border);
   padding-top: 14px;
+}
+
+.portal-editor {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.portal-toggle {
+  display: grid !important;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px !important;
+  color: #263445 !important;
+}
+
+.portal-toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #245ee8;
+}
+
+.portal-toggle span,
+.portal-toggle small {
+  display: block;
+}
+
+.portal-toggle span {
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.portal-toggle small {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 .inspector-section-title {
@@ -2213,7 +2260,8 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .mini-meta,
-.dashboard-shell-dark .dependency-chip {
+.dashboard-shell-dark .dependency-chip,
+.dashboard-shell-dark .portal-chip {
   background: rgba(148, 163, 184, 0.14);
   color: #a8b8ca;
 }
@@ -2221,6 +2269,12 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .dependency-open {
   background: rgba(245, 178, 44, 0.14);
   color: #f5b22c;
+}
+
+.dashboard-shell-dark .portal-chip {
+  border-color: rgba(193, 255, 36, 0.28);
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
 }
 
 .dashboard-shell-dark .task-actions button {
@@ -2277,6 +2331,18 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .inspector label {
   color: #a8b8ca;
+}
+
+.dashboard-shell-dark .portal-toggle {
+  color: #f8fbff !important;
+}
+
+.dashboard-shell-dark .portal-toggle input {
+  accent-color: #c9f82b;
+}
+
+.dashboard-shell-dark .portal-toggle small {
+  color: #8fa2b7;
 }
 
 .dashboard-shell-dark .inspector-footer {

@@ -59,6 +59,11 @@ function task(
     priority: options.priority ?? "normal",
     dependencies: options.dependencies ?? [],
     notes: options.notes ?? "",
+    portalVisible: options.portalVisible ?? false,
+    portalTitle: options.portalTitle ?? "",
+    portalNote: options.portalNote ?? "",
+    portalActionRequired: options.portalActionRequired ?? false,
+    portalConfigured: options.portalConfigured ?? false,
     sortOrder: idNumber,
   };
 }
