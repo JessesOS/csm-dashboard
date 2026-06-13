@@ -187,6 +187,10 @@ function slugify(value: string) {
   return slug || `client-${crypto.randomUUID().slice(0, 8)}`;
 }
 
+function makePortalToken() {
+  return `rsp${crypto.randomUUID().replace(/-/g, "")}`;
+}
+
 function clientCode(name: string) {
   const letters = name
     .split(/[\s-]+/)
@@ -208,6 +212,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string): RespondClient
 
   return {
     id,
+    portalToken: makePortalToken(),
     name,
     code: clientCode(name),
     industry,
@@ -251,6 +256,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string): RespondClient
 function clientInsertValues(client: RespondClient) {
   return [
     client.id,
+    client.portalToken ?? makePortalToken(),
     client.name,
     client.code,
     client.industry,
@@ -290,6 +296,24 @@ async function ensureTaskColumns() {
   }
 }
 
+async function ensureClientColumns() {
+  const d1 = getD1();
+  const columns = await tableColumns("clients");
+
+  if (!columns.has("portal_token")) {
+    await d1.prepare("ALTER TABLE clients ADD COLUMN portal_token TEXT NOT NULL DEFAULT ''").run();
+  }
+}
+
+async function ensureClientPortalTokens() {
+  const d1 = getD1();
+  const rows = await d1.prepare("SELECT id FROM clients WHERE portal_token = ''").all<{ id: string }>();
+
+  for (const row of rows.results ?? []) {
+    await d1.prepare("UPDATE clients SET portal_token = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(makePortalToken(), row.id).run();
+  }
+}
+
 async function seedClients() {
   const d1 = getD1();
 
@@ -299,6 +323,7 @@ async function seedClients() {
         .prepare(`
           INSERT OR IGNORE INTO clients (
             id,
+            portal_token,
             name,
             code,
             industry,
@@ -317,7 +342,7 @@ async function seedClients() {
             completed_tasks,
             timeline,
             attention
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...clientInsertValues(client))
     )
@@ -416,6 +441,7 @@ export async function ensureTaskStorage() {
     d1.prepare(`
       CREATE TABLE IF NOT EXISTS clients (
         id TEXT PRIMARY KEY,
+        portal_token TEXT NOT NULL DEFAULT '',
         name TEXT NOT NULL,
         code TEXT NOT NULL,
         industry TEXT NOT NULL DEFAULT '',
@@ -460,6 +486,10 @@ export async function ensureTaskStorage() {
   ]);
 
   await ensureTaskColumns();
+  await ensureClientColumns();
+
+  await seedClients();
+  await ensureClientPortalTokens();
 
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_client_idx ON tasks (client_id)"),
@@ -469,9 +499,9 @@ export async function ensureTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_assignee_idx ON tasks (assignee)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_sort_order_idx ON tasks (sort_order)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_name_idx ON clients (name)"),
+    d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS clients_portal_token_idx ON clients (portal_token)"),
   ]);
 
-  await seedClients();
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
 }
@@ -502,7 +532,7 @@ export async function listClients() {
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(
-        "SELECT id, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients ORDER BY created_at ASC"
+        "SELECT id, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients ORDER BY created_at ASC"
       )
       .all<ClientRow>(),
     d1
@@ -713,6 +743,7 @@ export async function createClient(payload: ClientCreatePayload) {
     .prepare(`
       INSERT INTO clients (
         id,
+        portal_token,
         name,
         code,
         industry,
@@ -731,12 +762,40 @@ export async function createClient(payload: ClientCreatePayload) {
         completed_tasks,
         timeline,
         attention
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(...clientInsertValues(client))
     .run();
 
   await seedTemplateTasksForClient(client.id, false);
+
+  return {
+    client,
+    tasks: await listTasks(client.id),
+  };
+}
+
+export async function getPortalWorkspace(token: string) {
+  const portalToken = token.trim();
+
+  if (!/^[a-zA-Z0-9_-]{20,80}$/.test(portalToken)) {
+    throw new Error("Portal not found.");
+  }
+
+  await ensureTaskStorage();
+
+  const row = await getD1()
+    .prepare(
+      "SELECT id, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE portal_token = ?"
+    )
+    .bind(portalToken)
+    .first<ClientRow>();
+
+  if (!row) {
+    throw new Error("Portal not found.");
+  }
+
+  const client = fromClientRow(row);
 
   return {
     client,

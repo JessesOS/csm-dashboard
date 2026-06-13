@@ -97,6 +97,7 @@ export interface ClientAttentionItem {
 
 export interface RespondClient {
   id: string;
+  portalToken?: string;
   name: string;
   code: string;
   industry: string;

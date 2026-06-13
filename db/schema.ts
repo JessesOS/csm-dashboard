@@ -21,6 +21,7 @@ export const tasks = sqliteTable("tasks", {
 
 export const clients = sqliteTable("clients", {
   id: text("id").primaryKey(),
+  portalToken: text("portal_token").notNull().default(""),
   name: text("name").notNull(),
   code: text("code").notNull(),
   industry: text("industry").notNull().default(""),

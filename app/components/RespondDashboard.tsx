@@ -737,6 +737,12 @@ function MissionControl({
               <Icon name="play" />
               Start walkthrough
             </button>
+            {selectedClient?.portalToken ? (
+              <a className="mission-secondary portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
+                <Icon name="link" />
+                Client portal
+              </a>
+            ) : null}
             <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
               <Icon name="plus" />
               New client
@@ -1328,6 +1334,12 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
               <Icon name="plus" />
               New client
             </button>
+            {selectedClient?.portalToken ? (
+              <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
+                <Icon name="link" />
+                Client portal
+              </a>
+            ) : null}
             <div className="search-box">
               <Icon name="search" />
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks, owners, categories" />
