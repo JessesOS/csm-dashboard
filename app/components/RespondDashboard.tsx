@@ -1677,7 +1677,7 @@ export default function RespondDashboard({
     () => [...filteredTasks].sort((a, b) => compareTasksByNavigationOrder(a, b, taskNavigationOrder)),
     [filteredTasks, taskNavigationOrder]
   );
-  const canImportGhlClient = activeEnvironment === "live" && activeProduct === "respond";
+  const canImportGhlClient = activeEnvironment === "live";
 
   const metrics = useMemo(() => {
     const completed = tasks.filter((task) => task.status === "complete").length;
@@ -1867,7 +1867,7 @@ export default function RespondDashboard({
       return;
     }
 
-    const selector = window.prompt("Enter the exact GHL client, contact, or opportunity name/ID to import.");
+    const selector = window.prompt(`Enter the exact GHL client, contact, or opportunity name/ID to import into ${currentProduct.shortLabel}.`);
 
     if (!selector?.trim()) {
       return;
@@ -1879,7 +1879,7 @@ export default function RespondDashboard({
       const response = await fetch("/api/clients/import-ghl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selector: selector.trim() }),
+        body: JSON.stringify({ selector: selector.trim(), product: activeProduct }),
       });
       const data = await response.json();
       if (!response.ok) {

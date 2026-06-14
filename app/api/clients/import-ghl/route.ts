@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
-import { specifiedGhlRespondClientImport } from "../../../../lib/ghlImport";
+import { specifiedGhlClientImport } from "../../../../lib/ghlImport";
+import { normalizeProduct } from "../../../../lib/productWorkspaces";
 import { createClient, routeErrorMessage } from "../../../../lib/taskStore";
 
 export const dynamic = "force-dynamic";
 
 const importEnvironment = "live";
-const importProduct = "respond";
 
 export async function POST(request: Request) {
   try {
     const payload = await request.json().catch(() => ({}));
     const selector = typeof payload.selector === "string" ? payload.selector.trim() : "";
-    const ghlImport = await specifiedGhlRespondClientImport(selector);
+    const importProduct = normalizeProduct(typeof payload.product === "string" ? payload.product : "respond");
+    const ghlImport = await specifiedGhlClientImport(selector, importProduct);
     const result = await createClient({
       ...ghlImport.payload,
       environment: importEnvironment,

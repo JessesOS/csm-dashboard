@@ -1,5 +1,5 @@
 import { env } from "cloudflare:workers";
-import type { ClientCreatePayload } from "./types";
+import type { ClientCreatePayload, ProductKey } from "./types";
 
 type GhlRecord = Record<string, unknown>;
 
@@ -43,7 +43,7 @@ const DEFAULT_GHL_API_BASE_URL = "https://services.leadconnectorhq.com";
 const DEFAULT_GHL_API_VERSION = "2021-07-28";
 const ACTIVE_CLIENT_PIPELINE = "active clients";
 
-export async function specifiedGhlRespondClientImport(selectorInput: string): Promise<GhlClientImport> {
+export async function specifiedGhlClientImport(selectorInput: string, product: ProductKey): Promise<GhlClientImport> {
   const selector = selectorInput.trim();
 
   if (!selector) {
@@ -87,7 +87,7 @@ export async function specifiedGhlRespondClientImport(selectorInput: string): Pr
   return {
     payload: {
       environment: "live",
-      product: "respond",
+      product,
       name: clientName,
       companyName: cleanCompanyName && normalizeLookup(cleanCompanyName) !== normalizeLookup(clientName) ? cleanCompanyName : undefined,
       industry,
