@@ -398,6 +398,10 @@ function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange
   );
 }
 
+function RespondMark({ className }: { className: string }) {
+  return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
+}
+
 function ProductSwitcher({
   activeProduct,
   onProductChange,
@@ -417,7 +421,7 @@ function ProductSwitcher({
             onClick={() => onProductChange(workspace.key)}
             title={workspace.description}
           >
-            <strong>{workspace.brandMark}</strong>
+            <RespondMark className="product-switcher-mark" />
             <span>{workspace.clientLabel}</span>
           </button>
         ))}
@@ -1220,7 +1224,7 @@ function MissionControl({
     <main className={`mission-shell mission-shell-${theme}`} data-tour-target={tourTarget}>
       <aside className="mission-side">
         <div className="mission-brand">
-          <span className="mission-brand-mark">{product.brandMark}</span>
+          <RespondMark className="mission-brand-mark" />
           <div>
             <strong>{product.label} CSM</strong>
             <span>Delivery command center</span>
@@ -2052,7 +2056,7 @@ export default function RespondDashboard({
     <main className={`dashboard-shell dashboard-shell-${theme}`} data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}>
       <aside className="side-rail">
         <div className="brand">
-          <span className="brand-mark">{currentProduct.brandMark}</span>
+          <RespondMark className="brand-mark" />
           <div>
             <strong>{currentProduct.label} CSM</strong>
             <span>Onboarding & delivery</span>

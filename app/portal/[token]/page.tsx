@@ -79,7 +79,7 @@ function PortalUnavailable() {
   return (
     <main className="client-portal-shell client-portal-unavailable">
       <section className="portal-unavailable-panel">
-        <span className="portal-brand-mark">R</span>
+        <RespondMark className="portal-brand-mark" />
         <h1>Portal unavailable</h1>
         <p>This private project link is missing, expired, or not ready yet. Please ask your CSM contact for a fresh portal link.</p>
       </section>
@@ -96,6 +96,10 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
   }
 
   return <ClientPortalView {...workspace} />;
+}
+
+function RespondMark({ className }: { className: string }) {
+  return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
 }
 
 function ClientPortalView({ client, tasks }: PortalWorkspace) {
@@ -128,7 +132,7 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
       <header className="client-portal-hero">
         <nav className="portal-topline" aria-label="Portal header">
           <div className="portal-brand">
-            <span className="portal-brand-mark">{product.brandMark}</span>
+            <RespondMark className="portal-brand-mark" />
             <div>
               <strong>{product.label} CSM</strong>
               <span>Private project portal</span>

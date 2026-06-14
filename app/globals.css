@@ -123,16 +123,20 @@ button:disabled {
   color: #f7ffe4;
 }
 
-.product-switcher button strong {
-  display: grid;
-  place-items: center;
+.product-switcher-mark {
+  display: block;
   width: 28px;
   height: 28px;
-  border-radius: 8px;
-  background: #c9f82b;
-  color: #07121f;
-  font-size: 13px;
-  font-weight: 900;
+  border: 1px solid rgba(193, 255, 36, 0.44);
+  border-radius: 50%;
+  background-color: #102333;
+}
+
+.respond-mark-image {
+  background-image: url("/respond-mark.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .product-switcher button span {
@@ -370,15 +374,12 @@ button:disabled {
 }
 
 .mission-brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 38px;
   height: 38px;
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background: #102333;
-  color: #c9f82b;
-  font-weight: 900;
+  background-color: #102333;
 }
 
 .mission-brand strong,
@@ -1308,9 +1309,8 @@ button:disabled {
 }
 
 .mission-shell-light .mission-brand-mark {
-  border-color: transparent;
-  background: #172033;
-  color: #ffffff;
+  border-color: rgba(36, 94, 232, 0.18);
+  background-color: #ffffff;
 }
 
 .mission-shell-light .mission-brand strong,
@@ -1404,10 +1404,10 @@ button:disabled {
   color: #10213d;
 }
 
-.mission-shell-light .product-switcher button strong,
-.dashboard-shell-light .product-switcher button strong {
-  background: #245ee8;
-  color: #ffffff;
+.mission-shell-light .product-switcher-mark,
+.dashboard-shell-light .product-switcher-mark {
+  border-color: rgba(36, 94, 232, 0.22);
+  background-color: #ffffff;
 }
 
 .mission-shell-light .environment-switcher,
@@ -1715,15 +1715,12 @@ button:disabled {
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 38px;
   height: 38px;
-  border-radius: 8px;
-  background: var(--ink);
-  color: #ffffff;
-  font-size: 17px;
-  font-weight: 800;
+  border: 1px solid rgba(36, 94, 232, 0.18);
+  border-radius: 50%;
+  background-color: #ffffff;
 }
 
 .brand strong,
@@ -2755,8 +2752,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .brand-mark {
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background: #102333;
-  color: #c9f82b;
+  background-color: #102333;
 }
 
 .dashboard-shell-dark .brand strong,
@@ -3123,15 +3119,12 @@ progress::-webkit-progress-value {
 }
 
 .portal-brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 38px;
   height: 38px;
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background: #102333;
-  color: #c9f82b;
-  font-weight: 900;
+  background-color: #102333;
 }
 
 .portal-brand strong,
