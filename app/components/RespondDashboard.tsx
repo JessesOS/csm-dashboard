@@ -411,17 +411,24 @@ function AttachmentLensSettings({
         <span>Settings</span>
       </div>
       <div className="attachment-lenses" aria-label="Attachment filters">
-        <button type="button" className={attachmentFilter === "all" ? "active" : ""} onClick={() => onAttachmentFilterChange("all")}>
-          <span>All cards</span>
-        </button>
-        <button type="button" className={attachmentFilter === "loom" ? "active" : ""} onClick={() => onAttachmentFilterChange("loom")}>
+        <button
+          type="button"
+          className={attachmentFilter === "loom" ? "active" : ""}
+          aria-pressed={attachmentFilter === "loom"}
+          onClick={() => onAttachmentFilterChange(attachmentFilter === "loom" ? "all" : "loom")}
+        >
           <span>
             <Icon name="video" />
             Looms
           </span>
           <strong>{attachmentCounts.looms}</strong>
         </button>
-        <button type="button" className={attachmentFilter === "forms" ? "active" : ""} onClick={() => onAttachmentFilterChange("forms")}>
+        <button
+          type="button"
+          className={attachmentFilter === "forms" ? "active" : ""}
+          aria-pressed={attachmentFilter === "forms"}
+          onClick={() => onAttachmentFilterChange(attachmentFilter === "forms" ? "all" : "forms")}
+        >
           <span>
             <Icon name="link" />
             Forms
