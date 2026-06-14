@@ -58,6 +58,8 @@ export interface Task {
   portalTitle: string;
   portalNote: string;
   portalActionRequired: boolean;
+  portalActionUrl?: string;
+  portalActionLabel?: string;
   portalConfigured: boolean;
   sortOrder: number;
   createdAt?: string;
@@ -80,6 +82,8 @@ export interface TaskUpdatePayload {
   portalTitle?: string;
   portalNote?: string;
   portalActionRequired?: boolean;
+  portalActionUrl?: string;
+  portalActionLabel?: string;
 }
 
 export type ClientHealth = "on_track" | "at_risk" | "off_track" | "on_hold";

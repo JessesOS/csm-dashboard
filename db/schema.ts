@@ -22,6 +22,8 @@ export const tasks = sqliteTable("tasks", {
   portalTitle: text("portal_title").notNull().default(""),
   portalNote: text("portal_note").notNull().default(""),
   portalActionRequired: integer("portal_action_required").notNull().default(0),
+  portalActionUrl: text("portal_action_url").notNull().default(""),
+  portalActionLabel: text("portal_action_label").notNull().default(""),
   portalConfigured: integer("portal_configured").notNull().default(0),
   sortOrder: integer("sort_order").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),

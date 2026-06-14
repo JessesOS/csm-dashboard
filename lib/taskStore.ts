@@ -30,7 +30,14 @@ import {
 
 type TaskRow = Omit<
   Task,
-  "environment" | "product" | "dependencies" | "clientId" | "templateId" | "portalVisible" | "portalActionRequired" | "portalConfigured"
+  | "environment"
+  | "product"
+  | "dependencies"
+  | "clientId"
+  | "templateId"
+  | "portalVisible"
+  | "portalActionRequired"
+  | "portalConfigured"
 > & {
   environment: string;
   product: string;
@@ -65,11 +72,11 @@ type MetaRow = {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-14-loom-instructions";
+const currentStorageVersion = "2026-06-14-portal-action-links";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
-  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
   "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const validStatuses = new Set<string>(taskStatuses);
@@ -149,6 +156,8 @@ function fromRow(row: TaskRow): Task {
     loomTitle: row.loomTitle ?? "",
     portalVisible: Boolean(row.portalVisible),
     portalActionRequired: Boolean(row.portalActionRequired),
+    portalActionUrl: row.portalActionUrl ?? "",
+    portalActionLabel: row.portalActionLabel ?? "",
     portalConfigured: Boolean(row.portalConfigured),
   };
 }
@@ -362,6 +371,8 @@ async function seedWorkspaceShapeReady() {
     "portal_title",
     "portal_note",
     "portal_action_required",
+    "portal_action_url",
+    "portal_action_label",
     "portal_configured",
   ];
   const requiredClientColumns = ["portal_token", "environment", "product", "company_name"];
@@ -475,6 +486,14 @@ async function ensureTaskColumns() {
 
   if (!columns.has("portal_action_required")) {
     await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_action_required INTEGER NOT NULL DEFAULT 0").run();
+  }
+
+  if (!columns.has("portal_action_url")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_action_url TEXT NOT NULL DEFAULT ''").run();
+  }
+
+  if (!columns.has("portal_action_label")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_action_label TEXT NOT NULL DEFAULT ''").run();
   }
 
   if (!columns.has("portal_configured")) {
@@ -630,9 +649,11 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
             portal_title,
             portal_note,
             portal_action_required,
+            portal_action_url,
+            portal_action_label,
             portal_configured,
             sort_order
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
@@ -663,6 +684,8 @@ function taskInsertValues(clientId: string, environment: EnvironmentKey, product
     item.portalTitle || portalDefaults.portalTitle,
     item.portalNote || portalDefaults.portalNote,
     item.portalActionRequired ? 1 : portalDefaults.portalActionRequired ? 1 : 0,
+    item.portalActionUrl ?? "",
+    item.portalActionLabel ?? "",
     1,
     item.sortOrder,
   ];
@@ -796,6 +819,8 @@ async function prepareTaskStorage() {
         portal_title TEXT NOT NULL DEFAULT '',
         portal_note TEXT NOT NULL DEFAULT '',
         portal_action_required INTEGER NOT NULL DEFAULT 0,
+        portal_action_url TEXT NOT NULL DEFAULT '',
+        portal_action_label TEXT NOT NULL DEFAULT '',
         portal_configured INTEGER NOT NULL DEFAULT 0,
         sort_order INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -996,9 +1021,11 @@ export async function createTask(
         portal_title,
         portal_note,
         portal_action_required,
+        portal_action_url,
+        portal_action_label,
         portal_configured,
         sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       id,
@@ -1021,7 +1048,9 @@ export async function createTask(
       payload.portalTitle?.trim() ?? "",
       payload.portalNote?.trim() ?? "",
       payload.portalActionRequired ? 1 : 0,
-      payload.portalVisible || payload.portalTitle || payload.portalNote || payload.portalActionRequired ? 1 : 0,
+      payload.portalActionUrl?.trim() ?? "",
+      payload.portalActionLabel?.trim() ?? "",
+      payload.portalVisible || payload.portalTitle || payload.portalNote || payload.portalActionRequired || payload.portalActionUrl ? 1 : 0,
       nextOrder?.nextOrder ?? templateTasks.length + 1
     )
     .run();
@@ -1143,6 +1172,29 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   if (typeof payload.portalActionRequired === "boolean") {
     updates.push("portal_action_required = ?");
     values.push(payload.portalActionRequired ? 1 : 0);
+    touchedPortalFields = true;
+  }
+
+  if (typeof payload.portalActionUrl === "string") {
+    const portalActionUrl = payload.portalActionUrl.trim();
+    updates.push("portal_action_url = ?");
+    values.push(portalActionUrl);
+    touchedPortalFields = true;
+
+    if (portalActionUrl && typeof payload.portalVisible !== "boolean") {
+      updates.push("portal_visible = ?");
+      values.push(1);
+    }
+
+    if (portalActionUrl && typeof payload.portalActionRequired !== "boolean") {
+      updates.push("portal_action_required = ?");
+      values.push(1);
+    }
+  }
+
+  if (typeof payload.portalActionLabel === "string") {
+    updates.push("portal_action_label = ?");
+    values.push(payload.portalActionLabel.trim());
     touchedPortalFields = true;
   }
 
@@ -1393,13 +1445,35 @@ async function mergeDuplicateClientTasks(canonicalClientId: string, duplicateCli
       values.push(duplicateRow.loomTitle);
     }
 
-    if (!existingRow.portalConfigured && duplicateRow.portalConfigured) {
-      updates.push("portal_visible = ?", "portal_title = ?", "portal_note = ?", "portal_action_required = ?", "portal_configured = ?");
+    const willCopyPortalConfiguration = !existingRow.portalConfigured && duplicateRow.portalConfigured;
+
+    if (!willCopyPortalConfiguration && !existingRow.portalActionUrl && duplicateRow.portalActionUrl) {
+      updates.push("portal_action_url = ?");
+      values.push(duplicateRow.portalActionUrl);
+    }
+
+    if (!willCopyPortalConfiguration && !existingRow.portalActionLabel && duplicateRow.portalActionLabel) {
+      updates.push("portal_action_label = ?");
+      values.push(duplicateRow.portalActionLabel);
+    }
+
+    if (willCopyPortalConfiguration) {
+      updates.push(
+        "portal_visible = ?",
+        "portal_title = ?",
+        "portal_note = ?",
+        "portal_action_required = ?",
+        "portal_action_url = ?",
+        "portal_action_label = ?",
+        "portal_configured = ?"
+      );
       values.push(
         duplicateRow.portalVisible ? 1 : 0,
         duplicateRow.portalTitle ?? "",
         duplicateRow.portalNote ?? "",
         duplicateRow.portalActionRequired ? 1 : 0,
+        duplicateRow.portalActionUrl ?? "",
+        duplicateRow.portalActionLabel ?? "",
         1
       );
     }

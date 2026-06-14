@@ -2562,7 +2562,10 @@ progress::-webkit-progress-value {
 
 .task-loom-trigger,
 .task-loom-open,
-.loom-watch-link {
+.task-portal-action-trigger,
+.task-portal-action-open,
+.loom-watch-link,
+.portal-action-preview-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -2574,7 +2577,8 @@ progress::-webkit-progress-value {
   text-decoration: none;
 }
 
-.task-loom-trigger {
+.task-loom-trigger,
+.task-portal-action-trigger {
   border: 1px solid var(--border);
   background: #f8fafc;
   color: #334155;
@@ -2586,6 +2590,14 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(36, 94, 232, 0.2);
   background: #edf4ff;
   color: #1d4ed8;
+}
+
+.task-portal-action-trigger.active,
+.task-portal-action-open,
+.portal-action-preview-link {
+  border: 1px solid rgba(5, 150, 105, 0.24);
+  background: #ecfdf5;
+  color: #047857;
 }
 
 .modal-close-button {
@@ -2673,7 +2685,8 @@ progress::-webkit-progress-value {
   line-height: 1.5;
 }
 
-.loom-editor {
+.loom-editor,
+.portal-action-editor {
   display: grid;
   gap: 12px;
   border: 1px solid var(--border);
@@ -2682,7 +2695,8 @@ progress::-webkit-progress-value {
   padding: 13px;
 }
 
-.loom-watch-link {
+.loom-watch-link,
+.portal-action-preview-link {
   width: fit-content;
   min-height: 32px;
 }
@@ -2952,7 +2966,8 @@ progress::-webkit-progress-value {
   color: #c9f82b;
 }
 
-.dashboard-shell-dark .task-loom-trigger {
+.dashboard-shell-dark .task-loom-trigger,
+.dashboard-shell-dark .task-portal-action-trigger {
   border-color: rgba(148, 163, 184, 0.18);
   background: #071827;
   color: #dce8f6;
@@ -2966,7 +2981,16 @@ progress::-webkit-progress-value {
   color: #2dd4bf;
 }
 
-.dashboard-shell-dark .loom-editor {
+.dashboard-shell-dark .task-portal-action-trigger.active,
+.dashboard-shell-dark .task-portal-action-open,
+.dashboard-shell-dark .portal-action-preview-link {
+  border-color: rgba(193, 255, 36, 0.34);
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .loom-editor,
+.dashboard-shell-dark .portal-action-editor {
   border-color: rgba(148, 163, 184, 0.18);
   background: #081b2d;
 }
@@ -3452,9 +3476,14 @@ progress::-webkit-progress-value {
 
 .portal-action-row {
   justify-content: space-between;
+  align-items: flex-start;
   gap: 14px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
   padding: 14px 18px;
+}
+
+.portal-action-row > div {
+  min-width: 0;
 }
 
 .portal-action-row strong,
@@ -3475,6 +3504,27 @@ progress::-webkit-progress-value {
   color: #8fa2b7;
   font-size: 11px;
   line-height: 1.35;
+}
+
+.portal-action-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 34px;
+  margin-top: 12px;
+  border: 1px solid rgba(193, 255, 36, 0.42);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.portal-action-link:hover {
+  background: rgba(193, 255, 36, 0.18);
 }
 
 .portal-status-queued {

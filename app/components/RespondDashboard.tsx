@@ -741,8 +741,11 @@ function TaskDetailModal({
   onOpenDependency: (task: Task) => void;
 }) {
   const [showLoomEditor, setShowLoomEditor] = useState(Boolean(safeInstructionUrl(task.loomUrl)));
+  const [showPortalActionEditor, setShowPortalActionEditor] = useState(Boolean(safeInstructionUrl(task.portalActionUrl)));
   const loomUrl = safeInstructionUrl(task.loomUrl);
   const loomLabel = task.loomTitle?.trim() || "Loom instructions";
+  const portalActionUrl = safeInstructionUrl(task.portalActionUrl);
+  const portalActionLabel = task.portalActionLabel?.trim() || "Complete form";
 
   return (
     <div className="modal-backdrop task-modal-backdrop" onClick={onClose}>
@@ -759,10 +762,24 @@ function TaskDetailModal({
                 <Icon name="video" />
                 {loomUrl ? "Loom" : "Add Loom"}
               </button>
+              <button
+                type="button"
+                className={portalActionUrl ? "task-portal-action-trigger active" : "task-portal-action-trigger"}
+                onClick={() => setShowPortalActionEditor((current) => !current)}
+              >
+                <Icon name="link" />
+                {portalActionUrl ? "Form" : "Add form"}
+              </button>
               {loomUrl ? (
                 <a className="task-loom-open" href={loomUrl} target="_blank" rel="noreferrer">
                   <Icon name="play" />
                   Watch
+                </a>
+              ) : null}
+              {portalActionUrl ? (
+                <a className="task-portal-action-open" href={portalActionUrl} target="_blank" rel="noreferrer">
+                  <Icon name="play" />
+                  Open
                 </a>
               ) : null}
             </div>
@@ -924,6 +941,46 @@ function TaskDetailModal({
                   placeholder="Add a short note the client will see"
                 />
               </label>
+              {showPortalActionEditor || portalActionUrl ? (
+                <div className="portal-action-editor">
+                  <div className="inspector-section-title">
+                    <Icon name="link" />
+                    Client form/action link
+                  </div>
+                  {portalActionUrl ? (
+                    <a className="portal-action-preview-link" href={portalActionUrl} target="_blank" rel="noreferrer">
+                      <Icon name="play" />
+                      {portalActionLabel}
+                    </a>
+                  ) : null}
+                  <label>
+                    Link URL
+                    <input
+                      aria-label="Client form or action URL"
+                      value={task.portalActionUrl ?? ""}
+                      onChange={(event) => {
+                        const portalActionUrlValue = event.target.value;
+                        const hasPortalActionUrl = Boolean(safeInstructionUrl(portalActionUrlValue));
+                        onUpdate(task.id, {
+                          portalActionUrl: portalActionUrlValue,
+                          portalVisible: hasPortalActionUrl || task.portalVisible,
+                          portalActionRequired: hasPortalActionUrl || task.portalActionRequired,
+                        });
+                      }}
+                      placeholder="https://docs.google.com/forms/..."
+                    />
+                  </label>
+                  <label>
+                    Button label
+                    <input
+                      aria-label="Client action button label"
+                      value={task.portalActionLabel ?? ""}
+                      onChange={(event) => onUpdate(task.id, { portalActionLabel: event.target.value })}
+                      placeholder="Complete onboarding form"
+                    />
+                  </label>
+                </div>
+              ) : null}
             </div>
 
             <div className="dependency-list">
@@ -1800,6 +1857,8 @@ export default function RespondDashboard({
       portalTitle: "",
       portalNote: "",
       portalActionRequired: false,
+      portalActionUrl: "",
+      portalActionLabel: "",
       portalConfigured: false,
       sortOrder: tasks.length + 1,
     };

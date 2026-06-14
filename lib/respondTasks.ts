@@ -63,6 +63,8 @@ function task(
     portalTitle: options.portalTitle ?? "",
     portalNote: options.portalNote ?? "",
     portalActionRequired: options.portalActionRequired ?? false,
+    portalActionUrl: options.portalActionUrl ?? "",
+    portalActionLabel: options.portalActionLabel ?? "",
     portalConfigured: options.portalConfigured ?? false,
     sortOrder: idNumber,
   };

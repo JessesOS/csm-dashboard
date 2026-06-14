@@ -56,6 +56,15 @@ function portalDetail(task: Task) {
   return task.portalNote || `${task.category} - ${task.dueWindow || "Timing to be confirmed"}`;
 }
 
+function portalActionUrl(task: Task) {
+  const clean = task.portalActionUrl?.trim() ?? "";
+  return /^https?:\/\//i.test(clean) ? clean : "";
+}
+
+function portalActionLabel(task: Task) {
+  return task.portalActionLabel?.trim() || "Complete this item";
+}
+
 type PortalWorkspace = Awaited<ReturnType<typeof getPortalWorkspace>>;
 
 async function resolvePortalWorkspace(token: string): Promise<PortalWorkspace | null> {
@@ -231,6 +240,11 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
                   <div>
                     <strong>{portalTitle(task)}</strong>
                     <span>{portalDetail(task)}</span>
+                    {portalActionUrl(task) ? (
+                      <a className="portal-action-link" href={portalActionUrl(task)} target="_blank" rel="noreferrer">
+                        {portalActionLabel(task)}
+                      </a>
+                    ) : null}
                   </div>
                   <em className={statusClass[task.status]}>{statusLabels[task.status]}</em>
                 </article>
