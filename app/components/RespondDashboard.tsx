@@ -1963,6 +1963,30 @@ export default function RespondDashboard({
             </p>
           </div>
           <div className="topbar-actions">
+            <div className="task-header-tools">
+              <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
+              <ThemeToggle theme={theme} onThemeChange={setTheme} />
+              <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
+                <Icon name="play" />
+                Start walkthrough
+              </button>
+              <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
+                <Icon name="plus" />
+                New client
+              </button>
+              {canImportGhlClient ? (
+                <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
+                  <Icon name="download" />
+                  {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                </button>
+              ) : null}
+              {selectedClient?.portalToken ? (
+                <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
+                  <Icon name="link" />
+                  Client portal
+                </a>
+              ) : null}
+            </div>
             <div className="task-quick-tools">
               <div className="search-box">
                 <Icon name="search" />
@@ -1990,30 +2014,6 @@ export default function RespondDashboard({
               }}>
                 <Icon name="filter" />
               </button>
-            </div>
-            <div className="task-header-tools">
-              <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
-              <ThemeToggle theme={theme} onThemeChange={setTheme} />
-              <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
-                <Icon name="play" />
-                Start walkthrough
-              </button>
-              <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
-                <Icon name="plus" />
-                New client
-              </button>
-              {canImportGhlClient ? (
-                <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
-                  <Icon name="download" />
-                  {isImportingGhlClient ? "Importing" : "Import from GHL"}
-                </button>
-              ) : null}
-              {selectedClient?.portalToken ? (
-                <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
-                  <Icon name="link" />
-                  Client portal
-                </a>
-              ) : null}
             </div>
           </div>
         </header>
