@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { productConfig } from "../../../lib/productWorkspaces";
 import { getPortalWorkspace } from "../../../lib/taskStore";
 import { statusLabels, type Phase, type Task, type TaskStatus } from "../../../lib/types";
 
@@ -71,7 +72,7 @@ function PortalUnavailable() {
       <section className="portal-unavailable-panel">
         <span className="portal-brand-mark">R</span>
         <h1>Portal unavailable</h1>
-        <p>This private project link is missing, expired, or not ready yet. Please ask your Respond CSM contact for a fresh portal link.</p>
+        <p>This private project link is missing, expired, or not ready yet. Please ask your CSM contact for a fresh portal link.</p>
       </section>
     </main>
   );
@@ -89,6 +90,7 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
 }
 
 function ClientPortalView({ client, tasks }: PortalWorkspace) {
+  const product = productConfig(client.product);
   const progressTasks = tasks.filter((task) => task.portalVisible);
   const completed = progressTasks.filter((task) => task.status === "complete").length;
   const progress = progressTasks.length > 0 ? Math.round((completed / progressTasks.length) * 100) : 0;
@@ -117,9 +119,9 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
       <header className="client-portal-hero">
         <nav className="portal-topline" aria-label="Portal header">
           <div className="portal-brand">
-            <span className="portal-brand-mark">R</span>
+            <span className="portal-brand-mark">{product.brandMark}</span>
             <div>
-              <strong>Respond CSM</strong>
+              <strong>{product.label} CSM</strong>
               <span>Private project portal</span>
             </div>
           </div>

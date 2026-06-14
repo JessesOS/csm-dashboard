@@ -8,6 +8,12 @@ const clientFacingCategories = new Set([
   "Internal Testing Phase",
   "Go-Live Call",
   "Post Go-Live Reporting & Support",
+  "Pre-Onboarding & Welcome Call",
+  "Meta Ads Setup, Handoff & Partner Access",
+  "Google Ads Strategy & Landing Page Funnel Creation",
+  "AI Test Call & Final Checks (Day 14)",
+  "Go Live Call (Day 30)",
+  "Post Go-Live Check-ins, Reporting & Admin",
 ]);
 
 const visibilityKeywords = [
@@ -28,6 +34,20 @@ const visibilityKeywords = [
   "leadconnector",
   "magic link",
   "demo",
+  "admin access",
+  "domain provider access",
+  "website builder access",
+  "google ads",
+  "google analytics",
+  "google my business",
+  "meta business suite",
+  "partner access",
+  "approval",
+  "calendar",
+  "social media dms",
+  "payment mechanism",
+  "go live call",
+  "ai test call",
 ];
 
 const actionKeywords = [
@@ -39,6 +59,14 @@ const actionKeywords = [
   "permission to update",
   "testing call with the client",
   "go-live call with client",
+  "provide admin access",
+  "domain provider access",
+  "website builder access",
+  "approve",
+  "connect their calendar",
+  "prepare and upload a csv",
+  "social media dms",
+  "payment mechanism",
 ];
 
 function lowerTitle(task: PortalTaskInput) {
@@ -92,6 +120,34 @@ export function suggestedPortalTitle(task: PortalTaskInput) {
 
   if (title.includes("go-live call")) {
     return "Attend your Go-Live Call";
+  }
+
+  if (title.includes("go live call")) {
+    return "Attend your Go Live Call";
+  }
+
+  if (title.includes("ai test call")) {
+    return "Attend your AI Test Call";
+  }
+
+  if (title.includes("domain provider access")) {
+    return "Provide domain provider access";
+  }
+
+  if (title.includes("website builder access")) {
+    return "Provide website builder access";
+  }
+
+  if (title.includes("google ads")) {
+    return "Confirm Google Ads access";
+  }
+
+  if (title.includes("meta business suite") || title.includes("partner access")) {
+    return "Confirm Meta partner access";
+  }
+
+  if (title.includes("calendar")) {
+    return "Connect your calendar";
   }
 
   if (title.includes("present the")) {

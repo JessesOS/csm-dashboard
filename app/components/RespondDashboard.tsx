@@ -1,14 +1,25 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
+import {
+  defaultProduct,
+  productCategories,
+  productClients,
+  productConfig,
+  productTasks,
+  productTeamMembers,
+  productWorkspaces,
+  type ProductWorkspace,
+} from "../../lib/productWorkspaces";
 import { missionTimelineDays } from "../../lib/respondClients";
-import type { Category, ClientCreatePayload, ClientHealth, ClientRisk, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
+import type { Category, ClientCreatePayload, ClientHealth, ClientRisk, ProductKey, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
 
 interface DashboardProps {
+  initialProduct: ProductKey;
   initialTasks: Task[];
-  categories: Category[];
-  teamMembers: string[];
+  initialCategories: Category[];
+  initialTeamMembers: string[];
   initialClients: RespondClient[];
 }
 
@@ -341,6 +352,34 @@ function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange
   );
 }
 
+function ProductSwitcher({
+  activeProduct,
+  onProductChange,
+}: {
+  activeProduct: ProductKey;
+  onProductChange: (product: ProductKey) => void;
+}) {
+  return (
+    <div className="product-switcher" aria-label="Client workspace">
+      <span>Workspace</span>
+      <div>
+        {productWorkspaces.map((workspace) => (
+          <button
+            type="button"
+            key={workspace.key}
+            className={activeProduct === workspace.key ? "active" : ""}
+            onClick={() => onProductChange(workspace.key)}
+            title={workspace.description}
+          >
+            <strong>{workspace.brandMark}</strong>
+            <span>{workspace.clientLabel}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WalkthroughPanel({
   step,
   stepIndex,
@@ -525,18 +564,20 @@ function NewClientPanel({
   open,
   saving,
   theme,
+  product,
   onClose,
   onSubmit,
 }: {
   open: boolean;
   saving: boolean;
   theme: ThemeMode;
+  product: ProductWorkspace;
   onClose: () => void;
   onSubmit: (payload: ClientCreatePayload) => void;
 }) {
   const [name, setName] = useState("");
   const [industry, setIndustry] = useState("");
-  const [owner, setOwner] = useState("Response CSM");
+  const [owner, setOwner] = useState(product.ownerFallback);
   const [goLiveDate, setGoLiveDate] = useState("");
 
   if (!open) {
@@ -556,7 +597,7 @@ function NewClientPanel({
         <div className="new-client-head">
           <div>
             <span>New client</span>
-            <h2>Create client workspace</h2>
+            <h2>Create {product.shortLabel} client workspace</h2>
           </div>
           <button type="button" className="icon-button" onClick={onClose} title="Close">
             x
@@ -572,7 +613,7 @@ function NewClientPanel({
         </label>
         <label>
           Owner
-          <input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Response CSM" />
+          <input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder={product.ownerFallback} />
         </label>
         <label>
           Target go-live
@@ -592,6 +633,9 @@ function NewClientPanel({
 }
 
 function MissionControl({
+  product,
+  activeProduct,
+  onProductChange,
   clients,
   selectedClientId,
   onSelectClient,
@@ -606,6 +650,9 @@ function MissionControl({
   completedTasks,
   waitingTasks,
 }: {
+  product: ProductWorkspace;
+  activeProduct: ProductKey;
+  onProductChange: (product: ProductKey) => void;
   clients: RespondClient[];
   selectedClientId: string;
   onSelectClient: (clientId: string) => void;
@@ -686,12 +733,14 @@ function MissionControl({
     <main className={`mission-shell mission-shell-${theme}`} data-tour-target={tourTarget}>
       <aside className="mission-side">
         <div className="mission-brand">
-          <span className="mission-brand-mark">R</span>
+          <span className="mission-brand-mark">{product.brandMark}</span>
           <div>
-            <strong>Respond CSM</strong>
+            <strong>{product.label} CSM</strong>
             <span>Delivery command center</span>
           </div>
         </div>
+
+        <ProductSwitcher activeProduct={activeProduct} onProductChange={onProductChange} />
 
         <nav className="mission-nav" aria-label="Primary views">
           <button type="button" className="active">
@@ -725,7 +774,7 @@ function MissionControl({
         <header className="mission-header">
           <div>
             <h1>Mission Control</h1>
-            <p>Portfolio health across Respond clients.</p>
+            <p>Portfolio health across {product.clientLabel}.</p>
           </div>
           <div className="mission-header-actions">
             <span className="system-pill">
@@ -948,7 +997,8 @@ function MissionControl({
   );
 }
 
-export default function RespondDashboard({ initialTasks, categories, teamMembers, initialClients }: DashboardProps) {
+export default function RespondDashboard({ initialProduct, initialTasks, initialCategories, initialTeamMembers, initialClients }: DashboardProps) {
+  const [activeProduct, setActiveProduct] = useState<ProductKey>(initialProduct ?? defaultProduct);
   const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
@@ -968,22 +1018,59 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   const [statusFilter, setStatusFilter] = useState("all");
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskCategory, setNewTaskCategory] = useState(categories[0]?.name ?? "");
+  const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
+  const currentProduct = useMemo(() => productConfig(activeProduct), [activeProduct]);
+  const categories = useMemo(
+    () => (activeProduct === initialProduct ? initialCategories : productCategories(activeProduct)),
+    [activeProduct, initialProduct, initialCategories]
+  );
+  const teamMembers = useMemo(
+    () => (activeProduct === initialProduct ? initialTeamMembers : productTeamMembers(activeProduct)),
+    [activeProduct, initialProduct, initialTeamMembers]
+  );
+  const templateTasks = useMemo(
+    () => (activeProduct === initialProduct ? initialTasks : productTasks(activeProduct)),
+    [activeProduct, initialProduct, initialTasks]
+  );
 
   const activeTaskClientId = useMemo(() => {
-    const fallbackClientId = clients[0]?.id ?? "northlane-health";
+    const fallbackClientId = clients[0]?.id ?? currentProduct.defaultClientId;
     if (selectedClientId !== "all" && clients.some((client) => client.id === selectedClientId)) {
       return selectedClientId;
     }
 
     return fallbackClientId;
-  }, [clients, selectedClientId]);
+  }, [clients, currentProduct.defaultClientId, selectedClientId]);
+
+  function switchProduct(product: ProductKey) {
+    if (product === activeProduct) {
+      return;
+    }
+
+    const nextClients = productClients(product);
+    const nextTasks = productTasks(product);
+    const nextCategories = productCategories(product);
+
+    setActiveProduct(product);
+    setClients(nextClients);
+    setTasks(nextTasks);
+    setSelectedId(nextTasks[0]?.id ?? "");
+    setSelectedClientId("all");
+    setQuery("");
+    setCategoryFilter("all");
+    setOwnerFilter("all");
+    setStatusFilter("all");
+    setNewTaskTitle("");
+    setNewTaskCategory(nextCategories[0]?.name ?? "");
+    setShowNewClientPanel(false);
+    setStorageNotice("");
+  }
 
   useEffect(() => {
     window.localStorage.setItem("respond-csm-theme", theme);
@@ -992,7 +1079,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
   useEffect(() => {
     let active = true;
 
-    fetch("/api/clients", { cache: "no-store" })
+    fetch(`/api/clients?product=${encodeURIComponent(activeProduct)}`, { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {
@@ -1016,12 +1103,12 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     return () => {
       active = false;
     };
-  }, []);
+  }, [activeProduct]);
 
   useEffect(() => {
     let active = true;
 
-    fetch(`/api/tasks?clientId=${encodeURIComponent(activeTaskClientId)}`, { cache: "no-store" })
+    fetch(`/api/tasks?product=${encodeURIComponent(activeProduct)}&clientId=${encodeURIComponent(activeTaskClientId)}`, { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {
@@ -1046,7 +1133,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     return () => {
       active = false;
     };
-  }, [activeTaskClientId]);
+  }, [activeProduct, activeTaskClientId]);
 
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
@@ -1138,6 +1225,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
 
     const tempTask: Task = {
       id: `draft-${activeTaskClientId}-${Date.now()}`,
+      product: activeProduct,
       clientId: activeTaskClientId,
       templateId: `draft-${Date.now()}`,
       title,
@@ -1165,7 +1253,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ clientId: activeTaskClientId, title, category: newTaskCategory }),
+        body: JSON.stringify({ product: activeProduct, clientId: activeTaskClientId, title, category: newTaskCategory }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -1187,7 +1275,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       const response = await fetch("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, product: activeProduct }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -1230,7 +1318,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
 
     const step = tourSteps[index];
     if (step.clientId) {
-      setSelectedClientId(step.clientId);
+      setSelectedClientId(currentProduct.defaultClientId);
     }
     setActiveSection(step.section);
     setTourStepIndex(index);
@@ -1256,6 +1344,10 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     return (
       <>
         <MissionControl
+          key={activeProduct}
+          product={currentProduct}
+          activeProduct={activeProduct}
+          onProductChange={switchProduct}
           clients={clients}
           selectedClientId={selectedClientId}
           onSelectClient={setSelectedClientId}
@@ -1266,14 +1358,16 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
           tourTarget={currentTourStep?.section === "home" ? currentTourStep.target : undefined}
           onStartTour={() => goToTourStep(0)}
           walkthroughPanel={walkthroughPanel}
-          taskCount={initialTasks.length}
+          taskCount={templateTasks.length}
           completedTasks={metrics.completed}
           waitingTasks={metrics.blocked}
         />
         <NewClientPanel
+          key={`home-${activeProduct}`}
           open={showNewClientPanel}
           saving={isCreatingClient}
           theme={theme}
+          product={currentProduct}
           onClose={() => setShowNewClientPanel(false)}
           onSubmit={createClientWorkspace}
         />
@@ -1285,12 +1379,14 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
     <main className={`dashboard-shell dashboard-shell-${theme}`} data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}>
       <aside className="side-rail">
         <div className="brand">
-          <span className="brand-mark">R</span>
+          <span className="brand-mark">{currentProduct.brandMark}</span>
           <div>
-            <strong>Respond CSM</strong>
+            <strong>{currentProduct.label} CSM</strong>
             <span>Onboarding & delivery</span>
           </div>
         </div>
+
+        <ProductSwitcher activeProduct={activeProduct} onProductChange={switchProduct} />
 
         <nav className="view-nav" aria-label="Primary views">
           <button type="button" onClick={() => setActiveSection("home")}>
@@ -1330,7 +1426,7 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
       <section className="workspace">
         <header className="topbar">
           <div>
-            <h1>{selectedClient ? `${selectedClient.name} workflow board` : "Respond workflow board"}</h1>
+            <h1>{selectedClient ? `${selectedClient.name} workflow board` : `${currentProduct.shortLabel} workflow board`}</h1>
             <p>
               {tasks.length} operational tasks in this client workspace
               {selectedClient ? ` - client context: ${selectedClient.phase}, ${clientHealthLabels[selectedClient.health]}` : ""}
@@ -1628,9 +1724,11 @@ export default function RespondDashboard({ initialTasks, categories, teamMembers
         ) : null}
       </aside>
       <NewClientPanel
+        key={`tasks-${activeProduct}`}
         open={showNewClientPanel}
         saving={isCreatingClient}
         theme={theme}
+        product={currentProduct}
         onClose={() => setShowNewClientPanel(false)}
         onSubmit={createClientWorkspace}
       />

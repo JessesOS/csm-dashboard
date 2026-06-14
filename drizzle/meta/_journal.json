@@ -29,6 +29,13 @@
       "when": 1781355073620,
       "tag": "0003_solid_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1781404029716,
+      "tag": "0004_violet_jubilee",
+      "breakpoints": true
     }
   ]
 }

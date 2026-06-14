@@ -18,6 +18,8 @@ export const statusLabels: Record<TaskStatus, string> = {
 
 export type Priority = "low" | "normal" | "high" | "critical";
 
+export type ProductKey = "respond" | "scale";
+
 export type Phase =
   | "Onboarding"
   | "Build"
@@ -35,6 +37,7 @@ export interface Category {
 
 export interface Task {
   id: string;
+  product?: ProductKey;
   clientId?: string;
   templateId?: string;
   title: string;
@@ -106,6 +109,7 @@ export interface ClientAttentionItem {
 
 export interface RespondClient {
   id: string;
+  product: ProductKey;
   portalToken?: string;
   name: string;
   code: string;
@@ -128,6 +132,7 @@ export interface RespondClient {
 }
 
 export interface ClientCreatePayload {
+  product?: ProductKey;
   name?: string;
   owner?: string;
   industry?: string;

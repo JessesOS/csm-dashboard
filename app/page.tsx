@@ -1,7 +1,14 @@
 import RespondDashboard from "./components/RespondDashboard";
-import { respondClients } from "../lib/respondClients";
-import { categories, seedTasks, teamMembers } from "../lib/respondTasks";
+import { defaultProduct, productCategories, productClients, productTasks, productTeamMembers } from "../lib/productWorkspaces";
 
 export default function Home() {
-  return <RespondDashboard initialTasks={seedTasks} categories={categories} teamMembers={teamMembers} initialClients={respondClients} />;
+  return (
+    <RespondDashboard
+      initialProduct={defaultProduct}
+      initialTasks={productTasks(defaultProduct)}
+      initialCategories={productCategories(defaultProduct)}
+      initialTeamMembers={productTeamMembers(defaultProduct)}
+      initialClients={productClients(defaultProduct)}
+    />
+  );
 }

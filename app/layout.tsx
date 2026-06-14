@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Respond CSM Dashboard",
-  description: "A task operations board for Respond onboarding and delivery.",
+  title: "CSM Mission Control",
+  description: "A product workspace dashboard for client onboarding, delivery, and scale operations.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
