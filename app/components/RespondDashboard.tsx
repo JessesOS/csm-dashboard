@@ -43,6 +43,7 @@ const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", 
 
 type ThemeMode = "dark" | "light";
 type AppSection = "home" | "tasks";
+type AttachmentFilter = "all" | "loom" | "forms";
 type TourTarget =
   | "mission-header"
   | "portfolio"
@@ -168,6 +169,7 @@ function Icon({
     | "sun"
     | "moon"
     | "play"
+    | "video"
     | "download"
     | "x";
 }) {
@@ -543,7 +545,15 @@ function safeInstructionUrl(value: string | null | undefined) {
   return /^https?:\/\//i.test(clean) ? clean : "";
 }
 
-function useFilteredTasks(tasks: Task[], query: string, category: string, owner: string, status: string) {
+function taskHasLoom(task: Task) {
+  return Boolean(safeInstructionUrl(task.loomUrl));
+}
+
+function taskHasClientForm(task: Task) {
+  return Boolean(safeInstructionUrl(task.portalActionUrl));
+}
+
+function useFilteredTasks(tasks: Task[], query: string, category: string, owner: string, status: string, attachments: AttachmentFilter) {
   return useMemo(() => {
     const text = normalizeText(query);
 
@@ -556,10 +566,11 @@ function useFilteredTasks(tasks: Task[], query: string, category: string, owner:
       const matchesCategory = category === "all" || task.category === category;
       const matchesOwner = owner === "all" || task.assignee === owner;
       const matchesStatus = status === "all" || task.status === status;
+      const matchesAttachment = attachments === "all" || (attachments === "loom" ? taskHasLoom(task) : taskHasClientForm(task));
 
-      return matchesText && matchesCategory && matchesOwner && matchesStatus;
+      return matchesText && matchesCategory && matchesOwner && matchesStatus && matchesAttachment;
     });
-  }, [tasks, query, category, owner, status]);
+  }, [tasks, query, category, owner, status, attachments]);
 }
 
 interface TaskNavigationOrder {
@@ -1550,6 +1561,7 @@ export default function RespondDashboard({
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [attachmentFilter, setAttachmentFilter] = useState<AttachmentFilter>("all");
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
@@ -1612,6 +1624,7 @@ export default function RespondDashboard({
     setCategoryFilter("all");
     setOwnerFilter("all");
     setStatusFilter("all");
+    setAttachmentFilter("all");
     setNewTaskTitle("");
     setNewTaskCategory(nextCategories[0]?.name ?? "");
     setShowNewClientPanel(false);
@@ -1732,11 +1745,18 @@ export default function RespondDashboard({
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
   const detailTask = detailTaskId ? taskMap.get(detailTaskId) ?? null : null;
-  const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter);
+  const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter, attachmentFilter);
   const taskNavigationOrder = useMemo(() => buildTaskNavigationOrder(categories, templateTasks), [categories, templateTasks]);
   const orderedFilteredTasks = useMemo(
     () => [...filteredTasks].sort((a, b) => compareTasksByNavigationOrder(a, b, taskNavigationOrder)),
     [filteredTasks, taskNavigationOrder]
+  );
+  const attachmentCounts = useMemo(
+    () => ({
+      looms: tasks.filter(taskHasLoom).length,
+      forms: tasks.filter(taskHasClientForm).length,
+    }),
+    [tasks]
   );
   const canImportGhlClient = activeEnvironment === "live";
 
@@ -2160,6 +2180,7 @@ export default function RespondDashboard({
                 setCategoryFilter("all");
                 setOwnerFilter("all");
                 setStatusFilter("all");
+                setAttachmentFilter("all");
                 setQuery("");
               }}>
                 <Icon name="filter" />
@@ -2179,6 +2200,21 @@ export default function RespondDashboard({
           <div className="segmented">
             <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
             <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
+          </div>
+          <div className="segmented attachment-segmented" aria-label="Attachment filters">
+            <button type="button" className={attachmentFilter === "all" ? "active" : ""} onClick={() => setAttachmentFilter("all")}>
+              All
+            </button>
+            <button type="button" className={attachmentFilter === "loom" ? "active" : ""} onClick={() => setAttachmentFilter("loom")}>
+              <Icon name="video" />
+              Looms
+              <span>{attachmentCounts.looms}</span>
+            </button>
+            <button type="button" className={attachmentFilter === "forms" ? "active" : ""} onClick={() => setAttachmentFilter("forms")}>
+              <Icon name="link" />
+              Forms
+              <span>{attachmentCounts.forms}</span>
+            </button>
           </div>
           <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => setSelectedClientId(event.target.value)} disabled={clients.length === 0}>
             {clients.length === 0 ? <option value="">No clients yet</option> : null}

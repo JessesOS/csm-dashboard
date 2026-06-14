@@ -2053,6 +2053,34 @@ button:disabled {
   padding: 0 13px;
 }
 
+.attachment-segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.attachment-segmented svg {
+  width: 14px;
+  height: 14px;
+}
+
+.attachment-segmented button span {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #edf4ff;
+  color: #1d4ed8;
+  font-size: 10px;
+  font-weight: 820;
+}
+
+.attachment-segmented button.active span {
+  background: #ffffff;
+  color: #174ac9;
+}
+
 .segmented button.active,
 .status-grid button.active {
   background: #eaf1ff;
@@ -2894,6 +2922,16 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .segmented button.active,
 .dashboard-shell-dark .status-grid button.active {
   background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .attachment-segmented button span {
+  background: rgba(148, 163, 184, 0.16);
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .attachment-segmented button.active span {
+  background: rgba(193, 255, 36, 0.18);
   color: #c9f82b;
 }
 
