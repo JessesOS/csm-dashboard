@@ -618,6 +618,10 @@ function compareTasksByNavigationOrder(a: Task, b: Task, order: TaskNavigationOr
   return a.title.localeCompare(b.title);
 }
 
+function taskWorkspaceKey(environment: EnvironmentKey, product: ProductKey, clientId: string) {
+  return clientId ? `${environment}:${product}:${clientId}` : "";
+}
+
 function TaskCard({
   task,
   taskMap,
@@ -1390,6 +1394,9 @@ export default function RespondDashboard({
   const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
+  const [loadedTaskKey, setLoadedTaskKey] = useState(() =>
+    taskWorkspaceKey(initialEnvironment ?? defaultEnvironment, initialProduct ?? defaultProduct, initialClients[0]?.id ?? "")
+  );
   const [detailReadyTaskId, setDetailReadyTaskId] = useState<string | null>(null);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<AppSection>("home");
@@ -1438,10 +1445,13 @@ export default function RespondDashboard({
 
     return clients[0]?.id ?? "";
   }, [clients, selectedClientId]);
+  const activeTaskKey = taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId);
+  const isTaskBoardLoading = Boolean(activeTaskClientId && loadedTaskKey !== activeTaskKey);
 
   function resetWorkspace(environment: EnvironmentKey, product: ProductKey) {
     const nextClients = environmentProductClients(environment, product);
-    const nextTasks = nextClients.length > 0 ? productTasks(product) : [];
+    const shouldUseSeededPreview = environment === defaultEnvironment && nextClients.length > 0;
+    const nextTasks = shouldUseSeededPreview ? productTasks(product) : [];
     const nextCategories = productCategories(product);
 
     setActiveEnvironment(environment);
@@ -1449,6 +1459,7 @@ export default function RespondDashboard({
     setClients(nextClients);
     setTasks(nextTasks);
     setSelectedId(nextTasks[0]?.id ?? "");
+    setLoadedTaskKey(shouldUseSeededPreview ? taskWorkspaceKey(environment, product, nextClients[0]?.id ?? "") : "");
     setDetailReadyTaskId(null);
     setDetailTaskId(null);
     setSelectedClientId("all");
@@ -1516,6 +1527,13 @@ export default function RespondDashboard({
 
   useEffect(() => {
     let active = true;
+    const requestKey = taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId);
+
+    if (!activeTaskClientId) {
+      return () => {
+        active = false;
+      };
+    }
 
     fetch(
       `/api/tasks?environment=${encodeURIComponent(activeEnvironment)}&product=${encodeURIComponent(activeProduct)}&clientId=${encodeURIComponent(activeTaskClientId)}`,
@@ -1534,12 +1552,14 @@ export default function RespondDashboard({
         }
         setTasks(remoteTasks);
         setSelectedId((current) => (remoteTasks.some((task) => task.id === current) ? current : remoteTasks[0]?.id || ""));
+        setLoadedTaskKey(requestKey);
         setDetailReadyTaskId(null);
         setDetailTaskId((current) => (current && remoteTasks.some((task) => task.id === current) ? current : null));
         setStorageNotice("");
       })
       .catch((error: Error) => {
         if (active) {
+          setLoadedTaskKey(requestKey);
           setStorageNotice(error.message);
         }
       });
@@ -1743,6 +1763,7 @@ export default function RespondDashboard({
       setSelectedClientId(client.id);
       setTasks(clientTasks);
       setSelectedId(clientTasks[0]?.id ?? "");
+      setLoadedTaskKey(taskWorkspaceKey(client.environment, client.product, client.id));
       setDetailReadyTaskId(null);
       setDetailTaskId(null);
       setActiveSection("tasks");
@@ -1785,6 +1806,7 @@ export default function RespondDashboard({
       setSelectedClientId(client.id);
       setTasks(clientTasks);
       setSelectedId(clientTasks[0]?.id ?? "");
+      setLoadedTaskKey(taskWorkspaceKey(client.environment, client.product, client.id));
       setDetailReadyTaskId(null);
       setDetailTaskId(null);
       setActiveSection("tasks");
@@ -2057,6 +2079,12 @@ export default function RespondDashboard({
                 New client
               </button>
             </div>
+          </section>
+        ) : isTaskBoardLoading ? (
+          <section className="empty-workspace-panel task-loading-panel" aria-label="Loading task workspace">
+            <span>{currentEnvironment.shortLabel}</span>
+            <h2>Loading {selectedClient?.name ?? currentProduct.shortLabel} task board</h2>
+            <p>Pulling the saved checklist statuses before showing this workspace.</p>
           </section>
         ) : view === "board" ? (
           <section className="board" aria-label="Task workflow board">
