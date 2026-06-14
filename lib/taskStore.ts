@@ -876,6 +876,9 @@ export async function listClients(environmentInput: string | null | undefined = 
   const d1 = getD1();
   const environment = normalizeEnvironment(environmentInput);
   const product = normalizeProduct(productInput);
+
+  await reconcileDuplicateClients(environment, product);
+
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
@@ -1183,15 +1186,140 @@ function normalizeClientIdentity(value: string | null | undefined) {
     .trim();
 }
 
-function clientIdentityValues(...values: Array<string | null | undefined>) {
-  return [...new Set(values.map(normalizeClientIdentity).filter(Boolean))];
+function stripCompanySuffix(identity: string) {
+  return identity
+    .replace(/\b(pty\s+ltd|pty\s+limited|limited|ltd|llc|incorporated|inc|corporation|corp|company|co)\b\.?$/i, "")
+    .trim();
 }
 
-async function findExistingClientByIdentity(environment: EnvironmentKey, product: ProductKey, name: string, companyName: string) {
+function clientIdentityValues(...values: Array<string | null | undefined>) {
+  const identities = new Set<string>();
+
+  values.forEach((value) => {
+    const normalized = normalizeClientIdentity(value);
+
+    if (!normalized) {
+      return;
+    }
+
+    [normalized, stripCompanySuffix(normalized)].forEach((identity) => {
+      if (!identity) {
+        return;
+      }
+
+      identities.add(identity);
+      identities.add(identity.replace(/\s+/g, ""));
+    });
+  });
+
+  return [...identities];
+}
+
+function identitiesOverlap(...identitySets: string[][]) {
+  const [first, ...rest] = identitySets;
+
+  if (!first || rest.length === 0) {
+    return false;
+  }
+
+  const lookup = new Set(first);
+  return rest.some((identities) => identities.some((identity) => lookup.has(identity)));
+}
+
+function companyNameLooksLegalEntity(value: string | null | undefined) {
+  return /\b(pty|ltd|limited|llc|inc|corp|corporation|company|co)\b/i.test(normalizeClientIdentity(value));
+}
+
+function companyIdentityValuesFor(name: string | null | undefined, companyName: string | null | undefined) {
+  return clientIdentityValues(companyName, companyNameLooksLegalEntity(name) ? name : undefined);
+}
+
+function ownerIdentityValuesFor(name: string | null | undefined) {
+  return companyNameLooksLegalEntity(name) ? [] : clientIdentityValues(name);
+}
+
+function clientMatchesIncomingIdentity(client: RespondClient, incomingName: string, incomingCompanyName: string) {
+  const clientCompanyIdentities = companyIdentityValuesFor(client.name, client.companyName);
+  const incomingCompanyIdentities = companyIdentityValuesFor(incomingName, incomingCompanyName);
+
+  if (identitiesOverlap(clientCompanyIdentities, incomingCompanyIdentities)) {
+    return true;
+  }
+
+  const clientOwnerIdentities = ownerIdentityValuesFor(client.name);
+  const incomingOwnerIdentities = ownerIdentityValuesFor(incomingName);
+
+  if (clientCompanyIdentities.length > 0 && incomingCompanyIdentities.length > 0) {
+    return false;
+  }
+
+  return identitiesOverlap(clientOwnerIdentities, incomingOwnerIdentities);
+}
+
+function clientsShareClientIdentity(left: RespondClient, right: RespondClient) {
+  const leftCompanyIdentities = companyIdentityValuesFor(left.name, left.companyName);
+  const rightCompanyIdentities = companyIdentityValuesFor(right.name, right.companyName);
+
+  if (identitiesOverlap(leftCompanyIdentities, rightCompanyIdentities)) {
+    return true;
+  }
+
+  if (leftCompanyIdentities.length > 0 && rightCompanyIdentities.length > 0) {
+    return false;
+  }
+
+  return identitiesOverlap(ownerIdentityValuesFor(left.name), ownerIdentityValuesFor(right.name));
+}
+
+function canonicalClientScore(client: RespondClient, incomingName?: string, incomingCompanyName?: string) {
+  const clientNameIdentities = clientIdentityValues(client.name);
+  const clientCompanyIdentities = clientIdentityValues(client.companyName);
+  const incomingNameIdentities = clientIdentityValues(incomingName);
+  const incomingCompanyIdentities = clientIdentityValues(incomingCompanyName);
+  const nameMatchesIncomingName = identitiesOverlap(clientNameIdentities, incomingNameIdentities);
+  const nameMatchesIncomingCompany = identitiesOverlap(clientNameIdentities, incomingCompanyIdentities);
+  const companyMatchesIncomingCompany = identitiesOverlap(clientCompanyIdentities, incomingCompanyIdentities);
+  const nameAndCompanyDiffer = Boolean(client.companyName) && !identitiesOverlap(clientNameIdentities, clientCompanyIdentities);
+  let score = 0;
+
+  if (nameMatchesIncomingName) {
+    score += 120;
+  }
+
+  if (companyMatchesIncomingCompany) {
+    score += 90;
+  }
+
+  if (nameAndCompanyDiffer) {
+    score += 70;
+  }
+
+  if (client.companyName) {
+    score += 30;
+  }
+
+  if (companyNameLooksLegalEntity(client.name)) {
+    score -= 25;
+  }
+
+  if (nameMatchesIncomingCompany && incomingNameIdentities.length > 0 && !nameMatchesIncomingName) {
+    score -= 20;
+  }
+
+  return score;
+}
+
+function pickCanonicalClient(clients: RespondClient[], incomingName?: string, incomingCompanyName?: string) {
+  return [...clients].sort(
+    (left, right) => canonicalClientScore(right, incomingName, incomingCompanyName) - canonicalClientScore(left, incomingName, incomingCompanyName)
+  )[0];
+}
+
+async function findExistingClientsByIdentity(environment: EnvironmentKey, product: ProductKey, name: string, companyName: string) {
   const incomingIdentities = clientIdentityValues(name, companyName);
 
   if (incomingIdentities.length === 0) {
-    return null;
+    return [];
   }
 
   const incoming = new Set(incomingIdentities);
@@ -1200,11 +1328,138 @@ async function findExistingClientByIdentity(environment: EnvironmentKey, product
     .bind(environment, product)
     .all<ClientRow>();
 
-  return (
-    (result.results ?? [])
-      .map(fromClientRow)
-      .find((client) => clientIdentityValues(client.name, client.companyName).some((identity) => incoming.has(identity))) ?? null
-  );
+  return (result.results ?? [])
+    .map(fromClientRow)
+    .filter(
+      (client) =>
+        clientIdentityValues(client.name, client.companyName).some((identity) => incoming.has(identity)) &&
+        clientMatchesIncomingIdentity(client, name, companyName)
+    );
+}
+
+async function mergeDuplicateClientTasks(canonicalClientId: string, duplicateClientId: string, environment: EnvironmentKey, product: ProductKey) {
+  const d1 = getD1();
+  const duplicateTasks = await d1
+    .prepare(`SELECT ${taskSelectFields} FROM tasks WHERE environment = ? AND product = ? AND client_id = ? ORDER BY sort_order ASC`)
+    .bind(environment, product, duplicateClientId)
+    .all<TaskRow>();
+
+  for (const duplicateRow of duplicateTasks.results ?? []) {
+    const templateId = duplicateRow.templateId || duplicateRow.id.split("__").at(-1) || duplicateRow.id;
+    const canonicalTaskId = scopedTaskId(canonicalClientId, templateId);
+    const dependencies = parseDependencies(duplicateRow.dependencies).map((dependencyId) =>
+      dependencyId.replace(`${duplicateClientId}__`, `${canonicalClientId}__`)
+    );
+    const existingRow = await d1.prepare(`SELECT ${taskSelectFields} FROM tasks WHERE id = ?`).bind(canonicalTaskId).first<TaskRow>();
+
+    if (!existingRow) {
+      await d1
+        .prepare("UPDATE tasks SET id = ?, client_id = ?, dependencies = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+        .bind(canonicalTaskId, canonicalClientId, JSON.stringify(dependencies), duplicateRow.id)
+        .run();
+      continue;
+    }
+
+    const updates: string[] = [];
+    const values: unknown[] = [];
+
+    if (existingRow.status === "queued" && duplicateRow.status !== "queued") {
+      updates.push("status = ?");
+      values.push(duplicateRow.status);
+    }
+
+    if (existingRow.assignee === "Unassigned" && duplicateRow.assignee && duplicateRow.assignee !== "Unassigned") {
+      updates.push("assignee = ?");
+      values.push(duplicateRow.assignee);
+    }
+
+    if (existingRow.priority === "normal" && duplicateRow.priority && duplicateRow.priority !== "normal") {
+      updates.push("priority = ?");
+      values.push(duplicateRow.priority);
+    }
+
+    if (!existingRow.notes && duplicateRow.notes) {
+      updates.push("notes = ?");
+      values.push(duplicateRow.notes);
+    }
+
+    if (!existingRow.loomUrl && duplicateRow.loomUrl) {
+      updates.push("loom_url = ?");
+      values.push(duplicateRow.loomUrl);
+    }
+
+    if (!existingRow.loomTitle && duplicateRow.loomTitle) {
+      updates.push("loom_title = ?");
+      values.push(duplicateRow.loomTitle);
+    }
+
+    if (!existingRow.portalConfigured && duplicateRow.portalConfigured) {
+      updates.push("portal_visible = ?", "portal_title = ?", "portal_note = ?", "portal_action_required = ?", "portal_configured = ?");
+      values.push(
+        duplicateRow.portalVisible ? 1 : 0,
+        duplicateRow.portalTitle ?? "",
+        duplicateRow.portalNote ?? "",
+        duplicateRow.portalActionRequired ? 1 : 0,
+        1
+      );
+    }
+
+    if (updates.length > 0) {
+      updates.push("updated_at = CURRENT_TIMESTAMP");
+      values.push(canonicalTaskId);
+      await d1.prepare(`UPDATE tasks SET ${updates.join(", ")} WHERE id = ?`).bind(...values).run();
+    }
+
+    await d1.prepare("DELETE FROM tasks WHERE id = ?").bind(duplicateRow.id).run();
+  }
+}
+
+async function mergeDuplicateClients(canonicalClient: RespondClient, duplicateClients: RespondClient[], environment: EnvironmentKey, product: ProductKey) {
+  const d1 = getD1();
+
+  for (const duplicateClient of duplicateClients) {
+    if (duplicateClient.id === canonicalClient.id) {
+      continue;
+    }
+
+    await mergeDuplicateClientTasks(canonicalClient.id, duplicateClient.id, environment, product);
+    await d1.prepare("DELETE FROM clients WHERE id = ?").bind(duplicateClient.id).run();
+  }
+}
+
+async function reconcileDuplicateClients(environment: EnvironmentKey, product: ProductKey) {
+  const result = await getD1()
+    .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
+    .bind(environment, product)
+    .all<ClientRow>();
+  const remaining = (result.results ?? []).map(fromClientRow);
+
+  while (remaining.length > 0) {
+    const client = remaining.shift();
+
+    if (!client) {
+      continue;
+    }
+
+    const duplicates = remaining.filter((candidate) => clientsShareClientIdentity(client, candidate));
+
+    if (duplicates.length === 0) {
+      continue;
+    }
+
+    const group = [client, ...duplicates];
+    const canonicalClient = pickCanonicalClient(group);
+    const duplicateClients = group.filter((candidate) => candidate.id !== canonicalClient.id);
+    await mergeDuplicateClients(canonicalClient, duplicateClients, environment, product);
+
+    duplicateClients.forEach((duplicateClient) => {
+      const index = remaining.findIndex((candidate) => candidate.id === duplicateClient.id);
+
+      if (index >= 0) {
+        remaining.splice(index, 1);
+      }
+    });
+  }
 }
 
 async function updateExistingClientIdentity(client: RespondClient, payload: ClientCreatePayload) {
@@ -1262,9 +1517,17 @@ export async function createClient(payload: ClientCreatePayload) {
   }
 
   const d1 = getD1();
-  const existingClient = await findExistingClientByIdentity(environment, product, name, companyName);
+  const existingClients = await findExistingClientsByIdentity(environment, product, name, companyName);
+  const existingClient = pickCanonicalClient(existingClients, name, companyName);
 
   if (existingClient) {
+    await mergeDuplicateClients(
+      existingClient,
+      existingClients.filter((client) => client.id !== existingClient.id),
+      environment,
+      product
+    );
+
     const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
     await seedTemplateTasksForClient(client.id, environment, product, false);
     await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
