@@ -1963,40 +1963,58 @@ export default function RespondDashboard({
             </p>
           </div>
           <div className="topbar-actions">
-            <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
-            <ThemeToggle theme={theme} onThemeChange={setTheme} />
-            <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
-              <Icon name="play" />
-              Start walkthrough
-            </button>
-            <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
-              <Icon name="plus" />
-              New client
-            </button>
-            {canImportGhlClient ? (
-              <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
-                <Icon name="download" />
-                {isImportingGhlClient ? "Importing" : "Import from GHL"}
+            <div className="task-quick-tools">
+              <div className="search-box">
+                <Icon name="search" />
+                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks, owners, categories" />
+              </div>
+              <div className="new-task">
+                <input value={newTaskTitle} onChange={(event) => setNewTaskTitle(event.target.value)} placeholder="Add a custom task" />
+                <select value={newTaskCategory} onChange={(event) => setNewTaskCategory(event.target.value)}>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" onClick={addTask} disabled={!newTaskTitle.trim() || !activeTaskClientId}>
+                  <Icon name="plus" />
+                  Add
+                </button>
+              </div>
+              <button className="icon-button" type="button" title="Clear filters" onClick={() => {
+                setCategoryFilter("all");
+                setOwnerFilter("all");
+                setStatusFilter("all");
+                setQuery("");
+              }}>
+                <Icon name="filter" />
               </button>
-            ) : null}
-            {selectedClient?.portalToken ? (
-              <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
-                <Icon name="link" />
-                Client portal
-              </a>
-            ) : null}
-            <div className="search-box">
-              <Icon name="search" />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tasks, owners, categories" />
             </div>
-            <button className="icon-button" type="button" title="Clear filters" onClick={() => {
-              setCategoryFilter("all");
-              setOwnerFilter("all");
-              setStatusFilter("all");
-              setQuery("");
-            }}>
-              <Icon name="filter" />
-            </button>
+            <div className="task-header-tools">
+              <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
+              <ThemeToggle theme={theme} onThemeChange={setTheme} />
+              <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
+                <Icon name="play" />
+                Start walkthrough
+              </button>
+              <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
+                <Icon name="plus" />
+                New client
+              </button>
+              {canImportGhlClient ? (
+                <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
+                  <Icon name="download" />
+                  {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                </button>
+              ) : null}
+              {selectedClient?.portalToken ? (
+                <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
+                  <Icon name="link" />
+                  Client portal
+                </a>
+              ) : null}
+            </div>
           </div>
         </header>
 
@@ -2005,20 +2023,6 @@ export default function RespondDashboard({
           <Metric label="Active" value={metrics.active} detail="In progress or review" />
           <Metric label="Waiting" value={metrics.blocked} detail="Open dependencies or holds" />
           <Metric label="Categories" value={categories.length} detail="Onboarding to support" />
-          <div className="new-task">
-            <input value={newTaskTitle} onChange={(event) => setNewTaskTitle(event.target.value)} placeholder="Add a custom task" />
-            <select value={newTaskCategory} onChange={(event) => setNewTaskCategory(event.target.value)}>
-              {categories.map((category) => (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <button type="button" onClick={addTask} disabled={!newTaskTitle.trim() || !activeTaskClientId}>
-              <Icon name="plus" />
-              Add
-            </button>
-          </div>
         </section>
 
         <section className="filters-row" aria-label="Dashboard filters">
