@@ -170,6 +170,7 @@ function Icon({
     | "moon"
     | "play"
     | "video"
+    | "settings"
     | "download"
     | "x";
 }) {
@@ -373,6 +374,15 @@ function Icon({
     );
   }
 
+  if (name === "settings") {
+    return (
+      <svg {...common}>
+        <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
+        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 0 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9L4.2 7A2 2 0 0 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 0 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="M12 3v18" />
@@ -382,6 +392,44 @@ function Icon({
       <path d="m7 8-4 4 4 4" />
       <path d="m17 8 4 4-4 4" />
     </svg>
+  );
+}
+
+function AttachmentLensSettings({
+  attachmentFilter,
+  attachmentCounts,
+  onAttachmentFilterChange,
+}: {
+  attachmentFilter: AttachmentFilter;
+  attachmentCounts: { looms: number; forms: number };
+  onAttachmentFilterChange: (filter: AttachmentFilter) => void;
+}) {
+  return (
+    <section className="rail-settings" aria-label="Settings">
+      <div className="rail-settings-title">
+        <Icon name="settings" />
+        <span>Settings</span>
+      </div>
+      <div className="attachment-lenses" aria-label="Attachment filters">
+        <button type="button" className={attachmentFilter === "all" ? "active" : ""} onClick={() => onAttachmentFilterChange("all")}>
+          <span>All cards</span>
+        </button>
+        <button type="button" className={attachmentFilter === "loom" ? "active" : ""} onClick={() => onAttachmentFilterChange("loom")}>
+          <span>
+            <Icon name="video" />
+            Looms
+          </span>
+          <strong>{attachmentCounts.looms}</strong>
+        </button>
+        <button type="button" className={attachmentFilter === "forms" ? "active" : ""} onClick={() => onAttachmentFilterChange("forms")}>
+          <span>
+            <Icon name="link" />
+            Forms
+          </span>
+          <strong>{attachmentCounts.forms}</strong>
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -1838,6 +1886,11 @@ export default function RespondDashboard({
     updateTask(task.id, { status });
   }
 
+  function selectTaskClient(clientId: string) {
+    setSelectedClientId(clientId);
+    setAttachmentFilter("all");
+  }
+
   function selectOrOpenTask(task: Task) {
     if (selectedId === task.id && detailReadyTaskId === task.id) {
       setDetailTaskId(task.id);
@@ -2120,6 +2173,7 @@ export default function RespondDashboard({
         </nav>
 
         <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={switchEnvironment} />
+        <AttachmentLensSettings attachmentFilter={attachmentFilter} attachmentCounts={attachmentCounts} onAttachmentFilterChange={setAttachmentFilter} />
       </aside>
 
       <section className="workspace">
@@ -2201,22 +2255,7 @@ export default function RespondDashboard({
             <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
             <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
           </div>
-          <div className="segmented attachment-segmented" aria-label="Attachment filters">
-            <button type="button" className={attachmentFilter === "all" ? "active" : ""} onClick={() => setAttachmentFilter("all")}>
-              All
-            </button>
-            <button type="button" className={attachmentFilter === "loom" ? "active" : ""} onClick={() => setAttachmentFilter("loom")}>
-              <Icon name="video" />
-              Looms
-              <span>{attachmentCounts.looms}</span>
-            </button>
-            <button type="button" className={attachmentFilter === "forms" ? "active" : ""} onClick={() => setAttachmentFilter("forms")}>
-              <Icon name="link" />
-              Forms
-              <span>{attachmentCounts.forms}</span>
-            </button>
-          </div>
-          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => setSelectedClientId(event.target.value)} disabled={clients.length === 0}>
+          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => selectTaskClient(event.target.value)} disabled={clients.length === 0}>
             {clients.length === 0 ? <option value="">No clients yet</option> : null}
             {clients.map((client) => (
               <option key={client.id} value={client.id}>
