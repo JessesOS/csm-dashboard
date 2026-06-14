@@ -600,6 +600,14 @@ button:disabled {
   background: rgba(20, 184, 166, 0.18);
 }
 
+.mission-secondary:disabled,
+.walkthrough-button:disabled {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.08);
+  color: #71849a;
+  cursor: not-allowed;
+}
+
 .portal-link {
   text-decoration: none;
   white-space: nowrap;
@@ -804,8 +812,16 @@ button:disabled {
   line-height: 1.55;
 }
 
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .empty-state-card .mission-primary,
-.empty-workspace-panel .walkthrough-primary {
+.empty-state-card .mission-secondary,
+.empty-workspace-panel .walkthrough-primary,
+.empty-workspace-panel .walkthrough-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;

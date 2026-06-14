@@ -167,7 +167,8 @@ function Icon({
     | "clock"
     | "sun"
     | "moon"
-    | "play";
+    | "play"
+    | "download";
 }) {
   const common = {
     width: 16,
@@ -222,6 +223,16 @@ function Icon({
       <svg {...common}>
         <path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.2 1.2" />
         <path d="M14 11a5 5 0 0 0-7.1-.1l-2 2a5 5 0 0 0 7.1 7.1l1.2-1.2" />
+      </svg>
+    );
+  }
+
+  if (name === "download") {
+    return (
+      <svg {...common}>
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 21h14" />
       </svg>
     );
   }
@@ -689,6 +700,9 @@ function MissionControl({
   onSelectClient,
   onOpenTasks,
   onCreateClientClick,
+  onImportGhlClient,
+  canImportGhlClient,
+  isImportingGhlClient,
   theme,
   onThemeChange,
   tourTarget,
@@ -709,6 +723,9 @@ function MissionControl({
   onSelectClient: (clientId: string) => void;
   onOpenTasks: (clientId?: string) => void;
   onCreateClientClick: () => void;
+  onImportGhlClient: () => void;
+  canImportGhlClient: boolean;
+  isImportingGhlClient: boolean;
   theme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
   tourTarget?: TourTarget;
@@ -847,6 +864,12 @@ function MissionControl({
                 Client portal
               </a>
             ) : null}
+            {canImportGhlClient ? (
+              <button type="button" className="mission-secondary" onClick={onImportGhlClient} disabled={isImportingGhlClient}>
+                <Icon name="download" />
+                {isImportingGhlClient ? "Importing" : "Import from GHL"}
+              </button>
+            ) : null}
             <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
               <Icon name="plus" />
               New client
@@ -920,10 +943,18 @@ function MissionControl({
               <span>{environment.shortLabel}</span>
               <h2>No {product.clientLabel.toLowerCase()} yet</h2>
               <p>Create your first {product.shortLabel} client to generate a fresh checklist, portal link, timeline, and task board.</p>
-              <button type="button" className="mission-primary" onClick={onCreateClientClick}>
-                <Icon name="plus" />
-                New client
-              </button>
+              <div className="empty-actions">
+                {canImportGhlClient ? (
+                  <button type="button" className="mission-primary" onClick={onImportGhlClient} disabled={isImportingGhlClient}>
+                    <Icon name="download" />
+                    {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                  </button>
+                ) : null}
+                <button type="button" className={canImportGhlClient ? "mission-secondary" : "mission-primary"} onClick={onCreateClientClick}>
+                  <Icon name="plus" />
+                  New client
+                </button>
+              </div>
             </article>
           ) : null}
           {clientCards.map((client) => (
@@ -1096,6 +1127,7 @@ export default function RespondDashboard({
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
+  const [isImportingGhlClient, setIsImportingGhlClient] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const currentEnvironment = useMemo(() => environmentConfig(activeEnvironment), [activeEnvironment]);
@@ -1228,6 +1260,7 @@ export default function RespondDashboard({
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
   const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter);
+  const canImportGhlClient = activeEnvironment === "live" && activeProduct === "respond";
 
   const metrics = useMemo(() => {
     const completed = tasks.filter((task) => task.status === "complete").length;
@@ -1389,6 +1422,46 @@ export default function RespondDashboard({
     }
   }
 
+  async function importGhlClientWorkspace() {
+    if (!canImportGhlClient || isImportingGhlClient) {
+      return;
+    }
+
+    const selector = window.prompt("Enter the exact GHL client, contact, or opportunity name/ID to import.");
+
+    if (!selector?.trim()) {
+      return;
+    }
+
+    setIsImportingGhlClient(true);
+
+    try {
+      const response = await fetch("/api/clients/import-ghl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selector: selector.trim() }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not import a GHL client.");
+      }
+
+      const client = data.client as RespondClient;
+      const clientTasks = data.tasks as Task[];
+      setClients((current) => [...current.filter((item) => item.id !== client.id), client]);
+      setSelectedClientId(client.id);
+      setTasks(clientTasks);
+      setSelectedId(clientTasks[0]?.id ?? "");
+      setActiveSection("tasks");
+      setShowNewClientPanel(false);
+      setStorageNotice(data.imported === false ? `${client.name} was already imported from GHL.` : `${client.name} imported from GHL.`);
+    } catch (error) {
+      setStorageNotice(error instanceof Error ? error.message : "Could not import a GHL client.");
+    } finally {
+      setIsImportingGhlClient(false);
+    }
+  }
+
   const statusTasks = useMemo(
     () =>
       taskStatuses.map((status) => ({
@@ -1447,6 +1520,9 @@ export default function RespondDashboard({
           onSelectClient={setSelectedClientId}
           onOpenTasks={openTasks}
           onCreateClientClick={() => setShowNewClientPanel(true)}
+          onImportGhlClient={importGhlClientWorkspace}
+          canImportGhlClient={canImportGhlClient}
+          isImportingGhlClient={isImportingGhlClient}
           theme={theme}
           onThemeChange={setTheme}
           tourTarget={currentTourStep?.section === "home" ? currentTourStep.target : undefined}
@@ -1540,6 +1616,12 @@ export default function RespondDashboard({
               <Icon name="plus" />
               New client
             </button>
+            {canImportGhlClient ? (
+              <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
+                <Icon name="download" />
+                {isImportingGhlClient ? "Importing" : "Import from GHL"}
+              </button>
+            ) : null}
             {selectedClient?.portalToken ? (
               <a className="walkthrough-button portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
                 <Icon name="link" />
@@ -1628,10 +1710,18 @@ export default function RespondDashboard({
             <span>{currentEnvironment.shortLabel}</span>
             <h2>No {currentProduct.clientLabel.toLowerCase()} in this workspace yet</h2>
             <p>Create a client to generate a fresh {currentProduct.taskTemplateLabel.toLowerCase()}, private portal link, and independent task board.</p>
-            <button type="button" className="walkthrough-primary" onClick={() => setShowNewClientPanel(true)}>
-              <Icon name="plus" />
-              New client
-            </button>
+            <div className="empty-actions">
+              {canImportGhlClient ? (
+                <button type="button" className="walkthrough-primary" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
+                  <Icon name="download" />
+                  {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                </button>
+              ) : null}
+              <button type="button" className={canImportGhlClient ? "walkthrough-secondary" : "walkthrough-primary"} onClick={() => setShowNewClientPanel(true)}>
+                <Icon name="plus" />
+                New client
+              </button>
+            </div>
           </section>
         ) : view === "board" ? (
           <section className="board" aria-label="Task workflow board">
