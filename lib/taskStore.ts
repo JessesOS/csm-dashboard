@@ -56,7 +56,18 @@ type ClientCountRow = {
   blocked: number;
 };
 
+type CountRow = {
+  count: number;
+};
+
+type MetaRow = {
+  value: string;
+};
+
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
+const currentStorageVersion = "2026-06-14-fast-task-load";
+const storagePreparedMetaKey = "task_storage_prepared";
+const portalDefaultBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const validStatuses = new Set<string>(taskStatuses);
@@ -321,6 +332,81 @@ async function tableColumns(tableName: string) {
   return new Set((result.results ?? []).map((column) => column.name));
 }
 
+async function ensureAppMetaTable(d1 = getD1()) {
+  await d1
+    .prepare(
+      "CREATE TABLE IF NOT EXISTS app_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)"
+    )
+    .run();
+}
+
+async function seedWorkspaceShapeReady() {
+  const d1 = getD1();
+  const [taskColumns, clientColumns] = await Promise.all([tableColumns("tasks"), tableColumns("clients")]);
+  const requiredTaskColumns = [
+    "client_id",
+    "environment",
+    "product",
+    "template_id",
+    "portal_visible",
+    "portal_title",
+    "portal_note",
+    "portal_action_required",
+    "portal_configured",
+  ];
+  const requiredClientColumns = ["portal_token", "environment", "product"];
+
+  if (!requiredTaskColumns.every((column) => taskColumns.has(column)) || !requiredClientColumns.every((column) => clientColumns.has(column))) {
+    return false;
+  }
+
+  const seedClientIds = allSeedClients.map((client) => client.id);
+  const placeholders = seedClientIds.map(() => "?").join(", ");
+  const [clientCount, taskClientCount] = await Promise.all([
+    d1
+      .prepare(`SELECT COUNT(DISTINCT id) AS count FROM clients WHERE id IN (${placeholders})`)
+      .bind(...seedClientIds)
+      .first<CountRow>(),
+    d1
+      .prepare(`SELECT COUNT(DISTINCT client_id) AS count FROM tasks WHERE client_id IN (${placeholders})`)
+      .bind(...seedClientIds)
+      .first<CountRow>(),
+  ]);
+
+  return (clientCount?.count ?? 0) >= seedClientIds.length && (taskClientCount?.count ?? 0) >= seedClientIds.length;
+}
+
+async function markStoragePrepared(d1 = getD1()) {
+  await ensureAppMetaTable(d1);
+  await d1
+    .prepare(
+      "INSERT INTO app_meta (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP"
+    )
+    .bind(storagePreparedMetaKey, currentStorageVersion)
+    .run();
+}
+
+async function storagePreparationAlreadyCompleted(d1 = getD1()) {
+  await ensureAppMetaTable(d1);
+
+  try {
+    const meta = await d1.prepare("SELECT value FROM app_meta WHERE key = ?").bind(storagePreparedMetaKey).first<MetaRow>();
+    const shapeReady = await seedWorkspaceShapeReady();
+
+    if (!shapeReady) {
+      return false;
+    }
+
+    if (meta?.value !== currentStorageVersion) {
+      await markStoragePrepared(d1);
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function ensureTaskColumns() {
   const d1 = getD1();
   const columns = await tableColumns("tasks");
@@ -517,7 +603,7 @@ function taskInsertValues(clientId: string, environment: EnvironmentKey, product
     item.portalTitle || portalDefaults.portalTitle,
     item.portalNote || portalDefaults.portalNote,
     item.portalActionRequired ? 1 : portalDefaults.portalActionRequired ? 1 : 0,
-    item.portalConfigured ? 1 : 0,
+    1,
     item.sortOrder,
   ];
 }
@@ -553,14 +639,22 @@ async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string, environ
     .bind(...binds)
     .all<Pick<Task, "id" | "title" | "category">>();
 
-  for (const task of result.results ?? []) {
-    const defaults = portalDefaultsForTask(task);
-    await d1
-      .prepare(
-        "UPDATE tasks SET portal_visible = ?, portal_title = ?, portal_note = ?, portal_action_required = ? WHERE id = ? AND portal_configured = 0"
-      )
-      .bind(defaults.portalVisible ? 1 : 0, defaults.portalTitle, defaults.portalNote, defaults.portalActionRequired ? 1 : 0, task.id)
-      .run();
+  const tasks = result.results ?? [];
+
+  for (let index = 0; index < tasks.length; index += portalDefaultBatchSize) {
+    const batch = tasks.slice(index, index + portalDefaultBatchSize).map((task) => {
+      const defaults = portalDefaultsForTask(task);
+
+      return d1
+        .prepare(
+          "UPDATE tasks SET portal_visible = ?, portal_title = ?, portal_note = ?, portal_action_required = ?, portal_configured = 1 WHERE id = ? AND portal_configured = 0"
+        )
+        .bind(defaults.portalVisible ? 1 : 0, defaults.portalTitle, defaults.portalNote, defaults.portalActionRequired ? 1 : 0, task.id);
+    });
+
+    if (batch.length > 0) {
+      await d1.batch(batch);
+    }
   }
 }
 
@@ -579,7 +673,18 @@ async function seedTaskWorkspaces() {
 async function prepareTaskStorage() {
   const d1 = getD1();
 
+  if (await storagePreparationAlreadyCompleted(d1)) {
+    return;
+  }
+
   await d1.batch([
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS app_meta (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
     d1.prepare(`
       CREATE TABLE IF NOT EXISTS clients (
         id TEXT PRIMARY KEY,
@@ -668,6 +773,7 @@ async function prepareTaskStorage() {
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
   await applyPortalDefaultsToUnconfiguredTasks();
+  await markStoragePrepared(d1);
 }
 
 export async function ensureTaskStorage() {

@@ -1446,7 +1446,15 @@ export default function RespondDashboard({
     return clients[0]?.id ?? "";
   }, [clients, selectedClientId]);
   const activeTaskKey = taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId);
-  const isTaskBoardLoading = Boolean(activeTaskClientId && loadedTaskKey !== activeTaskKey);
+  const tasksMatchActiveWorkspace = useMemo(
+    () =>
+      Boolean(activeTaskClientId && tasks.length > 0) &&
+      tasks.every((task) => task.clientId === activeTaskClientId && task.environment === activeEnvironment && task.product === activeProduct),
+    [activeEnvironment, activeProduct, activeTaskClientId, tasks]
+  );
+  const hasActiveTaskData = loadedTaskKey === activeTaskKey || tasksMatchActiveWorkspace;
+  const isTaskBoardRefreshing = Boolean(activeTaskClientId && loadedTaskKey !== activeTaskKey && hasActiveTaskData);
+  const isTaskBoardLoading = Boolean(activeTaskClientId && loadedTaskKey !== activeTaskKey && !hasActiveTaskData);
 
   function resetWorkspace(environment: EnvironmentKey, product: ProductKey) {
     const nextClients = environmentProductClients(environment, product);
@@ -2065,6 +2073,7 @@ export default function RespondDashboard({
         </section>
 
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
+        {!storageNotice && isTaskBoardRefreshing ? <div className="storage-notice">Refreshing saved task statuses...</div> : null}
 
         {clients.length === 0 ? (
           <section className="empty-workspace-panel" aria-label="Empty workspace">
