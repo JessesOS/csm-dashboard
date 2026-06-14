@@ -1,4 +1,4 @@
-import { respondClients } from "./respondClients";
+import { liveRespondClients, respondClients } from "./respondClients";
 import { categories, seedTasks, sourceDocument, teamMembers } from "./respondTasks";
 import { scaleClients } from "./scaleClients";
 import { scaleCategories, scaleSourceDocument, scaleTasks, scaleTeamMembers } from "./scaleTasks";
@@ -108,11 +108,15 @@ export function productClients(product: ProductKey): RespondClient[] {
 }
 
 export function environmentProductClients(environment: EnvironmentKey, product: ProductKey): RespondClient[] {
-  return environment === "demo" ? productClients(product) : [];
+  if (environment === "demo") {
+    return productClients(product);
+  }
+
+  return product === "respond" ? liveRespondClients : [];
 }
 
 export function productSourceDocument(product: ProductKey) {
   return product === "scale" ? scaleSourceDocument : sourceDocument;
 }
 
-export const allSeedClients: RespondClient[] = [...respondClients, ...scaleClients];
+export const allSeedClients: RespondClient[] = [...respondClients, ...scaleClients, ...liveRespondClients];

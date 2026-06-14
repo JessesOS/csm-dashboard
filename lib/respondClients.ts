@@ -1,4 +1,5 @@
 import type { RespondClient } from "./types";
+import { seedTasks } from "./respondTasks";
 
 export const missionTimelineDays = [
   "Jun 13",
@@ -344,3 +345,48 @@ export const respondClients: RespondClient[] = baseRespondClients.map((client) =
   environment: "demo",
   product: "respond",
 }));
+
+export const liveRespondClients: RespondClient[] = [
+  {
+    id: "live-bruce-chaplin",
+    environment: "live",
+    product: "respond",
+    name: "Bruce Chaplin",
+    code: "BC",
+    industry: "GHL Active Client",
+    owner: "GHL import",
+    phase: "Onboarding",
+    health: "on_track",
+    progress: 0,
+    currentTask: "Fresh Respond onboarding template",
+    goLiveDate: "2026-06-28",
+    goLiveLabel: "Jun 28, 2026",
+    lastUpdate: "Jun 14, 2026 5:20 AM",
+    nextStep: "Start Respond onboarding checklist",
+    blocker: "None",
+    risk: "low",
+    activeTasks: seedTasks.length,
+    completedTasks: 0,
+    timeline: [
+      {
+        label: "Respond checklist",
+        phase: "Onboarding",
+        startDay: 0,
+        span: 5,
+        status: "on_track",
+        marker: "milestone",
+      },
+    ],
+    attention: [
+      {
+        issue: "New client ready to start",
+        status: "Ready",
+        owner: "GHL import",
+        lastUpdate: "Jun 14, 2026 5:20 AM",
+        nextStep: "Start Respond onboarding checklist",
+        blocker: "None",
+        risk: "low",
+      },
+    ],
+  },
+];
