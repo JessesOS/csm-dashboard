@@ -16,6 +16,8 @@ export const tasks = sqliteTable("tasks", {
   priority: text("priority").notNull().default("normal"),
   dependencies: text("dependencies").notNull().default("[]"),
   notes: text("notes").notNull().default(""),
+  loomUrl: text("loom_url").notNull().default(""),
+  loomTitle: text("loom_title").notNull().default(""),
   portalVisible: integer("portal_visible").notNull().default(0),
   portalTitle: text("portal_title").notNull().default(""),
   portalNote: text("portal_note").notNull().default(""),

@@ -2186,7 +2186,8 @@ button:disabled {
 
 .mini-meta,
 .dependency-chip,
-.portal-chip {
+.portal-chip,
+.loom-card-indicator {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -2197,6 +2198,15 @@ button:disabled {
   padding: 0 8px;
   font-size: 11px;
   font-weight: 700;
+}
+
+.loom-card-indicator {
+  width: 28px;
+  justify-content: center;
+  border: 1px solid rgba(36, 94, 232, 0.2);
+  background: #edf4ff;
+  color: #1d4ed8;
+  padding: 0;
 }
 
 .dependency-open {
@@ -2543,6 +2553,41 @@ progress::-webkit-progress-value {
   font-weight: 720;
 }
 
+.task-modal-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-loom-trigger,
+.task-loom-open,
+.loom-watch-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 27px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.task-loom-trigger {
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: #334155;
+}
+
+.task-loom-trigger.active,
+.task-loom-open,
+.loom-watch-link {
+  border: 1px solid rgba(36, 94, 232, 0.2);
+  background: #edf4ff;
+  color: #1d4ed8;
+}
+
 .modal-close-button {
   display: grid;
   place-items: center;
@@ -2626,6 +2671,20 @@ progress::-webkit-progress-value {
   padding: 10px;
   font-size: 12px;
   line-height: 1.5;
+}
+
+.loom-editor {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fbff;
+  padding: 13px;
+}
+
+.loom-watch-link {
+  width: fit-content;
+  min-height: 32px;
 }
 
 .task-modal-footer {
@@ -2865,9 +2924,16 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .mini-meta,
 .dashboard-shell-dark .dependency-chip,
-.dashboard-shell-dark .portal-chip {
+.dashboard-shell-dark .portal-chip,
+.dashboard-shell-dark .loom-card-indicator {
   background: rgba(148, 163, 184, 0.14);
   color: #a8b8ca;
+}
+
+.dashboard-shell-dark .loom-card-indicator {
+  border-color: rgba(45, 212, 191, 0.32);
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
 }
 
 .dashboard-shell-dark .dependency-open {
@@ -2884,6 +2950,25 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-actions button {
   background: rgba(193, 255, 36, 0.1);
   color: #c9f82b;
+}
+
+.dashboard-shell-dark .task-loom-trigger {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #071827;
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .task-loom-trigger.active,
+.dashboard-shell-dark .task-loom-open,
+.dashboard-shell-dark .loom-watch-link {
+  border-color: rgba(45, 212, 191, 0.32);
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
+}
+
+.dashboard-shell-dark .loom-editor {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #081b2d;
 }
 
 .dashboard-shell-dark .priority-low,

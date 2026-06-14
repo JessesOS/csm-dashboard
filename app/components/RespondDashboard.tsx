@@ -362,6 +362,15 @@ function Icon({
     );
   }
 
+  if (name === "video") {
+    return (
+      <svg {...common}>
+        <path d="M15 10.5 20 7v10l-5-3.5" />
+        <rect x="3" y="6" width="12" height="12" rx="2" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="M12 3v18" />
@@ -525,6 +534,11 @@ function normalizeText(value: string) {
   return value.toLowerCase().trim();
 }
 
+function safeInstructionUrl(value: string | null | undefined) {
+  const clean = value?.trim() ?? "";
+  return /^https?:\/\//i.test(clean) ? clean : "";
+}
+
 function useFilteredTasks(tasks: Task[], query: string, category: string, owner: string, status: string) {
   return useMemo(() => {
     const text = normalizeText(query);
@@ -639,6 +653,7 @@ function TaskCard({
 }) {
   const dependencyState = getDependencyState(task, taskMap);
   const isDone = task.status === "complete";
+  const loomUrl = safeInstructionUrl(task.loomUrl);
 
   return (
     <article
@@ -667,6 +682,11 @@ function TaskCard({
         <span>{task.category}</span>
       </div>
       <div className="task-card-footer">
+        {loomUrl ? (
+          <span className="loom-card-indicator" title={task.loomTitle || "Loom instructions attached"}>
+            <Icon name="video" />
+          </span>
+        ) : null}
         <span className="avatar" title={task.assignee}>
           {initials(task.assignee)}
         </span>
@@ -720,12 +740,32 @@ function TaskDetailModal({
   onUpdate: (id: string, payload: TaskUpdatePayload) => void;
   onOpenDependency: (task: Task) => void;
 }) {
+  const [showLoomEditor, setShowLoomEditor] = useState(Boolean(safeInstructionUrl(task.loomUrl)));
+  const loomUrl = safeInstructionUrl(task.loomUrl);
+  const loomLabel = task.loomTitle?.trim() || "Loom instructions";
+
   return (
     <div className="modal-backdrop task-modal-backdrop" onClick={onClose}>
       <section className="task-detail-modal" role="dialog" aria-modal="true" aria-labelledby="task-detail-title" onClick={(event) => event.stopPropagation()}>
         <header className="task-modal-head">
           <div>
-            <span className={`priority priority-${task.priority}`}>{task.priority}</span>
+            <div className="task-modal-chip-row">
+              <span className={`priority priority-${task.priority}`}>{task.priority}</span>
+              <button
+                type="button"
+                className={loomUrl ? "task-loom-trigger active" : "task-loom-trigger"}
+                onClick={() => setShowLoomEditor((current) => !current)}
+              >
+                <Icon name="video" />
+                {loomUrl ? "Loom" : "Add Loom"}
+              </button>
+              {loomUrl ? (
+                <a className="task-loom-open" href={loomUrl} target="_blank" rel="noreferrer">
+                  <Icon name="play" />
+                  Watch
+                </a>
+              ) : null}
+            </div>
             <h2 id="task-detail-title">{task.title}</h2>
             <p>
               {task.category} / {task.phase}
@@ -806,6 +846,39 @@ function TaskDetailModal({
               Notes
               <textarea aria-label="Notes" value={task.notes} onChange={(event) => onUpdate(task.id, { notes: event.target.value })} placeholder="Add context for the team" />
             </label>
+
+            {showLoomEditor || loomUrl ? (
+              <div className="loom-editor">
+                <div className="inspector-section-title">
+                  <Icon name="video" />
+                  Loom instructions
+                </div>
+                {loomUrl ? (
+                  <a className="loom-watch-link" href={loomUrl} target="_blank" rel="noreferrer">
+                    <Icon name="play" />
+                    {loomLabel}
+                  </a>
+                ) : null}
+                <label>
+                  Loom URL
+                  <input
+                    aria-label="Loom URL"
+                    value={task.loomUrl ?? ""}
+                    onChange={(event) => onUpdate(task.id, { loomUrl: event.target.value })}
+                    placeholder="https://www.loom.com/share/..."
+                  />
+                </label>
+                <label>
+                  Instruction title
+                  <input
+                    aria-label="Loom instruction title"
+                    value={task.loomTitle ?? ""}
+                    onChange={(event) => onUpdate(task.id, { loomTitle: event.target.value })}
+                    placeholder="How to complete this task"
+                  />
+                </label>
+              </div>
+            ) : null}
           </section>
 
           <section className="task-modal-section">
@@ -1721,6 +1794,8 @@ export default function RespondDashboard({
       priority: "normal",
       dependencies: [],
       notes: "",
+      loomUrl: "",
+      loomTitle: "",
       portalVisible: false,
       portalTitle: "",
       portalNote: "",
@@ -2179,6 +2254,7 @@ export default function RespondDashboard({
       />
       {detailTask ? (
         <TaskDetailModal
+          key={detailTask.id}
           task={detailTask}
           taskMap={taskMap}
           categories={categories}

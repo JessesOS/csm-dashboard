@@ -52,6 +52,8 @@ export interface Task {
   priority: Priority;
   dependencies: string[];
   notes: string;
+  loomUrl?: string;
+  loomTitle?: string;
   portalVisible: boolean;
   portalTitle: string;
   portalNote: string;
@@ -72,6 +74,8 @@ export interface TaskUpdatePayload {
   priority?: Priority;
   dependencies?: string[];
   notes?: string;
+  loomUrl?: string;
+  loomTitle?: string;
   portalVisible?: boolean;
   portalTitle?: string;
   portalNote?: string;

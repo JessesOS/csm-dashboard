@@ -65,11 +65,11 @@ type MetaRow = {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-14-company-dedupe";
+const currentStorageVersion = "2026-06-14-loom-instructions";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
-  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
   "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const validStatuses = new Set<string>(taskStatuses);
@@ -145,6 +145,8 @@ function fromRow(row: TaskRow): Task {
     environment: normalizeEnvironment(row.environment),
     product: normalizeProduct(row.product),
     dependencies: parseDependencies(row.dependencies),
+    loomUrl: row.loomUrl ?? "",
+    loomTitle: row.loomTitle ?? "",
     portalVisible: Boolean(row.portalVisible),
     portalActionRequired: Boolean(row.portalActionRequired),
     portalConfigured: Boolean(row.portalConfigured),
@@ -354,6 +356,8 @@ async function seedWorkspaceShapeReady() {
     "environment",
     "product",
     "template_id",
+    "loom_url",
+    "loom_title",
     "portal_visible",
     "portal_title",
     "portal_note",
@@ -451,6 +455,14 @@ async function ensureTaskColumns() {
 
   if (!columns.has("portal_visible")) {
     await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_visible INTEGER NOT NULL DEFAULT 0").run();
+  }
+
+  if (!columns.has("loom_url")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN loom_url TEXT NOT NULL DEFAULT ''").run();
+  }
+
+  if (!columns.has("loom_title")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN loom_title TEXT NOT NULL DEFAULT ''").run();
   }
 
   if (!columns.has("portal_title")) {
@@ -612,13 +624,15 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
             priority,
             dependencies,
             notes,
+            loom_url,
+            loom_title,
             portal_visible,
             portal_title,
             portal_note,
             portal_action_required,
             portal_configured,
             sort_order
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
@@ -643,6 +657,8 @@ function taskInsertValues(clientId: string, environment: EnvironmentKey, product
     item.priority,
     JSON.stringify(item.dependencies.map((dependencyId) => scopedTaskId(clientId, dependencyId))),
     useTemplateState ? item.notes : "",
+    item.loomUrl ?? "",
+    item.loomTitle ?? "",
     item.portalVisible ? 1 : portalDefaults.portalVisible ? 1 : 0,
     item.portalTitle || portalDefaults.portalTitle,
     item.portalNote || portalDefaults.portalNote,
@@ -774,6 +790,8 @@ async function prepareTaskStorage() {
         priority TEXT NOT NULL DEFAULT 'normal',
         dependencies TEXT NOT NULL DEFAULT '[]',
         notes TEXT NOT NULL DEFAULT '',
+        loom_url TEXT NOT NULL DEFAULT '',
+        loom_title TEXT NOT NULL DEFAULT '',
         portal_visible INTEGER NOT NULL DEFAULT 0,
         portal_title TEXT NOT NULL DEFAULT '',
         portal_note TEXT NOT NULL DEFAULT '',
@@ -969,13 +987,15 @@ export async function createTask(
         priority,
         dependencies,
         notes,
+        loom_url,
+        loom_title,
         portal_visible,
         portal_title,
         portal_note,
         portal_action_required,
         portal_configured,
         sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       id,
@@ -992,6 +1012,8 @@ export async function createTask(
       priority,
       JSON.stringify(payload.dependencies ?? []),
       payload.notes?.trim() ?? "",
+      payload.loomUrl?.trim() ?? "",
+      payload.loomTitle?.trim() ?? "",
       payload.portalVisible ? 1 : 0,
       payload.portalTitle?.trim() ?? "",
       payload.portalNote?.trim() ?? "",
@@ -1085,6 +1107,16 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   if (typeof payload.notes === "string") {
     updates.push("notes = ?");
     values.push(payload.notes.trim());
+  }
+
+  if (typeof payload.loomUrl === "string") {
+    updates.push("loom_url = ?");
+    values.push(payload.loomUrl.trim());
+  }
+
+  if (typeof payload.loomTitle === "string") {
+    updates.push("loom_title = ?");
+    values.push(payload.loomTitle.trim());
   }
 
   if (typeof payload.portalVisible === "boolean") {
