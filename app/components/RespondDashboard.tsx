@@ -2264,7 +2264,6 @@ export default function RespondDashboard({
           </div>
           <div className="topbar-actions">
             <div className="task-header-tools">
-              <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
               <ThemeToggle theme={theme} onThemeChange={setTheme} />
               <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
                 <Icon name="play" />

@@ -713,21 +713,6 @@ button:disabled {
   font-size: 12px;
 }
 
-.workspace-mode-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 40px;
-  border: 1px solid rgba(193, 255, 36, 0.28);
-  border-radius: 999px;
-  background: rgba(193, 255, 36, 0.1);
-  color: #c9f82b;
-  padding: 0 12px;
-  font-size: 12px;
-  font-weight: 820;
-  white-space: nowrap;
-}
-
 .mission-primary {
   justify-content: center;
   gap: 8px;
@@ -1608,8 +1593,7 @@ button:disabled {
 .dashboard-shell-light .rail-settings-button.active,
 .dashboard-shell-light .rail-settings-open .rail-settings-button,
 .dashboard-shell-light .attachment-lenses button:hover,
-.dashboard-shell-light .attachment-lenses button.active,
-.dashboard-shell-light .workspace-mode-pill {
+.dashboard-shell-light .attachment-lenses button.active {
   border-color: rgba(36, 94, 232, 0.35);
   background: #eff5ff;
   color: #174ac9;
@@ -3048,8 +3032,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .theme-toggle button.active,
 .dashboard-shell-dark .new-task button,
 .dashboard-shell-dark .inspector-footer button,
-.dashboard-shell-dark .task-modal-primary,
-.dashboard-shell-dark .workspace-mode-pill {
+.dashboard-shell-dark .task-modal-primary {
   background: #c9f82b;
   color: #07121f;
 }
