@@ -2,7 +2,7 @@ import { respondClients } from "./respondClients";
 import { categories, seedTasks, sourceDocument, teamMembers } from "./respondTasks";
 import { scaleClients } from "./scaleClients";
 import { scaleCategories, scaleSourceDocument, scaleTasks, scaleTeamMembers } from "./scaleTasks";
-import type { Category, ProductKey, RespondClient, Task } from "./types";
+import type { Category, EnvironmentKey, ProductKey, RespondClient, Task } from "./types";
 
 export interface ProductWorkspace {
   key: ProductKey;
@@ -17,6 +17,31 @@ export interface ProductWorkspace {
   nextStepFallback: string;
   taskTemplateLabel: string;
 }
+
+export interface OperatingEnvironment {
+  key: EnvironmentKey;
+  label: string;
+  shortLabel: string;
+  description: string;
+  statusLabel: string;
+}
+
+export const operatingEnvironments: OperatingEnvironment[] = [
+  {
+    key: "demo",
+    label: "Demo",
+    shortLabel: "Demo",
+    description: "Seeded training data, walkthrough clients, and safe UI experiments.",
+    statusLabel: "Demo environment",
+  },
+  {
+    key: "live",
+    label: "Live",
+    shortLabel: "Live",
+    description: "Clean real-client workspace with the same Respond and Scale flows.",
+    statusLabel: "Live workspace",
+  },
+];
 
 export const productWorkspaces: ProductWorkspace[] = [
   {
@@ -48,13 +73,22 @@ export const productWorkspaces: ProductWorkspace[] = [
 ];
 
 export const defaultProduct: ProductKey = "respond";
+export const defaultEnvironment: EnvironmentKey = "demo";
 
 export function normalizeProduct(value: string | null | undefined): ProductKey {
   return value === "scale" ? "scale" : "respond";
 }
 
+export function normalizeEnvironment(value: string | null | undefined): EnvironmentKey {
+  return value === "live" ? "live" : "demo";
+}
+
 export function productConfig(product: ProductKey) {
   return productWorkspaces.find((workspace) => workspace.key === product) ?? productWorkspaces[0];
+}
+
+export function environmentConfig(environment: EnvironmentKey) {
+  return operatingEnvironments.find((workspace) => workspace.key === environment) ?? operatingEnvironments[0];
 }
 
 export function productCategories(product: ProductKey): Category[] {
@@ -71,6 +105,10 @@ export function productTasks(product: ProductKey): Task[] {
 
 export function productClients(product: ProductKey): RespondClient[] {
   return product === "scale" ? scaleClients : respondClients;
+}
+
+export function environmentProductClients(environment: EnvironmentKey, product: ProductKey): RespondClient[] {
+  return environment === "demo" ? productClients(product) : [];
 }
 
 export function productSourceDocument(product: ProductKey) {

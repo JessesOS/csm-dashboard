@@ -3,6 +3,7 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const tasks = sqliteTable("tasks", {
   id: text("id").primaryKey(),
+  environment: text("environment").notNull().default("demo"),
   product: text("product").notNull().default("respond"),
   clientId: text("client_id").notNull().default("northlane-health"),
   templateId: text("template_id").notNull().default(""),
@@ -27,6 +28,7 @@ export const tasks = sqliteTable("tasks", {
 
 export const clients = sqliteTable("clients", {
   id: text("id").primaryKey(),
+  environment: text("environment").notNull().default("demo"),
   product: text("product").notNull().default("respond"),
   portalToken: text("portal_token").notNull().default(""),
   name: text("name").notNull(),

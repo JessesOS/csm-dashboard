@@ -2,20 +2,36 @@
 
 import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import {
+  defaultEnvironment,
   defaultProduct,
+  environmentConfig,
+  environmentProductClients,
+  operatingEnvironments,
   productCategories,
-  productClients,
   productConfig,
   productTasks,
   productTeamMembers,
   productWorkspaces,
+  type OperatingEnvironment,
   type ProductWorkspace,
 } from "../../lib/productWorkspaces";
 import { missionTimelineDays } from "../../lib/respondClients";
-import type { Category, ClientCreatePayload, ClientHealth, ClientRisk, ProductKey, RespondClient, Task, TaskStatus, TaskUpdatePayload } from "../../lib/types";
+import type {
+  Category,
+  ClientCreatePayload,
+  ClientHealth,
+  ClientRisk,
+  EnvironmentKey,
+  ProductKey,
+  RespondClient,
+  Task,
+  TaskStatus,
+  TaskUpdatePayload,
+} from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
 
 interface DashboardProps {
+  initialEnvironment: EnvironmentKey;
   initialProduct: ProductKey;
   initialTasks: Task[];
   initialCategories: Category[];
@@ -380,6 +396,33 @@ function ProductSwitcher({
   );
 }
 
+function EnvironmentSwitcher({
+  activeEnvironment,
+  onEnvironmentChange,
+}: {
+  activeEnvironment: EnvironmentKey;
+  onEnvironmentChange: (environment: EnvironmentKey) => void;
+}) {
+  return (
+    <div className="environment-switcher" aria-label="Operating environment">
+      <span>Mode</span>
+      <div>
+        {operatingEnvironments.map((environment) => (
+          <button
+            type="button"
+            key={environment.key}
+            className={activeEnvironment === environment.key ? "active" : ""}
+            onClick={() => onEnvironmentChange(environment.key)}
+            title={environment.description}
+          >
+            {environment.shortLabel}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WalkthroughPanel({
   step,
   stepIndex,
@@ -564,6 +607,7 @@ function NewClientPanel({
   open,
   saving,
   theme,
+  environment,
   product,
   onClose,
   onSubmit,
@@ -571,6 +615,7 @@ function NewClientPanel({
   open: boolean;
   saving: boolean;
   theme: ThemeMode;
+  environment: OperatingEnvironment;
   product: ProductWorkspace;
   onClose: () => void;
   onSubmit: (payload: ClientCreatePayload) => void;
@@ -597,7 +642,7 @@ function NewClientPanel({
         <div className="new-client-head">
           <div>
             <span>New client</span>
-            <h2>Create {product.shortLabel} client workspace</h2>
+            <h2>Create {environment.shortLabel} {product.shortLabel} client workspace</h2>
           </div>
           <button type="button" className="icon-button" onClick={onClose} title="Close">
             x
@@ -633,6 +678,9 @@ function NewClientPanel({
 }
 
 function MissionControl({
+  environment,
+  activeEnvironment,
+  onEnvironmentChange,
   product,
   activeProduct,
   onProductChange,
@@ -650,6 +698,9 @@ function MissionControl({
   completedTasks,
   waitingTasks,
 }: {
+  environment: OperatingEnvironment;
+  activeEnvironment: EnvironmentKey;
+  onEnvironmentChange: (environment: EnvironmentKey) => void;
   product: ProductWorkspace;
   activeProduct: ProductKey;
   onProductChange: (product: ProductKey) => void;
@@ -695,6 +746,7 @@ function MissionControl({
   }, [activeLens, clients]);
   const scopedClients = selectedClient ? [selectedClient] : lensClients;
   const clientCards = selectedClient ? clients : lensClients;
+  const emptyPortfolio = clients.length === 0;
   const totalClients = clients.length || 1;
   const portfolioStats = {
     onTrack: clients.filter((client) => client.health === "on_track").length,
@@ -715,9 +767,9 @@ function MissionControl({
   const timelineClients = scopedClients;
   const totalAtRisk = portfolioStats.atRisk + portfolioStats.offTrack;
   const riskPercent = Math.round((totalAtRisk / totalClients) * 100);
-  const riskDegrees = Math.max(8, Math.round((riskPercent / 100) * 360));
-  const overallStatus = portfolioStats.offTrack > 0 ? "At risk" : portfolioStats.atRisk > 0 ? "Watch" : "Healthy";
-  const overallClass: ClientHealth = portfolioStats.offTrack > 0 ? "off_track" : portfolioStats.atRisk > 0 ? "at_risk" : "on_track";
+  const riskDegrees = emptyPortfolio ? 0 : Math.max(8, Math.round((riskPercent / 100) * 360));
+  const overallStatus = emptyPortfolio ? "Ready" : portfolioStats.offTrack > 0 ? "At risk" : portfolioStats.atRisk > 0 ? "Watch" : "Healthy";
+  const overallClass: ClientHealth = emptyPortfolio ? "on_track" : portfolioStats.offTrack > 0 ? "off_track" : portfolioStats.atRisk > 0 ? "at_risk" : "on_track";
 
   function chooseLens(lens: "all" | "waiting" | "golive" | "high") {
     setActiveLens(lens);
@@ -747,7 +799,7 @@ function MissionControl({
             <Icon name="home" />
             Mission Control
           </button>
-          <button type="button" onClick={() => onOpenTasks(selectedClient?.id)}>
+          <button type="button" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
             <Icon name="tasks" />
             Tasks
           </button>
@@ -760,6 +812,8 @@ function MissionControl({
           <button type="button" className={activeLens === "golive" && !selectedClient ? "active" : ""} onClick={() => chooseLens("golive")}>Go-live next 30 days</button>
           <button type="button" className={activeLens === "high" && !selectedClient ? "active" : ""} onClick={() => chooseLens("high")}>High risk</button>
         </div>
+
+        <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={onEnvironmentChange} />
 
         <div className="mission-user">
           <span className="avatar">JB</span>
@@ -779,7 +833,7 @@ function MissionControl({
           <div className="mission-header-actions">
             <span className="system-pill">
               <span />
-              All systems operational
+              {environment.statusLabel}
             </span>
             <span className="mission-date">Jun 13, 2026</span>
             <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
@@ -812,7 +866,7 @@ function MissionControl({
                 </option>
               ))}
             </select>
-            <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)}>
+            <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
               <Icon name="tasks" />
               Open tasks
             </button>
@@ -861,6 +915,17 @@ function MissionControl({
         </section>
 
         <section className="mission-client-grid" aria-label="Client portfolio">
+          {emptyPortfolio ? (
+            <article className="empty-state-card">
+              <span>{environment.shortLabel}</span>
+              <h2>No {product.clientLabel.toLowerCase()} yet</h2>
+              <p>Create your first {product.shortLabel} client to generate a fresh checklist, portal link, timeline, and task board.</p>
+              <button type="button" className="mission-primary" onClick={onCreateClientClick}>
+                <Icon name="plus" />
+                New client
+              </button>
+            </article>
+          ) : null}
           {clientCards.map((client) => (
             <article
               key={client.id}
@@ -997,7 +1062,15 @@ function MissionControl({
   );
 }
 
-export default function RespondDashboard({ initialProduct, initialTasks, initialCategories, initialTeamMembers, initialClients }: DashboardProps) {
+export default function RespondDashboard({
+  initialEnvironment,
+  initialProduct,
+  initialTasks,
+  initialCategories,
+  initialTeamMembers,
+  initialClients,
+}: DashboardProps) {
+  const [activeEnvironment, setActiveEnvironment] = useState<EnvironmentKey>(initialEnvironment ?? defaultEnvironment);
   const [activeProduct, setActiveProduct] = useState<ProductKey>(initialProduct ?? defaultProduct);
   const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
@@ -1025,6 +1098,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
+  const currentEnvironment = useMemo(() => environmentConfig(activeEnvironment), [activeEnvironment]);
   const currentProduct = useMemo(() => productConfig(activeProduct), [activeProduct]);
   const categories = useMemo(
     () => (activeProduct === initialProduct ? initialCategories : productCategories(activeProduct)),
@@ -1040,23 +1114,19 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
   );
 
   const activeTaskClientId = useMemo(() => {
-    const fallbackClientId = clients[0]?.id ?? currentProduct.defaultClientId;
     if (selectedClientId !== "all" && clients.some((client) => client.id === selectedClientId)) {
       return selectedClientId;
     }
 
-    return fallbackClientId;
-  }, [clients, currentProduct.defaultClientId, selectedClientId]);
+    return clients[0]?.id ?? "";
+  }, [clients, selectedClientId]);
 
-  function switchProduct(product: ProductKey) {
-    if (product === activeProduct) {
-      return;
-    }
-
-    const nextClients = productClients(product);
-    const nextTasks = productTasks(product);
+  function resetWorkspace(environment: EnvironmentKey, product: ProductKey) {
+    const nextClients = environmentProductClients(environment, product);
+    const nextTasks = nextClients.length > 0 ? productTasks(product) : [];
     const nextCategories = productCategories(product);
 
+    setActiveEnvironment(environment);
     setActiveProduct(product);
     setClients(nextClients);
     setTasks(nextTasks);
@@ -1072,6 +1142,22 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
     setStorageNotice("");
   }
 
+  function switchEnvironment(environment: EnvironmentKey) {
+    if (environment === activeEnvironment) {
+      return;
+    }
+
+    resetWorkspace(environment, activeProduct);
+  }
+
+  function switchProduct(product: ProductKey) {
+    if (product === activeProduct) {
+      return;
+    }
+
+    resetWorkspace(activeEnvironment, product);
+  }
+
   useEffect(() => {
     window.localStorage.setItem("respond-csm-theme", theme);
   }, [theme]);
@@ -1079,7 +1165,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
   useEffect(() => {
     let active = true;
 
-    fetch(`/api/clients?product=${encodeURIComponent(activeProduct)}`, { cache: "no-store" })
+    fetch(`/api/clients?environment=${encodeURIComponent(activeEnvironment)}&product=${encodeURIComponent(activeProduct)}`, { cache: "no-store" })
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {
@@ -1088,10 +1174,11 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
         return data.clients as RespondClient[];
       })
       .then((remoteClients) => {
-        if (!active || remoteClients.length === 0) {
+        if (!active) {
           return;
         }
         setClients(remoteClients);
+        setSelectedClientId((current) => (current !== "all" && remoteClients.some((client) => client.id === current) ? current : "all"));
         setStorageNotice("");
       })
       .catch((error: Error) => {
@@ -1103,12 +1190,15 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
     return () => {
       active = false;
     };
-  }, [activeProduct]);
+  }, [activeEnvironment, activeProduct]);
 
   useEffect(() => {
     let active = true;
 
-    fetch(`/api/tasks?product=${encodeURIComponent(activeProduct)}&clientId=${encodeURIComponent(activeTaskClientId)}`, { cache: "no-store" })
+    fetch(
+      `/api/tasks?environment=${encodeURIComponent(activeEnvironment)}&product=${encodeURIComponent(activeProduct)}&clientId=${encodeURIComponent(activeTaskClientId)}`,
+      { cache: "no-store" }
+    )
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) {
@@ -1117,7 +1207,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
         return data.tasks as Task[];
       })
       .then((remoteTasks) => {
-        if (!active || remoteTasks.length === 0) {
+        if (!active) {
           return;
         }
         setTasks(remoteTasks);
@@ -1133,7 +1223,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
     return () => {
       active = false;
     };
-  }, [activeProduct, activeTaskClientId]);
+  }, [activeEnvironment, activeProduct, activeTaskClientId]);
 
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
@@ -1219,12 +1309,13 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
 
   async function addTask() {
     const title = newTaskTitle.trim();
-    if (!title) {
+    if (!title || !activeTaskClientId) {
       return;
     }
 
     const tempTask: Task = {
       id: `draft-${activeTaskClientId}-${Date.now()}`,
+      environment: activeEnvironment,
       product: activeProduct,
       clientId: activeTaskClientId,
       templateId: `draft-${Date.now()}`,
@@ -1253,7 +1344,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
       const response = await fetch("/api/tasks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: activeProduct, clientId: activeTaskClientId, title, category: newTaskCategory }),
+        body: JSON.stringify({ environment: activeEnvironment, product: activeProduct, clientId: activeTaskClientId, title, category: newTaskCategory }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -1275,7 +1366,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
       const response = await fetch("/api/clients", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, product: activeProduct }),
+        body: JSON.stringify({ ...payload, environment: activeEnvironment, product: activeProduct }),
       });
       const data = await response.json();
       if (!response.ok) {
@@ -1318,7 +1409,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
 
     const step = tourSteps[index];
     if (step.clientId) {
-      setSelectedClientId(currentProduct.defaultClientId);
+      setSelectedClientId(clients[0]?.id ?? "all");
     }
     setActiveSection(step.section);
     setTourStepIndex(index);
@@ -1344,7 +1435,10 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
     return (
       <>
         <MissionControl
-          key={activeProduct}
+          key={`${activeEnvironment}-${activeProduct}`}
+          environment={currentEnvironment}
+          activeEnvironment={activeEnvironment}
+          onEnvironmentChange={switchEnvironment}
           product={currentProduct}
           activeProduct={activeProduct}
           onProductChange={switchProduct}
@@ -1363,10 +1457,11 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
           waitingTasks={metrics.blocked}
         />
         <NewClientPanel
-          key={`home-${activeProduct}`}
+          key={`home-${activeEnvironment}-${activeProduct}`}
           open={showNewClientPanel}
           saving={isCreatingClient}
           theme={theme}
+          environment={currentEnvironment}
           product={currentProduct}
           onClose={() => setShowNewClientPanel(false)}
           onSubmit={createClientWorkspace}
@@ -1421,6 +1516,8 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
             );
           })}
         </nav>
+
+        <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={switchEnvironment} />
       </aside>
 
       <section className="workspace">
@@ -1433,6 +1530,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
             </p>
           </div>
           <div className="topbar-actions">
+            <span className="workspace-mode-pill">{currentEnvironment.statusLabel}</span>
             <ThemeToggle theme={theme} onThemeChange={setTheme} />
             <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
               <Icon name="play" />
@@ -1477,7 +1575,7 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
                 </option>
               ))}
             </select>
-            <button type="button" onClick={addTask} disabled={!newTaskTitle.trim()}>
+            <button type="button" onClick={addTask} disabled={!newTaskTitle.trim() || !activeTaskClientId}>
               <Icon name="plus" />
               Add
             </button>
@@ -1489,7 +1587,8 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
             <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
             <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
           </div>
-          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => setSelectedClientId(event.target.value)}>
+          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => setSelectedClientId(event.target.value)} disabled={clients.length === 0}>
+            {clients.length === 0 ? <option value="">No clients yet</option> : null}
             {clients.map((client) => (
               <option key={client.id} value={client.id}>
                 {client.name}
@@ -1524,7 +1623,17 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
 
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
 
-        {view === "board" ? (
+        {clients.length === 0 ? (
+          <section className="empty-workspace-panel" aria-label="Empty workspace">
+            <span>{currentEnvironment.shortLabel}</span>
+            <h2>No {currentProduct.clientLabel.toLowerCase()} in this workspace yet</h2>
+            <p>Create a client to generate a fresh {currentProduct.taskTemplateLabel.toLowerCase()}, private portal link, and independent task board.</p>
+            <button type="button" className="walkthrough-primary" onClick={() => setShowNewClientPanel(true)}>
+              <Icon name="plus" />
+              New client
+            </button>
+          </section>
+        ) : view === "board" ? (
           <section className="board" aria-label="Task workflow board">
             {statusTasks.map(({ status, tasks: columnTasks }) => (
               <div
@@ -1724,10 +1833,11 @@ export default function RespondDashboard({ initialProduct, initialTasks, initial
         ) : null}
       </aside>
       <NewClientPanel
-        key={`tasks-${activeProduct}`}
+        key={`tasks-${activeEnvironment}-${activeProduct}`}
         open={showNewClientPanel}
         saving={isCreatingClient}
         theme={theme}
+        environment={currentEnvironment}
         product={currentProduct}
         onClose={() => setShowNewClientPanel(false)}
         onSubmit={createClientWorkspace}

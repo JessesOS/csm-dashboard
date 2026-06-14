@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const clients = await listClients(searchParams.get("product"));
+    const clients = await listClients(searchParams.get("environment"), searchParams.get("product"));
     return NextResponse.json({ clients });
   } catch (error) {
     return NextResponse.json({ error: routeErrorMessage(error), clients: [] }, { status: 503 });

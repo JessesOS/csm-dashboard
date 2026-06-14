@@ -20,6 +20,8 @@ export type Priority = "low" | "normal" | "high" | "critical";
 
 export type ProductKey = "respond" | "scale";
 
+export type EnvironmentKey = "demo" | "live";
+
 export type Phase =
   | "Onboarding"
   | "Build"
@@ -37,6 +39,7 @@ export interface Category {
 
 export interface Task {
   id: string;
+  environment?: EnvironmentKey;
   product?: ProductKey;
   clientId?: string;
   templateId?: string;
@@ -109,6 +112,7 @@ export interface ClientAttentionItem {
 
 export interface RespondClient {
   id: string;
+  environment: EnvironmentKey;
   product: ProductKey;
   portalToken?: string;
   name: string;
@@ -132,6 +136,7 @@ export interface RespondClient {
 }
 
 export interface ClientCreatePayload {
+  environment?: EnvironmentKey;
   product?: ProductKey;
   name?: string;
   owner?: string;

@@ -17,7 +17,7 @@ export const missionTimelineDays = [
   "Jun 26",
 ];
 
-const baseRespondClients: Array<Omit<RespondClient, "product">> = [
+const baseRespondClients: Array<Omit<RespondClient, "environment" | "product">> = [
   {
     id: "northlane-health",
     name: "Northlane Health",
@@ -341,5 +341,6 @@ const baseRespondClients: Array<Omit<RespondClient, "product">> = [
 
 export const respondClients: RespondClient[] = baseRespondClients.map((client) => ({
   ...client,
+  environment: "demo",
   product: "respond",
 }));

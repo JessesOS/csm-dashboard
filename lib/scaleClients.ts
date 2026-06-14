@@ -3,6 +3,7 @@ import type { RespondClient } from "./types";
 export const scaleClients: RespondClient[] = [
   {
     id: "scale-northlane-health",
+    environment: "demo",
     product: "scale",
     name: "Northlane Health",
     code: "NH",
@@ -51,6 +52,7 @@ export const scaleClients: RespondClient[] = [
   },
   {
     id: "scale-pioneer-financial",
+    environment: "demo",
     product: "scale",
     name: "Pioneer Financial",
     code: "PF",
@@ -92,6 +94,7 @@ export const scaleClients: RespondClient[] = [
   },
   {
     id: "scale-sunrise-retail",
+    environment: "demo",
     product: "scale",
     name: "Sunrise Retail",
     code: "SR",
@@ -133,6 +136,7 @@ export const scaleClients: RespondClient[] = [
   },
   {
     id: "scale-greenfield-insurance",
+    environment: "demo",
     product: "scale",
     name: "Greenfield Insurance",
     code: "GI",
@@ -174,6 +178,7 @@ export const scaleClients: RespondClient[] = [
   },
   {
     id: "scale-metro-logistics",
+    environment: "demo",
     product: "scale",
     name: "Metro Logistics",
     code: "ML",
@@ -222,6 +227,7 @@ export const scaleClients: RespondClient[] = [
   },
   {
     id: "scale-clearwater-dental",
+    environment: "demo",
     product: "scale",
     name: "Clearwater Dental",
     code: "CD",

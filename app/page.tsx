@@ -1,14 +1,22 @@
 import RespondDashboard from "./components/RespondDashboard";
-import { defaultProduct, productCategories, productClients, productTasks, productTeamMembers } from "../lib/productWorkspaces";
+import {
+  defaultEnvironment,
+  defaultProduct,
+  environmentProductClients,
+  productCategories,
+  productTasks,
+  productTeamMembers,
+} from "../lib/productWorkspaces";
 
 export default function Home() {
   return (
     <RespondDashboard
+      initialEnvironment={defaultEnvironment}
       initialProduct={defaultProduct}
       initialTasks={productTasks(defaultProduct)}
       initialCategories={productCategories(defaultProduct)}
       initialTeamMembers={productTeamMembers(defaultProduct)}
-      initialClients={productClients(defaultProduct)}
+      initialClients={environmentProductClients(defaultEnvironment, defaultProduct)}
     />
   );
 }

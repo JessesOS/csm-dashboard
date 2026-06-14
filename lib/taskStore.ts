@@ -2,8 +2,10 @@ import { getD1 } from "../db";
 import { portalDefaultsForTask } from "./portalDefaults";
 import {
   allSeedClients,
+  defaultEnvironment,
   defaultProduct,
   normalizeProduct,
+  normalizeEnvironment,
   productCategories,
   productConfig,
   productTasks,
@@ -17,6 +19,7 @@ import {
   type ClientHealth,
   type ClientRisk,
   type ClientTimelineSegment,
+  type EnvironmentKey,
   type Priority,
   type ProductKey,
   type RespondClient,
@@ -27,8 +30,9 @@ import {
 
 type TaskRow = Omit<
   Task,
-  "product" | "dependencies" | "clientId" | "templateId" | "portalVisible" | "portalActionRequired" | "portalConfigured"
+  "environment" | "product" | "dependencies" | "clientId" | "templateId" | "portalVisible" | "portalActionRequired" | "portalConfigured"
 > & {
+  environment: string;
   product: string;
   clientId: string;
   templateId: string;
@@ -38,7 +42,8 @@ type TaskRow = Omit<
   portalConfigured: number;
 };
 
-type ClientRow = Omit<RespondClient, "product" | "timeline" | "attention"> & {
+type ClientRow = Omit<RespondClient, "environment" | "product" | "timeline" | "attention"> & {
+  environment: string;
   product: string;
   timeline: string;
   attention: string;
@@ -53,7 +58,7 @@ type ClientCountRow = {
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
 const taskSelectFields =
-  "id, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -124,6 +129,7 @@ function isAttentionItem(item: unknown): item is ClientAttentionItem {
 function fromRow(row: TaskRow): Task {
   return {
     ...row,
+    environment: normalizeEnvironment(row.environment),
     product: normalizeProduct(row.product),
     dependencies: parseDependencies(row.dependencies),
     portalVisible: Boolean(row.portalVisible),
@@ -139,6 +145,7 @@ function fromClientRow(row: ClientRow): RespondClient {
 
   return {
     ...row,
+    environment: normalizeEnvironment(row.environment),
     product: normalizeProduct(row.product),
     phase,
     health,
@@ -228,7 +235,7 @@ function clientCode(name: string) {
   return (letters || "CL").slice(0, 3);
 }
 
-function buildNewClient(payload: ClientCreatePayload, id: string, product: ProductKey): RespondClient {
+function buildNewClient(payload: ClientCreatePayload, id: string, environment: EnvironmentKey, product: ProductKey): RespondClient {
   const config = productConfig(product);
   const templateTasks = productTasks(product);
   const name = payload.name?.trim() ?? "";
@@ -239,6 +246,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string, product: Produ
 
   return {
     id,
+    environment,
     product,
     portalToken: makePortalToken(),
     name,
@@ -284,6 +292,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string, product: Produ
 function clientInsertValues(client: RespondClient) {
   return [
     client.id,
+    client.environment,
     client.product,
     client.portalToken ?? makePortalToken(),
     client.name,
@@ -318,6 +327,10 @@ async function ensureTaskColumns() {
 
   if (!columns.has("client_id")) {
     await d1.prepare(`ALTER TABLE tasks ADD COLUMN client_id TEXT NOT NULL DEFAULT '${defaultClientId}'`).run();
+  }
+
+  if (!columns.has("environment")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN environment TEXT NOT NULL DEFAULT 'demo'").run();
   }
 
   if (!columns.has("product")) {
@@ -357,6 +370,10 @@ async function ensureClientColumns() {
     await d1.prepare("ALTER TABLE clients ADD COLUMN portal_token TEXT NOT NULL DEFAULT ''").run();
   }
 
+  if (!columns.has("environment")) {
+    await d1.prepare("ALTER TABLE clients ADD COLUMN environment TEXT NOT NULL DEFAULT 'demo'").run();
+  }
+
   if (!columns.has("product")) {
     await d1.prepare("ALTER TABLE clients ADD COLUMN product TEXT NOT NULL DEFAULT 'respond'").run();
   }
@@ -380,6 +397,7 @@ async function seedClients() {
         .prepare(`
           INSERT OR IGNORE INTO clients (
             id,
+            environment,
             product,
             portal_token,
             name,
@@ -400,7 +418,7 @@ async function seedClients() {
             completed_tasks,
             timeline,
             attention
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...clientInsertValues(client))
     )
@@ -432,11 +450,11 @@ async function migrateGlobalTasksToClient() {
   }
 }
 
-async function seedTemplateTasksForClient(clientId: string, product: ProductKey, useTemplateState: boolean) {
+async function seedTemplateTasksForClient(clientId: string, environment: EnvironmentKey, product: ProductKey, useTemplateState: boolean) {
   const d1 = getD1();
   const existing = await d1
-    .prepare("SELECT template_id AS templateId FROM tasks WHERE client_id = ? AND product = ?")
-    .bind(clientId, product)
+    .prepare("SELECT template_id AS templateId FROM tasks WHERE client_id = ? AND environment = ? AND product = ?")
+    .bind(clientId, environment, product)
     .all<{ templateId: string }>();
   const existingTemplates = new Set((existing.results ?? []).map((item) => item.templateId));
   const missing = productTasks(product).filter((item) => !existingTemplates.has(item.id));
@@ -451,6 +469,7 @@ async function seedTemplateTasksForClient(clientId: string, product: ProductKey,
         .prepare(`
           INSERT OR IGNORE INTO tasks (
             id,
+            environment,
             product,
             client_id,
             template_id,
@@ -469,18 +488,19 @@ async function seedTemplateTasksForClient(clientId: string, product: ProductKey,
             portal_action_required,
             portal_configured,
             sort_order
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
-        .bind(...taskInsertValues(clientId, product, item, useTemplateState))
+        .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
   );
 }
 
-function taskInsertValues(clientId: string, product: ProductKey, item: Task, useTemplateState: boolean) {
+function taskInsertValues(clientId: string, environment: EnvironmentKey, product: ProductKey, item: Task, useTemplateState: boolean) {
   const portalDefaults = portalDefaultsForTask(item);
 
   return [
     scopedTaskId(clientId, item.id),
+    environment,
     product,
     clientId,
     item.id,
@@ -502,7 +522,7 @@ function taskInsertValues(clientId: string, product: ProductKey, item: Task, use
   ];
 }
 
-async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string, product?: ProductKey) {
+async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string, environment?: EnvironmentKey, product?: ProductKey) {
   const d1 = getD1();
   const where = [
     "portal_configured = 0",
@@ -516,6 +536,11 @@ async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string, product
   if (clientId) {
     where.push("client_id = ?");
     binds.push(clientId);
+  }
+
+  if (environment) {
+    where.push("environment = ?");
+    binds.push(environment);
   }
 
   if (product) {
@@ -540,11 +565,14 @@ async function applyPortalDefaultsToUnconfiguredTasks(clientId?: string, product
 }
 
 async function seedTaskWorkspaces() {
-  const clients = await getD1().prepare("SELECT id, product FROM clients ORDER BY created_at ASC").all<{ id: string; product: string }>();
+  const clients = await getD1()
+    .prepare("SELECT id, environment, product FROM clients ORDER BY created_at ASC")
+    .all<{ id: string; environment: string; product: string }>();
 
   for (const client of clients.results ?? []) {
+    const environment = normalizeEnvironment(client.environment);
     const product = normalizeProduct(client.product);
-    await seedTemplateTasksForClient(client.id, product, client.id === productConfig(product).defaultClientId);
+    await seedTemplateTasksForClient(client.id, environment, product, environment === defaultEnvironment && client.id === productConfig(product).defaultClientId);
   }
 }
 
@@ -555,6 +583,7 @@ async function prepareTaskStorage() {
     d1.prepare(`
       CREATE TABLE IF NOT EXISTS clients (
         id TEXT PRIMARY KEY,
+        environment TEXT NOT NULL DEFAULT 'demo',
         product TEXT NOT NULL DEFAULT 'respond',
         portal_token TEXT NOT NULL DEFAULT '',
         name TEXT NOT NULL,
@@ -582,6 +611,7 @@ async function prepareTaskStorage() {
     d1.prepare(`
       CREATE TABLE IF NOT EXISTS tasks (
         id TEXT PRIMARY KEY,
+        environment TEXT NOT NULL DEFAULT 'demo',
         product TEXT NOT NULL DEFAULT 'respond',
         client_id TEXT NOT NULL DEFAULT '${defaultClientId}',
         template_id TEXT NOT NULL DEFAULT '',
@@ -613,6 +643,9 @@ async function prepareTaskStorage() {
   await ensureClientPortalTokens();
 
   await d1.batch([
+    d1.prepare("CREATE INDEX IF NOT EXISTS tasks_environment_idx ON tasks (environment)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS tasks_environment_product_idx ON tasks (environment, product)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS tasks_environment_product_client_idx ON tasks (environment, product, client_id)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_product_idx ON tasks (product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_product_client_idx ON tasks (product, client_id)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_product_status_idx ON tasks (product, status)"),
@@ -623,6 +656,9 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_category_idx ON tasks (category)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_assignee_idx ON tasks (assignee)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS tasks_sort_order_idx ON tasks (sort_order)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_idx ON clients (environment)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_product_idx ON clients (environment, product)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_product_name_idx ON clients (environment, product, name)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_product_idx ON clients (product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_product_name_idx ON clients (product, name)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_name_idx ON clients (name)"),
@@ -663,22 +699,23 @@ function applyClientCounts(client: RespondClient, counts: ClientCountRow | undef
   };
 }
 
-export async function listClients(productInput: string | null | undefined = defaultProduct) {
+export async function listClients(environmentInput: string | null | undefined = defaultEnvironment, productInput: string | null | undefined = defaultProduct) {
   await ensureTaskStorage();
   const d1 = getD1();
+  const environment = normalizeEnvironment(environmentInput);
   const product = normalizeProduct(productInput);
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(
-        "SELECT id, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE product = ? ORDER BY created_at ASC"
+        "SELECT id, environment, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC"
       )
-      .bind(product)
+      .bind(environment, product)
       .all<ClientRow>(),
     d1
       .prepare(
-        "SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE product = ? GROUP BY client_id"
+        "SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE environment = ? AND product = ? GROUP BY client_id"
       )
-      .bind(product)
+      .bind(environment, product)
       .all<ClientCountRow>(),
   ]);
   const counts = new Map((countRows.results ?? []).map((item) => [item.clientId, item]));
@@ -686,34 +723,63 @@ export async function listClients(productInput: string | null | undefined = defa
   return (clientRows.results ?? []).map(fromClientRow).map((client) => applyClientCounts(client, counts.get(client.id)));
 }
 
-async function requireClient(product: ProductKey, clientId: string) {
+async function requireClient(environment: EnvironmentKey, product: ProductKey, clientId: string) {
   await ensureTaskStorage();
-  const client = await getD1().prepare("SELECT id FROM clients WHERE id = ? AND product = ?").bind(clientId, product).first<{ id: string }>();
+  const client = await getD1()
+    .prepare("SELECT id FROM clients WHERE id = ? AND environment = ? AND product = ?")
+    .bind(clientId, environment, product)
+    .first<{ id: string }>();
 
   if (!client) {
     throw new Error("Client not found.");
   }
 
-  await seedTemplateTasksForClient(clientId, product, false);
-  await applyPortalDefaultsToUnconfiguredTasks(clientId, product);
+  await seedTemplateTasksForClient(clientId, environment, product, false);
+  await applyPortalDefaultsToUnconfiguredTasks(clientId, environment, product);
   return client.id;
 }
 
-export async function listTasks(productInput: string | null | undefined = defaultProduct, clientIdInput?: string | null) {
+async function firstClientId(environment: EnvironmentKey, product: ProductKey) {
+  const row = await getD1()
+    .prepare("SELECT id FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC")
+    .bind(environment, product)
+    .first<{ id: string }>();
+
+  return row?.id ?? "";
+}
+
+export async function listTasks(
+  environmentInput: string | null | undefined = defaultEnvironment,
+  productInput: string | null | undefined = defaultProduct,
+  clientIdInput?: string | null
+) {
+  await ensureTaskStorage();
+  const environment = normalizeEnvironment(environmentInput);
   const product = normalizeProduct(productInput);
-  const requestedClientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : productConfig(product).defaultClientId;
-  const scopedClientId = await requireClient(product, requestedClientId);
+  const requestedClientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : await firstClientId(environment, product);
+
+  if (!requestedClientId) {
+    return [];
+  }
+
+  const scopedClientId = await requireClient(environment, product, requestedClientId);
   const result = await getD1()
-    .prepare(`SELECT ${taskSelectFields} FROM tasks WHERE product = ? AND client_id = ? ORDER BY sort_order ASC`)
-    .bind(product, scopedClientId)
+    .prepare(`SELECT ${taskSelectFields} FROM tasks WHERE environment = ? AND product = ? AND client_id = ? ORDER BY sort_order ASC`)
+    .bind(environment, product, scopedClientId)
     .all<TaskRow>();
 
   return (result.results ?? []).map(fromRow);
 }
 
-export async function createTask(productInput: string | null | undefined, clientId: string | undefined, payload: Partial<TaskUpdatePayload>) {
+export async function createTask(
+  environmentInput: string | null | undefined,
+  productInput: string | null | undefined,
+  clientId: string | undefined,
+  payload: Partial<TaskUpdatePayload>
+) {
+  const environment = normalizeEnvironment(environmentInput);
   const product = normalizeProduct(productInput);
-  const scopedClientId = await requireClient(product, clientId || productConfig(product).defaultClientId);
+  const scopedClientId = await requireClient(environment, product, clientId || (await firstClientId(environment, product)));
   const d1 = getD1();
   const title = payload.title?.trim();
 
@@ -726,8 +792,8 @@ export async function createTask(productInput: string | null | undefined, client
   const templateTasks = productTasks(product);
   const category = categories.find((item) => item.name === payload.category) ?? categories[0];
   const nextOrder = await d1
-    .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM tasks WHERE product = ? AND client_id = ?")
-    .bind(product, scopedClientId)
+    .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM tasks WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(environment, product, scopedClientId)
     .first<{ nextOrder: number }>();
   const templateId = `custom-${crypto.randomUUID().slice(0, 8)}`;
   const id = scopedTaskId(scopedClientId, templateId);
@@ -738,6 +804,7 @@ export async function createTask(productInput: string | null | undefined, client
     .prepare(`
       INSERT INTO tasks (
         id,
+        environment,
         product,
         client_id,
         template_id,
@@ -756,10 +823,11 @@ export async function createTask(productInput: string | null | undefined, client
         portal_action_required,
         portal_configured,
         sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       id,
+      environment,
       product,
       scopedClientId,
       templateId,
@@ -801,7 +869,7 @@ export async function getTask(id: string) {
 export async function updateTask(id: string, payload: TaskUpdatePayload) {
   await ensureTaskStorage();
   const d1 = getD1();
-  const existing = await d1.prepare("SELECT product FROM tasks WHERE id = ?").bind(id).first<{ product: string }>();
+  const existing = await d1.prepare("SELECT environment, product FROM tasks WHERE id = ?").bind(id).first<{ environment: string; product: string }>();
 
   if (!existing) {
     throw new Error("Task not found.");
@@ -907,10 +975,11 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   return getTask(id);
 }
 
-async function nextClientId(name: string, product: ProductKey) {
+async function nextClientId(name: string, environment: EnvironmentKey, product: ProductKey) {
   const d1 = getD1();
   const slug = slugify(name);
-  const base = product === "respond" ? slug : `${product}-${slug}`;
+  const productSlug = product === "respond" ? slug : `${product}-${slug}`;
+  const base = environment === "demo" ? productSlug : `live-${productSlug}`;
   let id = base;
   let suffix = 2;
 
@@ -925,6 +994,7 @@ async function nextClientId(name: string, product: ProductKey) {
 export async function createClient(payload: ClientCreatePayload) {
   await ensureTaskStorage();
   const name = payload.name?.trim();
+  const environment = normalizeEnvironment(payload.environment);
   const product = normalizeProduct(payload.product);
 
   if (!name) {
@@ -932,13 +1002,14 @@ export async function createClient(payload: ClientCreatePayload) {
   }
 
   const d1 = getD1();
-  const id = await nextClientId(name, product);
-  const client = buildNewClient({ ...payload, name }, id, product);
+  const id = await nextClientId(name, environment, product);
+  const client = buildNewClient({ ...payload, name }, id, environment, product);
 
   await d1
     .prepare(`
       INSERT INTO clients (
         id,
+        environment,
         product,
         portal_token,
         name,
@@ -959,17 +1030,17 @@ export async function createClient(payload: ClientCreatePayload) {
         completed_tasks,
         timeline,
         attention
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(...clientInsertValues(client))
     .run();
 
-  await seedTemplateTasksForClient(client.id, product, false);
-  await applyPortalDefaultsToUnconfiguredTasks(client.id, product);
+  await seedTemplateTasksForClient(client.id, environment, product, false);
+  await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
 
   return {
     client,
-    tasks: await listTasks(product, client.id),
+    tasks: await listTasks(environment, product, client.id),
   };
 }
 
@@ -984,7 +1055,7 @@ export async function getPortalWorkspace(token: string) {
 
   const row = await getD1()
     .prepare(
-      "SELECT id, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE portal_token = ?"
+      "SELECT id, environment, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE portal_token = ?"
     )
     .bind(portalToken)
     .first<ClientRow>();
@@ -997,6 +1068,6 @@ export async function getPortalWorkspace(token: string) {
 
   return {
     client,
-    tasks: await listTasks(client.product, client.id),
+    tasks: await listTasks(client.environment, client.product, client.id),
   };
 }
