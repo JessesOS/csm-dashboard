@@ -399,14 +399,17 @@ function AttachmentLensSettings({
   attachmentFilter,
   attachmentCounts,
   onAttachmentFilterChange,
+  variant = "rail",
 }: {
   attachmentFilter: AttachmentFilter;
   attachmentCounts: { looms: number; forms: number };
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
+  variant?: "rail" | "compact";
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const settingsRef = useRef<HTMLElement>(null);
   const hasActiveLens = attachmentFilter !== "all";
+  const isCompact = variant === "compact";
 
   useEffect(() => {
     if (!isOpen) {
@@ -439,7 +442,7 @@ function AttachmentLensSettings({
   }
 
   return (
-    <section className={isOpen ? "rail-settings rail-settings-open" : "rail-settings"} aria-label="Settings" ref={settingsRef}>
+    <section className={`${isOpen ? "rail-settings rail-settings-open" : "rail-settings"} ${isCompact ? "rail-settings-compact" : ""}`} aria-label="Settings" ref={settingsRef}>
       {isOpen ? (
         <div className="rail-settings-menu" id="task-rail-settings-menu" role="menu">
           <div className="rail-settings-title">
@@ -464,10 +467,18 @@ function AttachmentLensSettings({
           </div>
         </div>
       ) : null}
-      <button type="button" className={hasActiveLens ? "rail-settings-button active" : "rail-settings-button"} aria-expanded={isOpen} aria-controls="task-rail-settings-menu" onClick={() => setIsOpen((current) => !current)}>
+      <button
+        type="button"
+        className={hasActiveLens ? "rail-settings-button active" : "rail-settings-button"}
+        aria-label={isCompact ? "Settings" : undefined}
+        title={isCompact ? "Settings" : undefined}
+        aria-expanded={isOpen}
+        aria-controls="task-rail-settings-menu"
+        onClick={() => setIsOpen((current) => !current)}
+      >
         <span>
           <Icon name="settings" />
-          Settings
+          {isCompact ? null : "Settings"}
         </span>
       </button>
     </section>
@@ -1233,6 +1244,9 @@ function MissionControl({
   taskCount,
   completedTasks,
   waitingTasks,
+  attachmentFilter,
+  attachmentCounts,
+  onAttachmentFilterChange,
 }: {
   environment: OperatingEnvironment;
   activeEnvironment: EnvironmentKey;
@@ -1256,6 +1270,9 @@ function MissionControl({
   taskCount: number;
   completedTasks: number;
   waitingTasks: number;
+  attachmentFilter: AttachmentFilter;
+  attachmentCounts: { looms: number; forms: number };
+  onAttachmentFilterChange: (filter: AttachmentFilter) => void;
 }) {
   const [activeLens, setActiveLens] = useState<"all" | "waiting" | "golive" | "high">("all");
   const selectedClient = clients.find((client) => client.id === selectedClientId);
@@ -1354,12 +1371,20 @@ function MissionControl({
 
         <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={onEnvironmentChange} />
 
-        <div className="mission-user">
-          <span className="avatar">JB</span>
-          <div>
-            <strong>Jamie Bennett</strong>
-            <span>CSM lead</span>
+        <div className="mission-user-row">
+          <div className="mission-user">
+            <span className="avatar">JB</span>
+            <div>
+              <strong>Jamie Bennett</strong>
+              <span>CSM lead</span>
+            </div>
           </div>
+          <AttachmentLensSettings
+            attachmentFilter={attachmentFilter}
+            attachmentCounts={attachmentCounts}
+            onAttachmentFilterChange={onAttachmentFilterChange}
+            variant="compact"
+          />
         </div>
       </aside>
 
@@ -2124,6 +2149,13 @@ export default function RespondDashboard({
     setActiveSection("tasks");
   }
 
+  function changeMissionAttachmentFilter(filter: AttachmentFilter) {
+    setAttachmentFilter(filter);
+    if (filter !== "all") {
+      setActiveSection("tasks");
+    }
+  }
+
   if (activeSection === "home") {
     return (
       <>
@@ -2151,6 +2183,9 @@ export default function RespondDashboard({
           taskCount={templateTasks.length}
           completedTasks={metrics.completed}
           waitingTasks={metrics.blocked}
+          attachmentFilter={attachmentFilter}
+          attachmentCounts={attachmentCounts}
+          onAttachmentFilterChange={changeMissionAttachmentFilter}
         />
         <NewClientPanel
           key={`home-${activeEnvironment}-${activeProduct}`}

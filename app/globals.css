@@ -257,6 +257,32 @@ button:disabled {
   color: #c9f82b;
 }
 
+.rail-settings-compact {
+  flex: 0 0 auto;
+  margin-top: 0;
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rail-settings-compact .rail-settings-menu {
+  right: 0;
+  left: auto;
+  width: 220px;
+}
+
+.rail-settings-compact .rail-settings-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
+.rail-settings-compact .rail-settings-button span {
+  gap: 0;
+}
+
 .attachment-lenses {
   display: grid;
   gap: 6px;
@@ -593,9 +619,20 @@ button:disabled {
 
 .mission-user {
   gap: 10px;
+}
+
+.mission-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-top: 24px;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
   padding-top: 18px;
+}
+
+.mission-user-row .mission-user {
+  flex: 1;
+  min-width: 0;
 }
 
 .mission-main {
@@ -1478,7 +1515,7 @@ button:disabled {
 }
 
 .mission-shell-light .mission-side-section,
-.mission-shell-light .mission-user {
+.mission-shell-light .mission-user-row {
   border-top-color: #d9e1ea;
 }
 
