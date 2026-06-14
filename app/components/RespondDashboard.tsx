@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import {
   defaultEnvironment,
   defaultProduct,
@@ -404,38 +404,72 @@ function AttachmentLensSettings({
   attachmentCounts: { looms: number; forms: number };
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const settingsRef = useRef<HTMLElement>(null);
+  const hasActiveLens = attachmentFilter !== "all";
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    };
+  }, [isOpen]);
+
+  function toggleAttachmentFilter(filter: Exclude<AttachmentFilter, "all">) {
+    onAttachmentFilterChange(attachmentFilter === filter ? "all" : filter);
+  }
+
   return (
-    <section className="rail-settings" aria-label="Settings">
-      <div className="rail-settings-title">
-        <Icon name="settings" />
-        <span>Settings</span>
-      </div>
-      <div className="attachment-lenses" aria-label="Attachment filters">
-        <button
-          type="button"
-          className={attachmentFilter === "loom" ? "active" : ""}
-          aria-pressed={attachmentFilter === "loom"}
-          onClick={() => onAttachmentFilterChange(attachmentFilter === "loom" ? "all" : "loom")}
-        >
-          <span>
-            <Icon name="video" />
-            Looms
-          </span>
-          <strong>{attachmentCounts.looms}</strong>
-        </button>
-        <button
-          type="button"
-          className={attachmentFilter === "forms" ? "active" : ""}
-          aria-pressed={attachmentFilter === "forms"}
-          onClick={() => onAttachmentFilterChange(attachmentFilter === "forms" ? "all" : "forms")}
-        >
-          <span>
-            <Icon name="link" />
-            Forms
-          </span>
-          <strong>{attachmentCounts.forms}</strong>
-        </button>
-      </div>
+    <section className={isOpen ? "rail-settings rail-settings-open" : "rail-settings"} aria-label="Settings" ref={settingsRef}>
+      {isOpen ? (
+        <div className="rail-settings-menu" id="task-rail-settings-menu" role="menu">
+          <div className="rail-settings-title">
+            <Icon name="settings" />
+            <span>Settings</span>
+          </div>
+          <div className="attachment-lenses" aria-label="Attachment filters">
+            <button type="button" className={attachmentFilter === "loom" ? "active" : ""} aria-pressed={attachmentFilter === "loom"} onClick={() => toggleAttachmentFilter("loom")}>
+              <span>
+                <Icon name="video" />
+                Looms
+              </span>
+              <strong>{attachmentCounts.looms}</strong>
+            </button>
+            <button type="button" className={attachmentFilter === "forms" ? "active" : ""} aria-pressed={attachmentFilter === "forms"} onClick={() => toggleAttachmentFilter("forms")}>
+              <span>
+                <Icon name="link" />
+                Forms
+              </span>
+              <strong>{attachmentCounts.forms}</strong>
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <button type="button" className={hasActiveLens ? "rail-settings-button active" : "rail-settings-button"} aria-expanded={isOpen} aria-controls="task-rail-settings-menu" onClick={() => setIsOpen((current) => !current)}>
+        <span>
+          <Icon name="settings" />
+          Settings
+        </span>
+      </button>
     </section>
   );
 }

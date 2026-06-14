@@ -187,11 +187,25 @@ button:disabled {
 }
 
 .rail-settings {
-  display: grid;
-  gap: 9px;
+  position: relative;
   margin-top: 12px;
   border-top: 1px solid rgba(148, 163, 184, 0.18);
   padding-top: 14px;
+}
+
+.rail-settings-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(7, 18, 31, 0.98);
+  padding: 10px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28);
 }
 
 .rail-settings-title {
@@ -207,6 +221,40 @@ button:disabled {
 .rail-settings-title svg {
   width: 14px;
   height: 14px;
+}
+
+.rail-settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #c8d7e8;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.rail-settings-button span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rail-settings-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.rail-settings-button:hover,
+.rail-settings-button.active,
+.rail-settings-open .rail-settings-button {
+  border-color: rgba(193, 255, 36, 0.5);
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
 }
 
 .attachment-lenses {
@@ -1494,6 +1542,12 @@ button:disabled {
   border-top-color: #d9e1ea;
 }
 
+.dashboard-shell-light .rail-settings-menu {
+  border-color: #d9e3ec;
+  background: #ffffff;
+  box-shadow: 0 22px 48px rgba(16, 24, 40, 0.16);
+}
+
 .mission-shell-light .environment-switcher > span,
 .dashboard-shell-light .environment-switcher > span,
 .dashboard-shell-light .rail-settings-title {
@@ -1502,6 +1556,7 @@ button:disabled {
 
 .mission-shell-light .environment-switcher button,
 .dashboard-shell-light .environment-switcher button,
+.dashboard-shell-light .rail-settings-button,
 .dashboard-shell-light .attachment-lenses button {
   border-color: #d9e3ec;
   background: #ffffff;
@@ -1512,6 +1567,9 @@ button:disabled {
 .mission-shell-light .environment-switcher button.active,
 .dashboard-shell-light .environment-switcher button:hover,
 .dashboard-shell-light .environment-switcher button.active,
+.dashboard-shell-light .rail-settings-button:hover,
+.dashboard-shell-light .rail-settings-button.active,
+.dashboard-shell-light .rail-settings-open .rail-settings-button,
 .dashboard-shell-light .attachment-lenses button:hover,
 .dashboard-shell-light .attachment-lenses button.active,
 .dashboard-shell-light .workspace-mode-pill {
