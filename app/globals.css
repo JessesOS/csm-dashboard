@@ -323,7 +323,7 @@ button:disabled {
 .mission-shell[data-tour-target="theme"] .theme-toggle,
 .dashboard-shell[data-tour-target="tasks-header"] .topbar,
 .dashboard-shell[data-tour-target="task-board"] .board,
-.dashboard-shell[data-tour-target="task-inspector"] .inspector,
+.dashboard-shell[data-tour-target="task-inspector"] .task-card-active,
 .dashboard-shell[data-tour-target="filters"] .filters-row,
 .dashboard-shell[data-tour-target="theme"] .theme-toggle {
   position: relative;
@@ -1669,7 +1669,7 @@ button:disabled {
 
 .dashboard-shell {
   display: grid;
-  grid-template-columns: 284px minmax(0, 1fr) 360px;
+  grid-template-columns: 284px minmax(0, 1fr);
   min-height: 100vh;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0)),
@@ -1932,7 +1932,10 @@ button:disabled {
 .filters-row select,
 .inspector input,
 .inspector select,
-.inspector textarea {
+.inspector textarea,
+.task-detail-modal input,
+.task-detail-modal select,
+.task-detail-modal textarea {
   min-width: 0;
   border: 1px solid #d6dee8;
   border-radius: 8px;
@@ -1945,14 +1948,18 @@ button:disabled {
 .new-task select,
 .filters-row select,
 .inspector input,
-.inspector select {
+.inspector select,
+.task-detail-modal input,
+.task-detail-modal select {
   height: 38px;
   padding: 0 10px;
   font-size: 12px;
 }
 
 .new-task button,
-.inspector-footer button {
+.inspector-footer button,
+.task-modal-primary,
+.task-modal-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2018,7 +2025,7 @@ button:disabled {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(5, minmax(210px, 1fr));
+  grid-template-columns: repeat(5, minmax(230px, 1fr));
   gap: 12px;
   height: calc(100vh - 230px);
   min-height: 520px;
@@ -2074,6 +2081,7 @@ button:disabled {
   border: 1px solid #d8e1eb;
   border-radius: 8px;
   background: #ffffff;
+  cursor: pointer;
   padding: 12px;
   box-shadow: 0 10px 24px rgba(18, 31, 53, 0.07);
 }
@@ -2447,6 +2455,162 @@ progress::-webkit-progress-value {
   color: var(--cobalt);
 }
 
+.task-modal-backdrop {
+  align-items: center;
+  overflow: auto;
+}
+
+.task-detail-modal {
+  display: flex;
+  width: min(980px, calc(100vw - 36px));
+  max-height: min(88vh, 860px);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(36, 94, 232, 0.16);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  box-shadow: 0 34px 110px rgba(15, 23, 42, 0.36);
+}
+
+.task-modal-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px;
+  align-items: start;
+  gap: 18px;
+  border-bottom: 1px solid var(--border);
+  padding: 20px 20px 16px;
+}
+
+.task-modal-head h2 {
+  margin: 10px 0 4px;
+  color: var(--ink);
+  font-size: 24px;
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.task-modal-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.modal-close-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #334155;
+}
+
+.task-modal-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  border-bottom: 1px solid var(--border);
+  background: var(--border);
+}
+
+.task-modal-summary div {
+  display: grid;
+  align-content: center;
+  min-height: 72px;
+  gap: 5px;
+  background: #fbfdff;
+  padding: 12px 16px;
+}
+
+.task-modal-summary span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.task-modal-summary strong {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 790;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.88fr);
+  gap: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.task-modal-section {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 18px 20px;
+}
+
+.task-modal-section + .task-modal-section {
+  border-left: 1px solid var(--border);
+}
+
+.task-detail-modal label {
+  display: grid;
+  gap: 7px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.task-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.task-detail-modal textarea {
+  min-height: 112px;
+  resize: vertical;
+  padding: 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.task-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  background: #ffffff;
+  padding: 14px 20px;
+}
+
+.task-modal-footer > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.task-modal-secondary {
+  border: 1px solid var(--border);
+  background: #f8fafc;
+  color: #334155;
+}
+
+.task-modal-primary {
+  border: 0;
+  background: var(--cobalt);
+  color: #ffffff;
+}
+
 .dashboard-shell-dark {
   --background: #061321;
   --foreground: #e9f2fb;
@@ -2482,6 +2646,8 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-card h3,
 .dashboard-shell-dark .category-panel-head strong,
 .dashboard-shell-dark .inspector h2,
+.dashboard-shell-dark .task-detail-modal h2,
+.dashboard-shell-dark .task-modal-summary strong,
 .dashboard-shell-dark .inspector-section-title,
 .dashboard-shell-dark .dependency-list button span {
   color: #f8fbff;
@@ -2494,6 +2660,8 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-meta-line,
 .dashboard-shell-dark .category-panel-head span,
 .dashboard-shell-dark .inspector p,
+.dashboard-shell-dark .task-detail-modal p,
+.dashboard-shell-dark .task-modal-summary span,
 .dashboard-shell-dark .dependency-list button em,
 .dashboard-shell-dark .saving {
   color: #8fa2b7;
@@ -2502,7 +2670,10 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .view-nav,
 .dashboard-shell-dark .inspector-head,
 .dashboard-shell-dark .dependency-list,
-.dashboard-shell-dark .inspector-footer {
+.dashboard-shell-dark .inspector-footer,
+.dashboard-shell-dark .task-modal-head,
+.dashboard-shell-dark .task-modal-section + .task-modal-section,
+.dashboard-shell-dark .task-modal-footer {
   border-color: rgba(148, 163, 184, 0.18);
 }
 
@@ -2540,7 +2711,10 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .filters-row select,
 .dashboard-shell-dark .inspector input,
 .dashboard-shell-dark .inspector select,
-.dashboard-shell-dark .inspector textarea {
+.dashboard-shell-dark .inspector textarea,
+.dashboard-shell-dark .task-detail-modal input,
+.dashboard-shell-dark .task-detail-modal select,
+.dashboard-shell-dark .task-detail-modal textarea {
   border-color: rgba(148, 163, 184, 0.28);
   background: #0a1f33;
   color: #eaf2fb;
@@ -2556,7 +2730,8 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .search-box input::placeholder,
 .dashboard-shell-dark .new-task input::placeholder,
-.dashboard-shell-dark .inspector textarea::placeholder {
+.dashboard-shell-dark .inspector textarea::placeholder,
+.dashboard-shell-dark .task-detail-modal textarea::placeholder {
   color: #71849a;
 }
 
@@ -2567,6 +2742,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .theme-toggle button.active,
 .dashboard-shell-dark .new-task button,
 .dashboard-shell-dark .inspector-footer button,
+.dashboard-shell-dark .task-modal-primary,
 .dashboard-shell-dark .workspace-mode-pill {
   background: #c9f82b;
   color: #07121f;
@@ -2584,7 +2760,8 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .new-task,
 .dashboard-shell-dark .storage-notice,
 .dashboard-shell-dark .category-panel,
-.dashboard-shell-dark .inspector {
+.dashboard-shell-dark .inspector,
+.dashboard-shell-dark .task-detail-modal {
   border-color: rgba(148, 163, 184, 0.18);
   background: #0a2035;
   box-shadow: var(--shadow);
@@ -2710,7 +2887,8 @@ progress::-webkit-progress-value {
   border-left-color: rgba(148, 163, 184, 0.18);
 }
 
-.dashboard-shell-dark .inspector label {
+.dashboard-shell-dark .inspector label,
+.dashboard-shell-dark .task-detail-modal label {
   color: #a8b8ca;
 }
 
@@ -2726,8 +2904,26 @@ progress::-webkit-progress-value {
   color: #8fa2b7;
 }
 
-.dashboard-shell-dark .inspector-footer {
+.dashboard-shell-dark .inspector-footer,
+.dashboard-shell-dark .task-modal-footer {
   background: transparent;
+}
+
+.dashboard-shell-dark .task-modal-backdrop {
+  background: rgba(1, 6, 12, 0.72);
+}
+
+.dashboard-shell-dark .modal-close-button,
+.dashboard-shell-dark .task-modal-secondary,
+.dashboard-shell-dark .task-modal-summary div {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #071827;
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .task-modal-summary {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: rgba(148, 163, 184, 0.18);
 }
 
 .client-portal-shell {
@@ -3305,19 +3501,6 @@ progress::-webkit-progress-value {
   .dashboard-shell {
     grid-template-columns: 236px minmax(0, 1fr);
   }
-
-  .inspector {
-    position: fixed;
-    z-index: 10;
-    right: 16px;
-    bottom: 16px;
-    top: auto;
-    width: min(420px, calc(100vw - 32px));
-    height: min(68vh, 680px);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
-  }
 }
 
 @media (max-width: 820px) {
@@ -3391,6 +3574,57 @@ progress::-webkit-progress-value {
     padding: 14px;
   }
 
+  .task-detail-modal {
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .task-modal-head {
+    grid-template-columns: minmax(0, 1fr) 38px;
+    padding: 16px 14px 14px;
+  }
+
+  .task-modal-head h2 {
+    font-size: 20px;
+  }
+
+  .task-modal-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .task-modal-summary div {
+    min-height: 64px;
+    padding: 10px 12px;
+  }
+
+  .task-modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .task-modal-section {
+    padding: 14px;
+  }
+
+  .task-modal-section + .task-modal-section {
+    border-top: 1px solid var(--border);
+    border-left: 0;
+  }
+
+  .task-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .task-modal-footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 14px;
+  }
+
+  .task-modal-footer > div,
+  .task-modal-footer button {
+    width: 100%;
+  }
+
   .new-client-actions {
     align-items: stretch;
     flex-direction: column-reverse;
@@ -3443,14 +3677,6 @@ progress::-webkit-progress-value {
 
   .column-scroll {
     max-height: 430px;
-  }
-
-  .inspector {
-    position: static;
-    width: auto;
-    height: auto;
-    margin: 0 16px 18px;
-    border-radius: 8px;
   }
 
   .client-portal-shell {

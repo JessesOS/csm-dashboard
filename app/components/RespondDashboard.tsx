@@ -111,8 +111,8 @@ const tourSteps: TourStep[] = [
   {
     section: "tasks",
     target: "task-inspector",
-    title: "Use the inspector for details",
-    body: "The inspector is where the selected task gets updated: status, assignee, category, due window, notes, and dependencies.",
+    title: "Open the task detail modal",
+    body: "Select a task card to hold your place on the board, then open the detail view to update status, assignee, category, due window, notes, portal settings, and dependencies.",
     clientId: "northlane-health",
   },
   {
@@ -168,7 +168,8 @@ function Icon({
     | "sun"
     | "moon"
     | "play"
-    | "download";
+    | "download"
+    | "x";
 }) {
   const common = {
     width: 16,
@@ -233,6 +234,15 @@ function Icon({
         <path d="M12 3v12" />
         <path d="m7 10 5 5 5-5" />
         <path d="M5 21h14" />
+      </svg>
+    );
+  }
+
+  if (name === "x") {
+    return (
+      <svg {...common}>
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
       </svg>
     );
   }
@@ -558,6 +568,15 @@ function TaskCard({
       draggable
       onDragStart={() => onDragStart(task)}
       onClick={() => onSelect(task)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(task);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
     >
       <div className="task-card-topline">
         <span className={`priority priority-${task.priority}`}>{task.priority}</span>
@@ -583,7 +602,7 @@ function TaskCard({
         </span>
         {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
       </div>
-      <div className="task-actions" onClick={(event) => event.stopPropagation()}>
+      <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
         {isDone ? (
           <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
             Review
@@ -601,6 +620,197 @@ function TaskCard({
         ) : null}
       </div>
     </article>
+  );
+}
+
+function TaskDetailModal({
+  task,
+  taskMap,
+  categories,
+  teamMembers,
+  isPending,
+  onClose,
+  onUpdate,
+  onOpenDependency,
+}: {
+  task: Task;
+  taskMap: Map<string, Task>;
+  categories: Category[];
+  teamMembers: string[];
+  isPending: boolean;
+  onClose: () => void;
+  onUpdate: (id: string, payload: TaskUpdatePayload) => void;
+  onOpenDependency: (task: Task) => void;
+}) {
+  return (
+    <div className="modal-backdrop task-modal-backdrop" onClick={onClose}>
+      <section className="task-detail-modal" role="dialog" aria-modal="true" aria-labelledby="task-detail-title" onClick={(event) => event.stopPropagation()}>
+        <header className="task-modal-head">
+          <div>
+            <span className={`priority priority-${task.priority}`}>{task.priority}</span>
+            <h2 id="task-detail-title">{task.title}</h2>
+            <p>
+              {task.category} / {task.phase}
+            </p>
+          </div>
+          <button type="button" className="modal-close-button" onClick={onClose} aria-label="Close task details">
+            <Icon name="x" />
+          </button>
+        </header>
+
+        <div className="task-modal-summary" aria-label="Task summary">
+          <div>
+            <span>Status</span>
+            <strong>{statusLabels[task.status]}</strong>
+          </div>
+          <div>
+            <span>Owner</span>
+            <strong>{task.assignee}</strong>
+          </div>
+          <div>
+            <span>Due window</span>
+            <strong>{task.dueWindow || "No date"}</strong>
+          </div>
+          <div>
+            <span>Portal</span>
+            <strong>{task.portalVisible ? "Visible" : "Hidden"}</strong>
+          </div>
+        </div>
+
+        <div className="task-modal-body">
+          <section className="task-modal-section">
+            <label>
+              Status
+              <div className="status-grid">
+                {taskStatuses.map((status) => (
+                  <button
+                    type="button"
+                    key={status}
+                    className={task.status === status ? "active" : ""}
+                    onClick={() => onUpdate(task.id, { status })}
+                  >
+                    {statusLabels[status]}
+                  </button>
+                ))}
+              </div>
+            </label>
+
+            <div className="task-field-grid">
+              <label>
+                Assignee
+                <select aria-label="Assignee" value={task.assignee} onChange={(event) => onUpdate(task.id, { assignee: event.target.value })}>
+                  {teamMembers.map((member) => (
+                    <option key={member} value={member}>
+                      {member}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Category
+                <select aria-label="Category" value={task.category} onChange={(event) => onUpdate(task.id, { category: event.target.value })}>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label>
+              Due window
+              <input aria-label="Due window" value={task.dueWindow} onChange={(event) => onUpdate(task.id, { dueWindow: event.target.value })} />
+            </label>
+
+            <label>
+              Notes
+              <textarea aria-label="Notes" value={task.notes} onChange={(event) => onUpdate(task.id, { notes: event.target.value })} placeholder="Add context for the team" />
+            </label>
+          </section>
+
+          <section className="task-modal-section">
+            <div className="portal-editor">
+              <div className="inspector-section-title">
+                <Icon name="link" />
+                Client portal
+              </div>
+              <label className="portal-toggle">
+                <input type="checkbox" checked={task.portalVisible} onChange={(event) => onUpdate(task.id, { portalVisible: event.target.checked })} />
+                <span>
+                  Show in portal
+                  <small>Make this item visible on the private client link.</small>
+                </span>
+              </label>
+              <label className="portal-toggle">
+                <input
+                  type="checkbox"
+                  checked={task.portalActionRequired}
+                  disabled={!task.portalVisible}
+                  onChange={(event) => onUpdate(task.id, { portalActionRequired: event.target.checked })}
+                />
+                <span>
+                  Client action required
+                  <small>Place it in the client action list.</small>
+                </span>
+              </label>
+              <label>
+                Client-facing title
+                <input
+                  aria-label="Client-facing title"
+                  value={task.portalTitle}
+                  onChange={(event) => onUpdate(task.id, { portalTitle: event.target.value })}
+                  placeholder={task.title}
+                />
+              </label>
+              <label>
+                Client-facing note
+                <textarea
+                  aria-label="Client-facing note"
+                  value={task.portalNote}
+                  onChange={(event) => onUpdate(task.id, { portalNote: event.target.value })}
+                  placeholder="Add a short note the client will see"
+                />
+              </label>
+            </div>
+
+            <div className="dependency-list">
+              <div className="inspector-section-title">
+                <Icon name="link" />
+                Dependencies
+              </div>
+              {task.dependencies.length === 0 ? (
+                <p>No dependencies attached.</p>
+              ) : (
+                task.dependencies.map((id) => {
+                  const dependency = taskMap.get(id);
+                  return (
+                    <button type="button" key={id} onClick={() => dependency && onOpenDependency(dependency)}>
+                      <span>{dependency?.title ?? id}</span>
+                      <em>{dependency ? statusLabels[dependency.status] : "Missing"}</em>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          </section>
+        </div>
+
+        <footer className="task-modal-footer">
+          <span className={isPending ? "saving active" : "saving"}>{isPending ? "Saving" : "Saved"}</span>
+          <div>
+            <button type="button" className="task-modal-secondary" onClick={onClose}>
+              Close
+            </button>
+            <button type="button" className="task-modal-primary" onClick={() => onUpdate(task.id, { status: "complete" })}>
+              <Icon name="check" />
+              Complete
+            </button>
+          </div>
+        </footer>
+      </section>
+    </div>
   );
 }
 
@@ -1106,6 +1316,8 @@ export default function RespondDashboard({
   const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
+  const [detailReadyTaskId, setDetailReadyTaskId] = useState<string | null>(null);
+  const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [selectedClientId, setSelectedClientId] = useState("all");
   const [theme, setTheme] = useState<ThemeMode>(() => {
@@ -1163,6 +1375,8 @@ export default function RespondDashboard({
     setClients(nextClients);
     setTasks(nextTasks);
     setSelectedId(nextTasks[0]?.id ?? "");
+    setDetailReadyTaskId(null);
+    setDetailTaskId(null);
     setSelectedClientId("all");
     setQuery("");
     setCategoryFilter("all");
@@ -1211,6 +1425,8 @@ export default function RespondDashboard({
         }
         setClients(remoteClients);
         setSelectedClientId((current) => (current !== "all" && remoteClients.some((client) => client.id === current) ? current : "all"));
+        setDetailReadyTaskId(null);
+        setDetailTaskId(null);
         setStorageNotice("");
       })
       .catch((error: Error) => {
@@ -1244,6 +1460,8 @@ export default function RespondDashboard({
         }
         setTasks(remoteTasks);
         setSelectedId((current) => (remoteTasks.some((task) => task.id === current) ? current : remoteTasks[0]?.id || ""));
+        setDetailReadyTaskId(null);
+        setDetailTaskId((current) => (current && remoteTasks.some((task) => task.id === current) ? current : null));
         setStorageNotice("");
       })
       .catch((error: Error) => {
@@ -1257,8 +1475,24 @@ export default function RespondDashboard({
     };
   }, [activeEnvironment, activeProduct, activeTaskClientId]);
 
+  useEffect(() => {
+    if (!detailTaskId) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setDetailTaskId(null);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [detailTaskId]);
+
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
+  const detailTask = detailTaskId ? taskMap.get(detailTaskId) ?? null : null;
   const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter);
   const canImportGhlClient = activeEnvironment === "live" && activeProduct === "respond";
 
@@ -1340,6 +1574,22 @@ export default function RespondDashboard({
     updateTask(task.id, { status });
   }
 
+  function selectOrOpenTask(task: Task) {
+    if (selectedId === task.id && detailReadyTaskId === task.id) {
+      setDetailTaskId(task.id);
+      return;
+    }
+
+    setSelectedId(task.id);
+    setDetailReadyTaskId(task.id);
+  }
+
+  function openTaskInModal(task: Task) {
+    setSelectedId(task.id);
+    setDetailReadyTaskId(task.id);
+    setDetailTaskId(task.id);
+  }
+
   async function addTask() {
     const title = newTaskTitle.trim();
     if (!title || !activeTaskClientId) {
@@ -1371,6 +1621,8 @@ export default function RespondDashboard({
 
     setTasks((current) => [...current, tempTask]);
     setSelectedId(tempTask.id);
+    setDetailReadyTaskId(null);
+    setDetailTaskId(null);
     setNewTaskTitle("");
 
     try {
@@ -1412,6 +1664,8 @@ export default function RespondDashboard({
       setSelectedClientId(client.id);
       setTasks(clientTasks);
       setSelectedId(clientTasks[0]?.id ?? "");
+      setDetailReadyTaskId(null);
+      setDetailTaskId(null);
       setActiveSection("tasks");
       setShowNewClientPanel(false);
       setStorageNotice("");
@@ -1452,6 +1706,8 @@ export default function RespondDashboard({
       setSelectedClientId(client.id);
       setTasks(clientTasks);
       setSelectedId(clientTasks[0]?.id ?? "");
+      setDetailReadyTaskId(null);
+      setDetailTaskId(null);
       setActiveSection("tasks");
       setShowNewClientPanel(false);
       setStorageNotice(data.imported === false ? `${client.name} was already imported from GHL.` : `${client.name} imported from GHL.`);
@@ -1748,7 +2004,7 @@ export default function RespondDashboard({
                       task={task}
                       taskMap={taskMap}
                       active={selectedTask?.id === task.id}
-                      onSelect={(item) => setSelectedId(item.id)}
+                      onSelect={selectOrOpenTask}
                       onQuickMove={moveTask}
                       onDragStart={setDraggedTask}
                     />
@@ -1774,7 +2030,7 @@ export default function RespondDashboard({
                   </div>
                   <div className="category-task-list">
                     {rows.slice(0, 10).map((task) => (
-                      <button type="button" key={task.id} onClick={() => setSelectedId(task.id)}>
+                      <button type="button" key={task.id} onClick={() => selectOrOpenTask(task)}>
                         <span>{task.title}</span>
                         <em>{statusLabels[task.status]}</em>
                       </button>
@@ -1787,141 +2043,6 @@ export default function RespondDashboard({
         )}
       </section>
 
-      <aside className="inspector">
-        {selectedTask ? (
-          <>
-            <div className="inspector-head">
-              <span className={`priority priority-${selectedTask.priority}`}>{selectedTask.priority}</span>
-              <h2>{selectedTask.title}</h2>
-              <p>{selectedTask.category}</p>
-            </div>
-
-            <label>
-              Status
-              <div className="status-grid">
-                {taskStatuses.map((status) => (
-                  <button
-                    type="button"
-                    key={status}
-                    className={selectedTask.status === status ? "active" : ""}
-                    onClick={() => updateTask(selectedTask.id, { status })}
-                  >
-                    {statusLabels[status]}
-                  </button>
-                ))}
-              </div>
-            </label>
-
-            <label>
-              Assignee
-              <select aria-label="Assignee" value={selectedTask.assignee} onChange={(event) => updateTask(selectedTask.id, { assignee: event.target.value })}>
-                {teamMembers.map((member) => (
-                  <option key={member} value={member}>
-                    {member}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Category
-              <select aria-label="Category" value={selectedTask.category} onChange={(event) => updateTask(selectedTask.id, { category: event.target.value })}>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Due window
-              <input aria-label="Due window" value={selectedTask.dueWindow} onChange={(event) => updateTask(selectedTask.id, { dueWindow: event.target.value })} />
-            </label>
-
-            <label>
-              Notes
-              <textarea aria-label="Notes" value={selectedTask.notes} onChange={(event) => updateTask(selectedTask.id, { notes: event.target.value })} placeholder="Add context for the team" />
-            </label>
-
-            <div className="portal-editor">
-              <div className="inspector-section-title">
-                <Icon name="link" />
-                Client portal
-              </div>
-              <label className="portal-toggle">
-                <input
-                  type="checkbox"
-                  checked={selectedTask.portalVisible}
-                  onChange={(event) => updateTask(selectedTask.id, { portalVisible: event.target.checked })}
-                />
-                <span>
-                  Show in portal
-                  <small>Make this item visible on the private client link.</small>
-                </span>
-              </label>
-              <label className="portal-toggle">
-                <input
-                  type="checkbox"
-                  checked={selectedTask.portalActionRequired}
-                  disabled={!selectedTask.portalVisible}
-                  onChange={(event) => updateTask(selectedTask.id, { portalActionRequired: event.target.checked })}
-                />
-                <span>
-                  Client action required
-                  <small>Place it in the client action list.</small>
-                </span>
-              </label>
-              <label>
-                Client-facing title
-                <input
-                  aria-label="Client-facing title"
-                  value={selectedTask.portalTitle}
-                  onChange={(event) => updateTask(selectedTask.id, { portalTitle: event.target.value })}
-                  placeholder={selectedTask.title}
-                />
-              </label>
-              <label>
-                Client-facing note
-                <textarea
-                  aria-label="Client-facing note"
-                  value={selectedTask.portalNote}
-                  onChange={(event) => updateTask(selectedTask.id, { portalNote: event.target.value })}
-                  placeholder="Add a short note the client will see"
-                />
-              </label>
-            </div>
-
-            <div className="dependency-list">
-              <div className="inspector-section-title">
-                <Icon name="link" />
-                Dependencies
-              </div>
-              {selectedTask.dependencies.length === 0 ? (
-                <p>No dependencies attached.</p>
-              ) : (
-                selectedTask.dependencies.map((id) => {
-                  const dependency = taskMap.get(id);
-                  return (
-                    <button type="button" key={id} onClick={() => dependency && setSelectedId(dependency.id)}>
-                      <span>{dependency?.title ?? id}</span>
-                      <em>{dependency ? statusLabels[dependency.status] : "Missing"}</em>
-                    </button>
-                  );
-                })
-              )}
-            </div>
-
-            <div className="inspector-footer">
-              <span className={isPending ? "saving active" : "saving"}>{isPending ? "Saving" : "Saved"}</span>
-              <button type="button" onClick={() => updateTask(selectedTask.id, { status: "complete" })}>
-                <Icon name="check" />
-                Complete
-              </button>
-            </div>
-          </>
-        ) : null}
-      </aside>
       <NewClientPanel
         key={`tasks-${activeEnvironment}-${activeProduct}`}
         open={showNewClientPanel}
@@ -1932,6 +2053,18 @@ export default function RespondDashboard({
         onClose={() => setShowNewClientPanel(false)}
         onSubmit={createClientWorkspace}
       />
+      {detailTask ? (
+        <TaskDetailModal
+          task={detailTask}
+          taskMap={taskMap}
+          categories={categories}
+          teamMembers={teamMembers}
+          isPending={isPending}
+          onClose={() => setDetailTaskId(null)}
+          onUpdate={updateTask}
+          onOpenDependency={openTaskInModal}
+        />
+      ) : null}
       {walkthroughPanel}
     </main>
   );
