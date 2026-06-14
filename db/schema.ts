@@ -32,6 +32,7 @@ export const clients = sqliteTable("clients", {
   product: text("product").notNull().default("respond"),
   portalToken: text("portal_token").notNull().default(""),
   name: text("name").notNull(),
+  companyName: text("company_name").notNull().default(""),
   code: text("code").notNull(),
   industry: text("industry").notNull().default(""),
   owner: text("owner").notNull().default("Response CSM"),

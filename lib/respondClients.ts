@@ -352,6 +352,7 @@ export const liveRespondClients: RespondClient[] = [
     environment: "live",
     product: "respond",
     name: "Bruce Chaplin",
+    companyName: "BC TD Management PTY LTD",
     code: "BC",
     industry: "GHL Active Client",
     owner: "GHL import",

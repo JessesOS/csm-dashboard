@@ -116,6 +116,7 @@ export interface RespondClient {
   product: ProductKey;
   portalToken?: string;
   name: string;
+  companyName?: string;
   code: string;
   industry: string;
   owner: string;
@@ -139,6 +140,7 @@ export interface ClientCreatePayload {
   environment?: EnvironmentKey;
   product?: ProductKey;
   name?: string;
+  companyName?: string;
   owner?: string;
   industry?: string;
   goLiveDate?: string;

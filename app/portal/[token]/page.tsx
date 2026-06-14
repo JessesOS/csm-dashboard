@@ -132,8 +132,15 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
           <div className="portal-hero-copy">
             <span className="portal-code">{client.code}</span>
             <h1>{client.name}</h1>
+            {client.companyName ? <strong className="portal-company-name">{client.companyName}</strong> : null}
             <p>A clear client-facing view of your onboarding progress, upcoming milestones, and any actions we need from your team before launch.</p>
             <dl className="portal-meta-grid">
+              {client.companyName ? (
+                <div>
+                  <dt>Company</dt>
+                  <dd>{client.companyName}</dd>
+                </div>
+              ) : null}
               <div>
                 <dt>CSM owner</dt>
                 <dd>{client.owner}</dd>

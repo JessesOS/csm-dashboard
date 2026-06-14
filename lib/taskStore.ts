@@ -65,11 +65,13 @@ type MetaRow = {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-14-fast-task-load";
+const currentStorageVersion = "2026-06-14-company-dedupe";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+const clientSelectFields =
+  "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -158,6 +160,7 @@ function fromClientRow(row: ClientRow): RespondClient {
     ...row,
     environment: normalizeEnvironment(row.environment),
     product: normalizeProduct(row.product),
+    companyName: row.companyName ?? "",
     phase,
     health,
     risk,
@@ -250,6 +253,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string, environment: E
   const config = productConfig(product);
   const templateTasks = productTasks(product);
   const name = payload.name?.trim() ?? "";
+  const companyName = payload.companyName?.trim() ?? "";
   const goLiveDate = payload.goLiveDate?.trim() || defaultGoLiveDate();
   const owner = payload.owner?.trim() || config.ownerFallback;
   const industry = payload.industry?.trim() || "New client";
@@ -261,6 +265,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string, environment: E
     product,
     portalToken: makePortalToken(),
     name,
+    companyName,
     code: clientCode(name),
     industry,
     owner,
@@ -307,6 +312,7 @@ function clientInsertValues(client: RespondClient) {
     client.product,
     client.portalToken ?? makePortalToken(),
     client.name,
+    client.companyName ?? "",
     client.code,
     client.industry,
     client.owner,
@@ -354,13 +360,14 @@ async function seedWorkspaceShapeReady() {
     "portal_action_required",
     "portal_configured",
   ];
-  const requiredClientColumns = ["portal_token", "environment", "product"];
+  const requiredClientColumns = ["portal_token", "environment", "product", "company_name"];
 
   if (!requiredTaskColumns.every((column) => taskColumns.has(column)) || !requiredClientColumns.every((column) => clientColumns.has(column))) {
     return false;
   }
 
   const seedClientIds = allSeedClients.map((client) => client.id);
+  const seedClientsWithCompany = allSeedClients.filter((client) => client.companyName);
   const placeholders = seedClientIds.map(() => "?").join(", ");
   const [clientCount, taskClientCount] = await Promise.all([
     d1
@@ -373,7 +380,22 @@ async function seedWorkspaceShapeReady() {
       .first<CountRow>(),
   ]);
 
-  return (clientCount?.count ?? 0) >= seedClientIds.length && (taskClientCount?.count ?? 0) >= seedClientIds.length;
+  if ((clientCount?.count ?? 0) < seedClientIds.length || (taskClientCount?.count ?? 0) < seedClientIds.length) {
+    return false;
+  }
+
+  if (seedClientsWithCompany.length === 0) {
+    return true;
+  }
+
+  const companyPlaceholders = seedClientsWithCompany.map(() => "?").join(", ");
+  const companyRows = await d1
+    .prepare(`SELECT id, company_name AS companyName FROM clients WHERE id IN (${companyPlaceholders})`)
+    .bind(...seedClientsWithCompany.map((client) => client.id))
+    .all<Pick<ClientRow, "id" | "companyName">>();
+  const companyByClientId = new Map((companyRows.results ?? []).map((client) => [client.id, client.companyName ?? ""]));
+
+  return seedClientsWithCompany.every((client) => normalizeClientIdentity(companyByClientId.get(client.id)) === normalizeClientIdentity(client.companyName));
 }
 
 async function markStoragePrepared(d1 = getD1()) {
@@ -463,6 +485,10 @@ async function ensureClientColumns() {
   if (!columns.has("product")) {
     await d1.prepare("ALTER TABLE clients ADD COLUMN product TEXT NOT NULL DEFAULT 'respond'").run();
   }
+
+  if (!columns.has("company_name")) {
+    await d1.prepare("ALTER TABLE clients ADD COLUMN company_name TEXT NOT NULL DEFAULT ''").run();
+  }
 }
 
 async function ensureClientPortalTokens() {
@@ -487,6 +513,7 @@ async function seedClients() {
             product,
             portal_token,
             name,
+            company_name,
             code,
             industry,
             owner,
@@ -504,9 +531,26 @@ async function seedClients() {
             completed_tasks,
             timeline,
             attention
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...clientInsertValues(client))
+    )
+  );
+}
+
+async function syncSeedClientIdentityDefaults() {
+  const d1 = getD1();
+  const seededCompanies = allSeedClients.filter((client) => client.companyName);
+
+  if (seededCompanies.length === 0) {
+    return;
+  }
+
+  await d1.batch(
+    seededCompanies.map((client) =>
+      d1
+        .prepare("UPDATE clients SET company_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND company_name = ''")
+        .bind(client.companyName ?? "", client.id)
     )
   );
 }
@@ -692,6 +736,7 @@ async function prepareTaskStorage() {
         product TEXT NOT NULL DEFAULT 'respond',
         portal_token TEXT NOT NULL DEFAULT '',
         name TEXT NOT NULL,
+        company_name TEXT NOT NULL DEFAULT '',
         code TEXT NOT NULL,
         industry TEXT NOT NULL DEFAULT '',
         owner TEXT NOT NULL DEFAULT 'Response CSM',
@@ -745,6 +790,7 @@ async function prepareTaskStorage() {
   await ensureClientColumns();
 
   await seedClients();
+  await syncSeedClientIdentityDefaults();
   await ensureClientPortalTokens();
 
   await d1.batch([
@@ -764,9 +810,11 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_idx ON clients (environment)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_product_idx ON clients (environment, product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_product_name_idx ON clients (environment, product, name)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS clients_environment_product_company_idx ON clients (environment, product, company_name)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_product_idx ON clients (product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_product_name_idx ON clients (product, name)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_name_idx ON clients (name)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS clients_company_name_idx ON clients (company_name)"),
     d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS clients_portal_token_idx ON clients (portal_token)"),
   ]);
 
@@ -812,9 +860,7 @@ export async function listClients(environmentInput: string | null | undefined = 
   const product = normalizeProduct(productInput);
   const [clientRows, countRows] = await Promise.all([
     d1
-      .prepare(
-        "SELECT id, environment, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC"
-      )
+      .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
       .bind(environment, product)
       .all<ClientRow>(),
     d1
@@ -1097,9 +1143,85 @@ async function nextClientId(name: string, environment: EnvironmentKey, product: 
   return id;
 }
 
+function normalizeClientIdentity(value: string | null | undefined) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function clientIdentityValues(...values: Array<string | null | undefined>) {
+  return [...new Set(values.map(normalizeClientIdentity).filter(Boolean))];
+}
+
+async function findExistingClientByIdentity(environment: EnvironmentKey, product: ProductKey, name: string, companyName: string) {
+  const incomingIdentities = clientIdentityValues(name, companyName);
+
+  if (incomingIdentities.length === 0) {
+    return null;
+  }
+
+  const incoming = new Set(incomingIdentities);
+  const result = await getD1()
+    .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
+    .bind(environment, product)
+    .all<ClientRow>();
+
+  return (
+    (result.results ?? [])
+      .map(fromClientRow)
+      .find((client) => clientIdentityValues(client.name, client.companyName).some((identity) => incoming.has(identity))) ?? null
+  );
+}
+
+async function updateExistingClientIdentity(client: RespondClient, payload: ClientCreatePayload) {
+  const d1 = getD1();
+  const updates: string[] = [];
+  const values: unknown[] = [];
+  const incomingName = payload.name?.trim() ?? "";
+  const incomingCompanyName = payload.companyName?.trim() ?? "";
+  const currentCompanyName = client.companyName ?? "";
+  const existingLooksCompanyNamed =
+    (Boolean(currentCompanyName) && normalizeClientIdentity(client.name) === normalizeClientIdentity(currentCompanyName)) ||
+    (Boolean(incomingCompanyName) && normalizeClientIdentity(client.name) === normalizeClientIdentity(incomingCompanyName));
+
+  if (incomingCompanyName && normalizeClientIdentity(incomingCompanyName) !== normalizeClientIdentity(currentCompanyName)) {
+    updates.push("company_name = ?");
+    values.push(incomingCompanyName);
+  }
+
+  if (
+    incomingName &&
+    existingLooksCompanyNamed &&
+    normalizeClientIdentity(incomingName) !== normalizeClientIdentity(client.name) &&
+    normalizeClientIdentity(incomingName) !== normalizeClientIdentity(incomingCompanyName)
+  ) {
+    updates.push("name = ?", "code = ?");
+    values.push(incomingName, clientCode(incomingName));
+  }
+
+  if (payload.industry?.trim() && (!client.industry || client.industry === "New client")) {
+    updates.push("industry = ?");
+    values.push(payload.industry.trim());
+  }
+
+  if (updates.length === 0) {
+    return client;
+  }
+
+  updates.push("updated_at = CURRENT_TIMESTAMP");
+  values.push(client.id);
+  await d1.prepare(`UPDATE clients SET ${updates.join(", ")} WHERE id = ?`).bind(...values).run();
+
+  const row = await d1.prepare(`SELECT ${clientSelectFields} FROM clients WHERE id = ?`).bind(client.id).first<ClientRow>();
+  return row ? fromClientRow(row) : client;
+}
+
 export async function createClient(payload: ClientCreatePayload) {
   await ensureTaskStorage();
   const name = payload.name?.trim();
+  const companyName = payload.companyName?.trim() ?? "";
   const environment = normalizeEnvironment(payload.environment);
   const product = normalizeProduct(payload.product);
 
@@ -1108,8 +1230,22 @@ export async function createClient(payload: ClientCreatePayload) {
   }
 
   const d1 = getD1();
+  const existingClient = await findExistingClientByIdentity(environment, product, name, companyName);
+
+  if (existingClient) {
+    const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
+    await seedTemplateTasksForClient(client.id, environment, product, false);
+    await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
+
+    return {
+      client,
+      tasks: await listTasks(environment, product, client.id),
+      created: false,
+    };
+  }
+
   const id = await nextClientId(name, environment, product);
-  const client = buildNewClient({ ...payload, name }, id, environment, product);
+  const client = buildNewClient({ ...payload, name, companyName }, id, environment, product);
 
   await d1
     .prepare(`
@@ -1119,6 +1255,7 @@ export async function createClient(payload: ClientCreatePayload) {
         product,
         portal_token,
         name,
+        company_name,
         code,
         industry,
         owner,
@@ -1136,7 +1273,7 @@ export async function createClient(payload: ClientCreatePayload) {
         completed_tasks,
         timeline,
         attention
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(...clientInsertValues(client))
     .run();
@@ -1147,6 +1284,7 @@ export async function createClient(payload: ClientCreatePayload) {
   return {
     client,
     tasks: await listTasks(environment, product, client.id),
+    created: true,
   };
 }
 
@@ -1160,9 +1298,7 @@ export async function getPortalWorkspace(token: string) {
   await ensureTaskStorage();
 
   const row = await getD1()
-    .prepare(
-      "SELECT id, environment, product, portal_token AS portalToken, name, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention FROM clients WHERE portal_token = ?"
-    )
+    .prepare(`SELECT ${clientSelectFields} FROM clients WHERE portal_token = ?`)
     .bind(portalToken)
     .first<ClientRow>();
 

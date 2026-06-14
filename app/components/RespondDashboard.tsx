@@ -1173,7 +1173,7 @@ function MissionControl({
               <option value="all">All clients</option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>
-                  {client.name}
+                  {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
                 </option>
               ))}
             </select>
@@ -1252,7 +1252,10 @@ function MissionControl({
             >
               <button type="button" className="mission-client-card-main" onClick={() => chooseClient(client.id)}>
                 <span className="mission-client-code">{client.code}</span>
-                <span className="mission-client-name">{client.name}</span>
+                <span className="mission-client-name">
+                  {client.name}
+                  {client.companyName ? <small>{client.companyName}</small> : null}
+                </span>
                 <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
                 <span className="mission-client-meta">{client.phase} - {client.owner}</span>
                 <span className="mission-progress-track">
@@ -1968,6 +1971,7 @@ export default function RespondDashboard({
             <p>
               {tasks.length} operational tasks in this client workspace
               {selectedClient ? ` - client context: ${selectedClient.phase}, ${clientHealthLabels[selectedClient.health]}` : ""}
+              {selectedClient?.companyName ? ` - company: ${selectedClient.companyName}` : ""}
             </p>
           </div>
           <div className="topbar-actions">
@@ -2042,7 +2046,7 @@ export default function RespondDashboard({
             {clients.length === 0 ? <option value="">No clients yet</option> : null}
             {clients.map((client) => (
               <option key={client.id} value={client.id}>
-                {client.name}
+                {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
               </option>
             ))}
           </select>

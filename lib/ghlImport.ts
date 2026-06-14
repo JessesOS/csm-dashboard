@@ -17,6 +17,7 @@ type GhlOpportunity = {
   status: string;
   stageName?: string;
   contactName?: string;
+  companyName?: string;
   assignedTo?: string;
   source?: string;
   tags: string[];
@@ -28,6 +29,8 @@ export type GhlClientImportPreview = {
   contactId?: string;
   opportunityName: string;
   stageName?: string;
+  contactName?: string;
+  companyName?: string;
   status: string;
 };
 
@@ -70,9 +73,10 @@ export async function specifiedGhlRespondClientImport(selectorInput: string): Pr
 
   const contact = selectedOpportunity.contactId ? await loadContact(selectedOpportunity.contactId) : null;
   const contactRecord = contact && isRecord(contact.contact) ? contact.contact : null;
-  const contactName = contactRecord
-    ? readString(contactRecord, ["companyName", "businessName", "name", "fullName", "contactName"])
-    : null;
+  const contactName = contactRecord ? readContactName(contactRecord) : null;
+  const companyName = contactRecord ? readCompanyName(contactRecord) : selectedOpportunity.companyName;
+  const clientName = cleanImportText(contactName ?? selectedOpportunity.contactName ?? selectedOpportunity.name);
+  const cleanCompanyName = cleanOptionalImportText(companyName ?? selectedOpportunity.companyName);
   const industry = cleanImportText(
     (contactRecord ? readString(contactRecord, ["source"]) : null) ??
       selectedOpportunity.source ??
@@ -84,7 +88,8 @@ export async function specifiedGhlRespondClientImport(selectorInput: string): Pr
     payload: {
       environment: "live",
       product: "respond",
-      name: cleanImportText(contactName ?? selectedOpportunity.contactName ?? selectedOpportunity.name),
+      name: clientName,
+      companyName: cleanCompanyName && normalizeLookup(cleanCompanyName) !== normalizeLookup(clientName) ? cleanCompanyName : undefined,
       industry,
       owner: "GHL import",
     },
@@ -93,6 +98,8 @@ export async function specifiedGhlRespondClientImport(selectorInput: string): Pr
       contactId: selectedOpportunity.contactId,
       opportunityName: selectedOpportunity.name,
       stageName: selectedOpportunity.stageName,
+      contactName: contactName ?? selectedOpportunity.contactName,
+      companyName: cleanCompanyName,
       status: selectedOpportunity.status,
     },
   };
@@ -101,7 +108,7 @@ export async function specifiedGhlRespondClientImport(selectorInput: string): Pr
 function findSpecifiedOpportunity(opportunities: GhlOpportunity[], selector: string) {
   const normalizedSelector = normalizeLookup(selector);
   const exactMatches = opportunities.filter((opportunity) =>
-    [opportunity.id, opportunity.contactId, opportunity.name, opportunity.contactName]
+    [opportunity.id, opportunity.contactId, opportunity.name, opportunity.contactName, opportunity.companyName]
       .filter((value): value is string => Boolean(value))
       .some((value) => normalizeLookup(value) === normalizedSelector)
   );
@@ -115,7 +122,7 @@ function findSpecifiedOpportunity(opportunities: GhlOpportunity[], selector: str
   }
 
   const partialMatches = opportunities.filter((opportunity) =>
-    [opportunity.name, opportunity.contactName]
+    [opportunity.name, opportunity.contactName, opportunity.companyName]
       .filter((value): value is string => Boolean(value))
       .some((value) => normalizeLookup(value).includes(normalizedSelector))
   );
@@ -239,6 +246,7 @@ function normalizeOpportunity(
     status: (readString(opportunity, ["status"]) ?? "open").toLowerCase(),
     stageName: stage?.stageName,
     contactName: readPathString(opportunity, ["contact.name", "contact.fullName", "contact.contactName"]),
+    companyName: readPathString(opportunity, ["contact.companyName", "contact.businessName", "contact.company", "companyName", "businessName"]),
     assignedTo: readString(opportunity, ["assignedTo"]),
     source: readString(opportunity, ["source"]),
     tags: readPathStringArray(opportunity, ["contact.tags", "tags"]),
@@ -317,12 +325,29 @@ function readPath(record: GhlRecord, path: string) {
   }, record);
 }
 
+function readContactName(record: GhlRecord) {
+  const firstName = readString(record, ["firstName", "first_name"]);
+  const lastName = readString(record, ["lastName", "last_name"]);
+  const joinedName = [firstName, lastName].filter(Boolean).join(" ").trim();
+
+  return joinedName || readString(record, ["fullName", "contactName", "name"]);
+}
+
+function readCompanyName(record: GhlRecord) {
+  return readString(record, ["companyName", "businessName", "company", "organization", "company_name"]);
+}
+
 function isRecord(value: unknown): value is GhlRecord {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function cleanImportText(value: string) {
   return value.replace(/\s+/g, " ").trim().slice(0, 90) || "GHL Client";
+}
+
+function cleanOptionalImportText(value?: string | null) {
+  const clean = value?.replace(/\s+/g, " ").trim().slice(0, 90);
+  return clean || undefined;
 }
 
 function normalizeLookup(value: string) {
