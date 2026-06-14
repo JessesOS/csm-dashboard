@@ -544,6 +544,80 @@ function useFilteredTasks(tasks: Task[], query: string, category: string, owner:
   }, [tasks, query, category, owner, status]);
 }
 
+interface TaskNavigationOrder {
+  categoryOrder: Map<string, number>;
+  templateOrder: Map<string, number>;
+}
+
+const categoryOrderBucket = 100_000;
+const customTaskOffset = 50_000;
+
+function buildTaskNavigationOrder(categories: Category[], templateTasks: Task[]): TaskNavigationOrder {
+  const categoryOrder = new Map<string, number>();
+
+  for (const phase of phaseOrder) {
+    for (const category of categories) {
+      if (category.phase === phase && !categoryOrder.has(category.name)) {
+        categoryOrder.set(category.name, categoryOrder.size);
+      }
+    }
+  }
+
+  for (const category of categories) {
+    if (!categoryOrder.has(category.name)) {
+      categoryOrder.set(category.name, categoryOrder.size);
+    }
+  }
+
+  const templateOrder = new Map<string, number>();
+  const withinCategoryCounts = new Map<string, number>();
+
+  for (const task of templateTasks) {
+    const categoryRank = categoryOrder.get(task.category) ?? categoryOrder.size;
+    const withinCategoryRank = withinCategoryCounts.get(task.category) ?? 0;
+    withinCategoryCounts.set(task.category, withinCategoryRank + 1);
+    templateOrder.set(task.id, categoryRank * categoryOrderBucket + withinCategoryRank);
+  }
+
+  return { categoryOrder, templateOrder };
+}
+
+function templateKeyForTask(task: Task) {
+  if (task.templateId) {
+    return task.templateId;
+  }
+
+  const scopedParts = task.id.split("__");
+  return scopedParts.length > 1 ? scopedParts[scopedParts.length - 1] : task.id;
+}
+
+function taskNavigationRank(task: Task, order: TaskNavigationOrder) {
+  const templateRank = order.templateOrder.get(templateKeyForTask(task));
+
+  if (templateRank !== undefined) {
+    return templateRank;
+  }
+
+  const categoryRank = order.categoryOrder.get(task.category) ?? order.categoryOrder.size;
+  return categoryRank * categoryOrderBucket + customTaskOffset + task.sortOrder;
+}
+
+function compareTasksByNavigationOrder(a: Task, b: Task, order: TaskNavigationOrder) {
+  const rankDifference = taskNavigationRank(a, order) - taskNavigationRank(b, order);
+
+  if (rankDifference !== 0) {
+    return rankDifference;
+  }
+
+  const sortDifference = a.sortOrder - b.sortOrder;
+
+  if (sortDifference !== 0) {
+    return sortDifference;
+  }
+
+  return a.title.localeCompare(b.title);
+}
+
 function TaskCard({
   task,
   taskMap,
@@ -1494,6 +1568,11 @@ export default function RespondDashboard({
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
   const detailTask = detailTaskId ? taskMap.get(detailTaskId) ?? null : null;
   const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter);
+  const taskNavigationOrder = useMemo(() => buildTaskNavigationOrder(categories, templateTasks), [categories, templateTasks]);
+  const orderedFilteredTasks = useMemo(
+    () => [...filteredTasks].sort((a, b) => compareTasksByNavigationOrder(a, b, taskNavigationOrder)),
+    [filteredTasks, taskNavigationOrder]
+  );
   const canImportGhlClient = activeEnvironment === "live" && activeProduct === "respond";
 
   const metrics = useMemo(() => {
@@ -1722,9 +1801,9 @@ export default function RespondDashboard({
     () =>
       taskStatuses.map((status) => ({
         status,
-        tasks: filteredTasks.filter((task) => task.status === status),
+        tasks: orderedFilteredTasks.filter((task) => task.status === status),
       })),
-    [filteredTasks]
+    [orderedFilteredTasks]
   );
 
   const selectedClient = clients.find((client) => client.id === activeTaskClientId);
@@ -2016,7 +2095,7 @@ export default function RespondDashboard({
         ) : (
           <section className="category-view" aria-label="Task categories">
             {categoryStats.map((category) => {
-              const rows = filteredTasks.filter((task) => task.category === category.name);
+              const rows = orderedFilteredTasks.filter((task) => task.category === category.name);
               return (
                 <article key={category.id} className="category-panel">
                   <div className="category-panel-head">
