@@ -57,12 +57,36 @@ function portalDetail(task: Task) {
 }
 
 function portalActionUrl(task: Task) {
-  const clean = task.portalActionUrl?.trim() ?? "";
+  return safePortalUrl(task.portalActionUrl);
+}
+
+function portalLoomUrl(task: Task) {
+  return safePortalUrl(task.loomUrl);
+}
+
+function safePortalUrl(value: string | null | undefined) {
+  const clean = value?.trim() ?? "";
   return /^https?:\/\//i.test(clean) ? clean : "";
 }
 
 function portalActionLabel(task: Task) {
   return task.portalActionLabel?.trim() || "Complete this item";
+}
+
+function portalStepState(task: Task, index: number, activeIndex: number) {
+  if (task.status === "complete") {
+    return "complete";
+  }
+
+  if (index === activeIndex) {
+    return "active";
+  }
+
+  if (index > activeIndex) {
+    return "locked";
+  }
+
+  return "available";
 }
 
 type PortalWorkspace = Awaited<ReturnType<typeof getPortalWorkspace>>;
@@ -112,6 +136,25 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
   const clientActions = progressTasks.filter((task) => task.status !== "complete" && task.portalActionRequired).slice(0, 6);
   const upcomingTouchpoints = progressTasks.filter((task) => task.status !== "complete" && !task.portalActionRequired).slice(0, 5);
   const nextTask = clientActions[0] ?? openTasks[0];
+  const guidedSource = progressTasks.some((task) => task.portalActionRequired || portalActionUrl(task))
+    ? progressTasks.filter((task) => task.portalActionRequired || portalActionUrl(task))
+    : progressTasks;
+  const guidedSteps = guidedSource.slice(0, 8);
+  const firstOpenGuidedStep = guidedSteps.findIndex((task) => task.status !== "complete");
+  const activeGuidedStepIndex = firstOpenGuidedStep;
+  const activeGuidedStep = activeGuidedStepIndex >= 0 ? guidedSteps[activeGuidedStepIndex] : null;
+  const activeGuidedStepUrl = activeGuidedStep ? portalActionUrl(activeGuidedStep) : "";
+  const activeGuidedStepLoomUrl = activeGuidedStep ? portalLoomUrl(activeGuidedStep) : "";
+  const guidedComplete = guidedSteps.filter((task) => task.status === "complete").length;
+  const guidedProgress = guidedSteps.length > 0 ? Math.round((guidedComplete / guidedSteps.length) * 100) : 0;
+  const guidedProgressLabel = guidedSteps.length > 0
+    ? activeGuidedStepIndex >= 0
+      ? `Step ${activeGuidedStepIndex + 1} of ${guidedSteps.length}`
+      : "All steps complete"
+    : "No required steps";
+  const supportingResources = progressTasks
+    .filter((task) => task.id !== activeGuidedStep?.id && (portalLoomUrl(task) || portalActionUrl(task)))
+    .slice(0, 3);
   const phaseSummaries = portalPhaseOrder
     .map((phase) => {
       const phaseTasks = progressTasks.filter((task) => task.phase === phase);
@@ -140,6 +183,102 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
           </div>
           <span className={`portal-health portal-health-${client.health}`}>{client.phase}</span>
         </nav>
+
+        <section className="portal-guided-panel" aria-label="Guided onboarding steps">
+          <div className="portal-guided-head">
+            <div>
+              <span className="portal-guided-kicker">{client.name} guided onboarding</span>
+              <h2>Complete one step at a time</h2>
+              <p>Start with the current step. Later steps unlock as your CSM marks each required item complete.</p>
+            </div>
+            <div className="portal-guided-progress" aria-label="Guided step progress">
+              <span>{guidedProgressLabel}</span>
+              <strong>{guidedProgress}%</strong>
+              <div className="portal-guided-meter">
+                <span style={{ width: `${guidedProgress}%` }} />
+              </div>
+            </div>
+          </div>
+
+          {guidedSteps.length > 0 ? (
+            <div className="portal-guided-layout">
+              <ol className="portal-stepper-list">
+                {guidedSteps.map((task, index) => {
+                  const stepState = portalStepState(task, index, activeGuidedStepIndex);
+                  const isLocked = stepState === "locked";
+                  const isActive = stepState === "active";
+                  const isComplete = stepState === "complete";
+                  return (
+                    <li key={task.id} className={`portal-step-card portal-step-${stepState}`}>
+                      <span className="portal-step-marker">{isComplete ? "✓" : index + 1}</span>
+                      <div className="portal-step-content">
+                        <div className="portal-step-title">
+                          <strong>{portalTitle(task)}</strong>
+                          <em>{isComplete ? "Complete" : isActive ? "Current step" : isLocked ? "Locked" : statusLabels[task.status]}</em>
+                        </div>
+                        <p>{portalDetail(task)}</p>
+                        {isLocked ? <small>Unlocks after the current step is completed.</small> : null}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+
+              <aside className="portal-focus-card" aria-label="Current portal step">
+                {activeGuidedStep ? (
+                  <>
+                    <span className="portal-focus-eyebrow">Current step</span>
+                    <h3>{portalTitle(activeGuidedStep)}</h3>
+                    <p>{portalDetail(activeGuidedStep)}</p>
+                    <div className="portal-focus-actions">
+                      {activeGuidedStepUrl ? (
+                        <a className="portal-primary-action" href={activeGuidedStepUrl} target="_blank" rel="noreferrer">
+                          {portalActionLabel(activeGuidedStep)}
+                        </a>
+                      ) : (
+                        <span className="portal-action-placeholder">Your CSM will confirm this step with you.</span>
+                      )}
+                      {activeGuidedStepLoomUrl ? (
+                        <a className="portal-secondary-action" href={activeGuidedStepLoomUrl} target="_blank" rel="noreferrer">
+                          Watch walkthrough
+                        </a>
+                      ) : null}
+                    </div>
+                    <small className="portal-focus-note">Once this is complete, the next step becomes your focus.</small>
+                  </>
+                ) : (
+                  <>
+                    <span className="portal-focus-eyebrow">All set</span>
+                    <h3>No client actions are currently required</h3>
+                    <p>Your onboarding team will add the next guided step here if they need anything from you.</p>
+                  </>
+                )}
+
+                <div className="portal-resource-list" aria-label="Helpful resources">
+                  <h4>Resources</h4>
+                  {supportingResources.length > 0 ? (
+                    supportingResources.map((task) => {
+                      const resourceUrl = portalLoomUrl(task) || portalActionUrl(task);
+                      return (
+                        <a key={task.id} className="portal-resource-item" href={resourceUrl} target="_blank" rel="noreferrer">
+                          <span>{portalLoomUrl(task) ? "Walkthrough" : "Link"}</span>
+                          <strong>{portalTitle(task)}</strong>
+                        </a>
+                      );
+                    })
+                  ) : (
+                    <div className="portal-resource-item portal-resource-static">
+                      <span>Support</span>
+                      <strong>{client.owner} is keeping this path clear for you.</strong>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </div>
+          ) : (
+            <p className="portal-empty">Your guided onboarding path is being prepared.</p>
+          )}
+        </section>
 
         <section className="portal-hero-grid">
           <div className="portal-hero-copy">
