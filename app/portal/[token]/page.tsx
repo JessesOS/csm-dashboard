@@ -132,7 +132,7 @@ function RespondMark({ className }: { className: string }) {
   return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
 }
 
-function ClientPortalView({ client, tasks, formSubmission, token }: PortalWorkspace & { token: string }) {
+function ClientPortalView({ client, tasks, formDefinition, formSubmission, token }: PortalWorkspace & { token: string }) {
   const product = productConfig(client.product);
   const progressTasks = tasks.filter((task) => task.portalVisible);
   const completed = progressTasks.filter((task) => task.status === "complete").length;
@@ -240,7 +240,7 @@ function ClientPortalView({ client, tasks, formSubmission, token }: PortalWorksp
                     <p>{portalDetail(activeGuidedStep)}</p>
                     {activeGuidedStepIsForm ? (
                       <>
-                        <PortalOnboardingForm token={token} initialSubmission={formSubmission} />
+                        <PortalOnboardingForm token={token} form={formDefinition} initialSubmission={formSubmission} />
                         {activeGuidedStepLoomUrl ? (
                           <div className="portal-focus-actions">
                             <a className="portal-secondary-action" href={activeGuidedStepLoomUrl} target="_blank" rel="noreferrer">

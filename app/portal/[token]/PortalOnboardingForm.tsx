@@ -3,15 +3,14 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   emptyOnboardingFormResponses,
-  onboardingFormSections,
-  onboardingFormTitle,
+  type PortalFormDefinition,
   type PortalFormField,
 } from "../../../lib/onboardingForm";
 import type { PortalFormResponses, PortalFormSubmission, PortalFormValue } from "../../../lib/types";
 
-function mergeResponses(submission: PortalFormSubmission | null | undefined) {
+function mergeResponses(form: PortalFormDefinition, submission: PortalFormSubmission | null | undefined) {
   return {
-    ...emptyOnboardingFormResponses(),
+    ...emptyOnboardingFormResponses(form),
     ...(submission?.responses ?? {}),
   };
 }
@@ -46,20 +45,22 @@ function submittedLabel(value: string | undefined) {
 
 export function PortalOnboardingForm({
   token,
+  form,
   initialSubmission,
 }: {
   token: string;
+  form: PortalFormDefinition;
   initialSubmission: PortalFormSubmission | null;
 }) {
   const [isOpen, setIsOpen] = useState(!initialSubmission);
-  const [responses, setResponses] = useState<PortalFormResponses>(() => mergeResponses(initialSubmission));
+  const [responses, setResponses] = useState<PortalFormResponses>(() => mergeResponses(form, initialSubmission));
   const [submission, setSubmission] = useState<PortalFormSubmission | null>(initialSubmission);
   const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const completedFields = useMemo(() => {
     return Object.values(responses).filter((value) => (Array.isArray(value) ? value.length > 0 : Boolean(value))).length;
   }, [responses]);
-  const totalFields = useMemo(() => onboardingFormSections.reduce((count, section) => count + section.fields.length, 0), []);
+  const totalFields = useMemo(() => form.sections.reduce((count, section) => count + section.fields.length, 0), [form.sections]);
 
   function updateField(field: PortalFormField, value: string) {
     setResponses((current) => ({ ...current, [field.id]: value }));
@@ -98,7 +99,7 @@ export function PortalOnboardingForm({
       }
 
       setSubmission(payload.submission);
-      setResponses(mergeResponses(payload.submission));
+      setResponses(mergeResponses(form, payload.submission));
       setIsOpen(false);
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "We could not save the onboarding form.");
@@ -229,7 +230,7 @@ export function PortalOnboardingForm({
       >
         <span className="portal-native-form-chevron" aria-hidden="true" />
         <span>
-          <strong>{onboardingFormTitle}</strong>
+          <strong>{form.title}</strong>
           <small>{submission ? `Submitted ${submittedLabel(submission.submittedAt)}. You can update it if anything has changed.` : "Open the guided form and submit it here in the portal."}</small>
         </span>
         <em>{submission ? "Submitted" : `${completedFields}/${totalFields}`}</em>
@@ -238,11 +239,11 @@ export function PortalOnboardingForm({
       {isOpen ? (
         <form className="portal-native-form-body" onSubmit={submitForm}>
           <div className="portal-native-form-intro">
-            <strong>Complete this once so the team can build from one clean source of truth.</strong>
-            <span>For passwords, use your approved secure handoff method or paste a secure one-time link instead of raw credentials.</span>
+            <strong>{form.introTitle}</strong>
+            <span>{form.introDescription}</span>
           </div>
 
-          {onboardingFormSections.map((section) => (
+          {form.sections.map((section) => (
             <fieldset key={section.id} className="portal-form-section">
               <legend>
                 <strong>{section.title}</strong>

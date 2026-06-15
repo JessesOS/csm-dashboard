@@ -1,7 +1,8 @@
 import { getD1 } from "../db";
 import {
   isOnboardingFormTaskTitle,
-  onboardingFormId,
+  onboardingFormForId,
+  onboardingFormForProduct,
   onboardingFormMissingRequired,
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
@@ -128,13 +129,13 @@ function parseDependencies(value: string | null | undefined) {
   return parseJsonArray(value, (item): item is string => typeof item === "string");
 }
 
-function parsePortalFormResponses(value: string | null | undefined): PortalFormResponses {
+function parsePortalFormResponses(value: string | null | undefined, formId: string, product: ProductKey): PortalFormResponses {
   if (!value) {
     return {};
   }
 
   try {
-    return sanitizeOnboardingFormResponses(JSON.parse(value));
+    return sanitizeOnboardingFormResponses(JSON.parse(value), onboardingFormForId(formId, product));
   } catch {
     return {};
   }
@@ -210,12 +211,14 @@ function fromClientRow(row: ClientRow): RespondClient {
 }
 
 function fromPortalFormSubmissionRow(row: PortalFormSubmissionRow): PortalFormSubmission {
+  const product = normalizeProduct(row.product);
+
   return {
     ...row,
     environment: normalizeEnvironment(row.environment),
-    product: normalizeProduct(row.product),
+    product,
     status: row.status === "submitted" ? "submitted" : "draft",
-    responses: parsePortalFormResponses(row.responses),
+    responses: parsePortalFormResponses(row.responses, row.formId, product),
   };
 }
 
@@ -1756,12 +1759,17 @@ async function getClientByPortalToken(token: string) {
   return fromClientRow(row);
 }
 
-async function getPortalFormSubmissionForClient(clientId: string, formId = onboardingFormId) {
+async function getPortalFormSubmissionForClient(client: RespondClient) {
   await ensureTaskStorage();
 
+  const form = onboardingFormForProduct(client.product);
+  const formIds = [form.id, ...(form.legacyIds ?? [])];
+  const placeholders = formIds.map(() => "?").join(", ");
   const row = await getD1()
-    .prepare(`SELECT ${portalFormSubmissionSelectFields} FROM portal_form_submissions WHERE client_id = ? AND form_id = ?`)
-    .bind(clientId, formId)
+    .prepare(
+      `SELECT ${portalFormSubmissionSelectFields} FROM portal_form_submissions WHERE client_id = ? AND form_id IN (${placeholders}) ORDER BY updated_at DESC LIMIT 1`
+    )
+    .bind(client.id, ...formIds)
     .first<PortalFormSubmissionRow>();
 
   return row ? fromPortalFormSubmissionRow(row) : null;
@@ -1792,19 +1800,20 @@ async function markOnboardingFormTaskInReview(client: RespondClient) {
 
 export async function getPortalOnboardingFormSubmission(token: string) {
   const client = await getClientByPortalToken(token);
-  return getPortalFormSubmissionForClient(client.id);
+  return getPortalFormSubmissionForClient(client);
 }
 
 export async function savePortalOnboardingFormSubmission(token: string, responsesInput: unknown) {
   const client = await getClientByPortalToken(token);
-  const responses = sanitizeOnboardingFormResponses(responsesInput);
-  const missingRequired = onboardingFormMissingRequired(responses);
+  const form = onboardingFormForProduct(client.product);
+  const responses = sanitizeOnboardingFormResponses(responsesInput, form);
+  const missingRequired = onboardingFormMissingRequired(responses, form);
 
   if (missingRequired.length > 0) {
     throw new Error(`Please complete: ${missingRequired.join(", ")}.`);
   }
 
-  const id = `${client.id}__${onboardingFormId}`;
+  const id = `${client.id}__${form.id}`;
   const d1 = getD1();
 
   await d1
@@ -1827,12 +1836,12 @@ export async function savePortalOnboardingFormSubmission(token: string, response
           updated_at = CURRENT_TIMESTAMP
       `
     )
-    .bind(id, client.environment, client.product, client.id, onboardingFormId, JSON.stringify(responses))
+    .bind(id, client.environment, client.product, client.id, form.id, JSON.stringify(responses))
     .run();
 
   await markOnboardingFormTaskInReview(client);
 
-  const submission = await getPortalFormSubmissionForClient(client.id);
+  const submission = await getPortalFormSubmissionForClient(client);
 
   if (!submission) {
     throw new Error("The onboarding form was submitted, but the saved response could not be reloaded.");
@@ -1847,6 +1856,7 @@ export async function getPortalWorkspace(token: string) {
   return {
     client,
     tasks: await listTasks(client.environment, client.product, client.id),
-    formSubmission: await getPortalFormSubmissionForClient(client.id),
+    formDefinition: onboardingFormForProduct(client.product),
+    formSubmission: await getPortalFormSubmissionForClient(client),
   };
 }

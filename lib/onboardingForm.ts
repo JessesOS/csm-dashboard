@@ -1,4 +1,4 @@
-import type { PortalFormResponses, PortalFormValue } from "./types";
+import type { PortalFormResponses, PortalFormValue, ProductKey } from "./types";
 
 export type PortalFormFieldType =
   | "text"
@@ -34,11 +34,24 @@ export interface PortalFormSection {
   fields: PortalFormField[];
 }
 
-export const onboardingFormId = "client-onboarding-intake-v1";
+export interface PortalFormDefinition {
+  id: string;
+  legacyIds?: string[];
+  title: string;
+  introTitle: string;
+  introDescription: string;
+  sections: PortalFormSection[];
+}
 
-export const onboardingFormTitle = "Client onboarding intake";
+const legacyScaleOnboardingFormId = "client-onboarding-intake-v1";
 
-export const onboardingFormSections: PortalFormSection[] = [
+export const scaleOnboardingForm: PortalFormDefinition = {
+  id: "scale-onboarding-intake-v1",
+  legacyIds: [legacyScaleOnboardingFormId],
+  title: "Scale onboarding intake",
+  introTitle: "Complete this once so the Scale team can build from one clean source of truth.",
+  introDescription: "For passwords, use your approved secure handoff method or paste a secure one-time link instead of raw credentials.",
+  sections: [
   {
     id: "business-basics",
     title: "Business basics",
@@ -311,10 +324,133 @@ export const onboardingFormSections: PortalFormSection[] = [
       { id: "terms_acceptance", label: "I accept the Terms & Conditions", type: "checkbox", required: true },
     ],
   },
-];
+  ],
+};
 
-const fields = onboardingFormSections.flatMap((section) => section.fields);
-const fieldLookup = new Map(fields.map((field) => [field.id, field]));
+export const respondOnboardingForm: PortalFormDefinition = {
+  id: "respond-onboarding-intake-v1",
+  title: "Respond onboarding intake",
+  introTitle: "Welcome to your TradeAi Respond onboarding form.",
+  introDescription: "This quick form tailors your AI assistant, phone setup, and lead follow-up so it works like an extension of your team.",
+  sections: [
+    {
+      id: "about-business",
+      title: "About your business",
+      description: "Collect essential business details so the AI assistant, CRM, and domain integrations can be set up correctly.",
+      fields: [
+        { id: "website_url", label: "What is your website URL?", type: "url", required: true, placeholder: "https://example.com" },
+        { id: "email_address", label: "What is your email address?", type: "email", required: true, placeholder: "name@example.com" },
+        { id: "legal_business_name", label: "Legal Business Name (Trading Name)", type: "text", required: true },
+        { id: "australian_company_number", label: "Australian Company Number (ACN)", type: "text" },
+        {
+          id: "business_type",
+          label: "Business Type",
+          type: "select",
+          options: [
+            { label: "Sole proprietorship", value: "sole-proprietorship" },
+            { label: "Partnership", value: "partnership" },
+            { label: "Limited liability company / LLC", value: "llc" },
+            { label: "Corporation", value: "corporation" },
+            { label: "Other", value: "other" },
+          ],
+        },
+        { id: "street_address", label: "Business Street Address", type: "text" },
+        { id: "city", label: "Business City", type: "text" },
+        { id: "state_region", label: "Business State / Province / Region", type: "text" },
+        { id: "country", label: "Business Country", type: "text" },
+        { id: "post_code", label: "Business Post Code / Zip Code", type: "text" },
+        { id: "business_phone", label: "Business Phone Number", type: "tel" },
+      ],
+    },
+    {
+      id: "proof-of-address",
+      title: "Proof of address",
+      description: "To register a phone number on your behalf, proof of business address is required.",
+      fields: [
+        {
+          id: "proof_of_address_link",
+          label: "Proof of Address document link",
+          type: "url",
+          helper: "Upload a utility bill, lease agreement, or business registration document to a secure shared folder and paste the link here.",
+          placeholder: "https://drive.google.com/...",
+        },
+      ],
+    },
+    {
+      id: "about-ai",
+      title: "About your AI",
+      description: "These details shape the assistant's personality and behaviour.",
+      fields: [
+        { id: "assistant_name", label: "What name would you like your AI assistant to be called?", type: "text" },
+        {
+          id: "assistant_tone",
+          label: "Choose up to 3 words that best describe the tone you'd like your AI assistant to use.",
+          type: "checkboxes",
+          helper: "Pick up to three.",
+          options: [
+            { label: "Friendly", value: "friendly" },
+            { label: "Professional", value: "professional" },
+            { label: "Humorous", value: "humorous" },
+            { label: "Formal", value: "formal" },
+            { label: "Casual", value: "casual" },
+            { label: "Technical", value: "technical" },
+            { label: "Conversational", value: "conversational" },
+          ],
+        },
+        {
+          id: "prohibited_words",
+          label: "What prohibited words should your AI assistant NEVER use?",
+          type: "textarea",
+          placeholder: "Examples: contract, guarantee, warranty, pricing",
+        },
+        {
+          id: "bot_disclosure",
+          label: "Should AI disclose being a bot when asked by a lead?",
+          type: "radio",
+          options: [
+            { label: "Yes", value: "yes" },
+            { label: "No", value: "no" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "phone-number",
+      title: "AI answering service phone number",
+      fields: [
+        {
+          id: "phone_number_handling",
+          label: "How would you like to handle your phone number for this system?",
+          type: "radio",
+          helper: "Your system can go live immediately. Porting can be completed later if needed.",
+          options: [
+            { label: "Use a new number that we'll purchase for you", value: "new-number", description: "Recommended." },
+            {
+              label: "Port your number to us",
+              value: "port-number",
+              description: "We'll transfer your current number into our system so you can keep using it, if supported by your carrier.",
+            },
+            {
+              label: "Forward your current number to the new one",
+              value: "forward-number",
+              description: "We'll forward calls from your existing number to the new AI-powered line. SMS will not be forwarded.",
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export function onboardingFormForProduct(product: ProductKey): PortalFormDefinition {
+  return product === "scale" ? scaleOnboardingForm : respondOnboardingForm;
+}
+
+export function onboardingFormForId(formId: string, product?: ProductKey): PortalFormDefinition {
+  const forms = [respondOnboardingForm, scaleOnboardingForm];
+  return forms.find((form) => form.id === formId || form.legacyIds?.includes(formId)) ?? onboardingFormForProduct(product ?? "respond");
+}
+
 const maxLengths: Partial<Record<PortalFormFieldType, number>> = {
   text: 220,
   email: 180,
@@ -375,13 +511,19 @@ function sanitizeFieldValue(field: PortalFormField, value: unknown): PortalFormV
   return cleanTextValue(value, field.type);
 }
 
-export function emptyOnboardingFormResponses(): PortalFormResponses {
+function formFields(form: PortalFormDefinition) {
+  return form.sections.flatMap((section) => section.fields);
+}
+
+export function emptyOnboardingFormResponses(form: PortalFormDefinition): PortalFormResponses {
+  const fields = formFields(form);
   return Object.fromEntries(fields.map((field) => [field.id, field.type === "checkboxes" ? [] : ""]));
 }
 
-export function sanitizeOnboardingFormResponses(input: unknown): PortalFormResponses {
+export function sanitizeOnboardingFormResponses(input: unknown, form: PortalFormDefinition): PortalFormResponses {
   const source = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
-  const responses = emptyOnboardingFormResponses();
+  const responses = emptyOnboardingFormResponses(form);
+  const fieldLookup = new Map(formFields(form).map((field) => [field.id, field]));
 
   fieldLookup.forEach((field, fieldId) => {
     responses[fieldId] = sanitizeFieldValue(field, source[fieldId]);
@@ -390,8 +532,8 @@ export function sanitizeOnboardingFormResponses(input: unknown): PortalFormRespo
   return responses;
 }
 
-export function onboardingFormMissingRequired(responses: PortalFormResponses) {
-  return fields
+export function onboardingFormMissingRequired(responses: PortalFormResponses, form: PortalFormDefinition) {
+  return formFields(form)
     .filter((field) => field.required)
     .filter((field) => {
       const value = responses[field.id];

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import {
   getPortalOnboardingFormSubmission,
+  getPortalWorkspace,
   routeErrorMessage,
   savePortalOnboardingFormSubmission,
 } from "../../../../../lib/taskStore";
-import { onboardingFormId, onboardingFormSections, onboardingFormTitle } from "../../../../../lib/onboardingForm";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +15,12 @@ type PortalRouteContext = {
 export async function GET(_request: Request, context: PortalRouteContext) {
   try {
     const { token } = await context.params;
-    const submission = await getPortalOnboardingFormSubmission(token);
+    const [{ formDefinition }, submission] = await Promise.all([
+      getPortalWorkspace(token),
+      getPortalOnboardingFormSubmission(token),
+    ]);
     return NextResponse.json({
-      form: {
-        id: onboardingFormId,
-        title: onboardingFormTitle,
-        sections: onboardingFormSections,
-      },
+      form: formDefinition,
       submission,
     });
   } catch (error) {
