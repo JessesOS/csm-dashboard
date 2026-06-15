@@ -294,6 +294,7 @@ function Icon({
     | "video"
     | "settings"
     | "download"
+    | "trash"
     | "x";
 }) {
   const common = {
@@ -368,6 +369,18 @@ function Icon({
       <svg {...common}>
         <path d="M18 6 6 18" />
         <path d="m6 6 12 12" />
+      </svg>
+    );
+  }
+
+  if (name === "trash") {
+    return (
+      <svg {...common}>
+        <path d="M3 6h18" />
+        <path d="M8 6V4h8v2" />
+        <path d="M19 6l-1 15H6L5 6" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
       </svg>
     );
   }
@@ -521,16 +534,20 @@ function AttachmentLensSettings({
   attachmentFilter,
   attachmentCounts,
   onAttachmentFilterChange,
+  adminEditing,
+  onAdminEditingChange,
   variant = "rail",
 }: {
   attachmentFilter: AttachmentFilter;
   attachmentCounts: { looms: number; forms: number };
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
+  adminEditing: boolean;
+  onAdminEditingChange: (enabled: boolean) => void;
   variant?: "rail" | "compact";
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const settingsRef = useRef<HTMLElement>(null);
-  const hasActiveLens = attachmentFilter !== "all";
+  const hasActiveLens = attachmentFilter !== "all" || adminEditing;
   const isCompact = variant === "compact";
 
   useEffect(() => {
@@ -585,6 +602,16 @@ function AttachmentLensSettings({
                 Forms
               </span>
               <strong>{attachmentCounts.forms}</strong>
+            </button>
+          </div>
+          <div className="rail-settings-divider" />
+          <div className="attachment-lenses admin-settings" aria-label="Admin controls">
+            <button type="button" className={adminEditing ? "active" : ""} aria-pressed={adminEditing} onClick={() => onAdminEditingChange(!adminEditing)}>
+              <span>
+                <Icon name="settings" />
+                Admin editing
+              </span>
+              <strong>{adminEditing ? "On" : "Off"}</strong>
             </button>
           </div>
         </div>
@@ -877,17 +904,31 @@ function TaskCard({
   task,
   taskMap,
   active,
+  adminEditing,
+  isDeleting,
   onSelect,
   onQuickMove,
+  onTitleChange,
+  onDelete,
   onDragStart,
 }: {
   task: Task;
   taskMap: Map<string, Task>;
   active: boolean;
+  adminEditing: boolean;
+  isDeleting: boolean;
   onSelect: (task: Task) => void;
   onQuickMove: (task: Task, status: TaskStatus) => void;
+  onTitleChange: (task: Task, title: string) => void;
+  onDelete: (task: Task) => void;
   onDragStart: (task: Task) => void;
 }) {
+  const [draftState, setDraftState] = useState(() => ({
+    sourceTitle: task.title,
+    taskId: task.id,
+    title: task.title,
+  }));
+  const draftTitle = draftState.taskId === task.id && draftState.sourceTitle === task.title ? draftState.title : task.title;
   const dependencyState = getDependencyState(task, taskMap);
   const isDone = task.status === "complete";
   const loomUrl = safeInstructionUrl(task.loomUrl);
@@ -898,10 +939,31 @@ function TaskCard({
         ? `${dependencyState.open.length} open`
         : `${dependencyState.dependencies.length} cleared`;
 
+  function updateDraftTitle(title: string) {
+    setDraftState({
+      sourceTitle: task.title,
+      taskId: task.id,
+      title,
+    });
+  }
+
+  function commitTitle() {
+    const cleanTitle = draftTitle.trim();
+
+    if (!cleanTitle) {
+      updateDraftTitle(task.title);
+      return;
+    }
+
+    if (cleanTitle !== task.title) {
+      onTitleChange(task, cleanTitle);
+    }
+  }
+
   return (
     <article
-      className={`task-card ${active ? "task-card-active" : ""}`}
-      draggable
+      className={`task-card ${active ? "task-card-active" : ""} ${adminEditing ? "task-card-admin" : ""}`}
+      draggable={!adminEditing}
       onDragStart={() => onDragStart(task)}
       onClick={() => onSelect(task)}
       onKeyDown={(event) => {
@@ -915,7 +977,32 @@ function TaskCard({
       aria-pressed={active}
     >
       <div className="task-card-topline">
-        <h3>{task.title}</h3>
+        {adminEditing ? (
+          <input
+            className="task-title-edit"
+            aria-label="Task title"
+            value={draftTitle}
+            onChange={(event) => updateDraftTitle(event.target.value)}
+            onBlur={commitTitle}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+
+              if (event.key === "Enter") {
+                event.preventDefault();
+                commitTitle();
+                event.currentTarget.blur();
+              }
+
+              if (event.key === "Escape") {
+                updateDraftTitle(task.title);
+                event.currentTarget.blur();
+              }
+            }}
+          />
+        ) : (
+          <h3>{task.title}</h3>
+        )}
         <span className="avatar" title={task.assignee}>
           {initials(task.assignee)}
         </span>
@@ -951,6 +1038,12 @@ function TaskCard({
         </span>
         {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
         <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+          {adminEditing ? (
+            <button type="button" className="admin-delete-task" onClick={() => onDelete(task)} disabled={isDeleting} title="Delete task">
+              <Icon name="trash" />
+              {isDeleting ? "Deleting" : "Delete"}
+            </button>
+          ) : null}
           {isDone ? (
             <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
               Review
@@ -1530,6 +1623,8 @@ function MissionControl({
   attachmentFilter,
   attachmentCounts,
   onAttachmentFilterChange,
+  adminEditing,
+  onAdminEditingChange,
 }: {
   environment: OperatingEnvironment;
   activeEnvironment: EnvironmentKey;
@@ -1556,6 +1651,8 @@ function MissionControl({
   attachmentFilter: AttachmentFilter;
   attachmentCounts: { looms: number; forms: number };
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
+  adminEditing: boolean;
+  onAdminEditingChange: (enabled: boolean) => void;
 }) {
   const [activeLens, setActiveLens] = useState<"all" | "waiting" | "golive" | "high">("all");
   const selectedClient = clients.find((client) => client.id === selectedClientId);
@@ -1666,6 +1763,8 @@ function MissionControl({
             attachmentFilter={attachmentFilter}
             attachmentCounts={attachmentCounts}
             onAttachmentFilterChange={onAttachmentFilterChange}
+            adminEditing={adminEditing}
+            onAdminEditingChange={onAdminEditingChange}
             variant="compact"
           />
         </div>
@@ -1961,6 +2060,7 @@ export default function RespondDashboard({
   const [ownerFilter, setOwnerFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [attachmentFilter, setAttachmentFilter] = useState<AttachmentFilter>("all");
+  const [adminEditing, setAdminEditing] = useState(false);
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
@@ -1971,6 +2071,7 @@ export default function RespondDashboard({
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [isImportingGhlClient, setIsImportingGhlClient] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
   const currentEnvironment = useMemo(() => environmentConfig(activeEnvironment), [activeEnvironment]);
@@ -2239,6 +2340,19 @@ export default function RespondDashboard({
     return data.task as Task;
   }
 
+  async function persistDeleteTask(id: string) {
+    const response = await fetch(`/api/tasks/${id}`, {
+      method: "DELETE",
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error ?? "Task delete failed.");
+    }
+
+    return data.task as Pick<Task, "id">;
+  }
+
   function updateTask(id: string, payload: TaskUpdatePayload) {
     const previous = tasks;
     setTasks((current) =>
@@ -2267,6 +2381,38 @@ export default function RespondDashboard({
           setStorageNotice(error.message);
         });
     });
+  }
+
+  async function removeTask(task: Task) {
+    if (!window.confirm(`Delete "${task.title}"? This cannot be undone.`)) {
+      return;
+    }
+
+    const previous = tasks;
+    const nextSelectedTask = previous.find((item) => item.id !== task.id);
+    setDeletingTaskId(task.id);
+    setTasks((current) =>
+      current
+        .filter((item) => item.id !== task.id)
+        .map((item) => ({
+          ...item,
+          dependencies: item.dependencies.filter((dependencyId) => dependencyId !== task.id),
+        }))
+    );
+    setSelectedId((current) => (current === task.id ? nextSelectedTask?.id ?? "" : current));
+    setDetailReadyTaskId((current) => (current === task.id ? null : current));
+    setDetailTaskId((current) => (current === task.id ? null : current));
+
+    try {
+      await persistDeleteTask(task.id);
+      setStorageNotice("");
+    } catch (error) {
+      setTasks(previous);
+      setSelectedId((current) => current || task.id);
+      setStorageNotice(error instanceof Error ? error.message : "Task delete failed.");
+    } finally {
+      setDeletingTaskId(null);
+    }
   }
 
   function moveTask(task: Task, status: TaskStatus) {
@@ -2535,6 +2681,8 @@ export default function RespondDashboard({
           attachmentFilter={attachmentFilter}
           attachmentCounts={attachmentCounts}
           onAttachmentFilterChange={changeMissionAttachmentFilter}
+          adminEditing={adminEditing}
+          onAdminEditingChange={setAdminEditing}
         />
         <NewClientPanel
           key={`home-${activeEnvironment}-${activeProduct}`}
@@ -2640,7 +2788,13 @@ export default function RespondDashboard({
         </nav>
 
         <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={switchEnvironment} />
-        <AttachmentLensSettings attachmentFilter={attachmentFilter} attachmentCounts={attachmentCounts} onAttachmentFilterChange={setAttachmentFilter} />
+        <AttachmentLensSettings
+          attachmentFilter={attachmentFilter}
+          attachmentCounts={attachmentCounts}
+          onAttachmentFilterChange={setAttachmentFilter}
+          adminEditing={adminEditing}
+          onAdminEditingChange={setAdminEditing}
+        />
       </aside>
 
       <section className="workspace">
@@ -2792,6 +2946,12 @@ export default function RespondDashboard({
 
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
         {!storageNotice && isTaskBoardRefreshing ? <div className="storage-notice">Refreshing saved task statuses...</div> : null}
+        {adminEditing ? (
+          <div className="admin-editing-notice">
+            <Icon name="settings" />
+            Admin editing mode
+          </div>
+        ) : null}
 
         {clients.length === 0 ? (
           <section className="empty-workspace-panel" aria-label="Empty workspace">
@@ -2845,8 +3005,12 @@ export default function RespondDashboard({
                       task={task}
                       taskMap={taskMap}
                       active={selectedTask?.id === task.id}
+                      adminEditing={adminEditing}
+                      isDeleting={deletingTaskId === task.id}
                       onSelect={selectOrOpenTask}
                       onQuickMove={moveTask}
+                      onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
+                      onDelete={removeTask}
                       onDragStart={setDraggedTask}
                     />
                   ))}

@@ -1289,6 +1289,38 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   return getTask(id);
 }
 
+export async function deleteTask(id: string) {
+  await ensureTaskStorage();
+  const d1 = getD1();
+  const existing = await d1
+    .prepare("SELECT environment, product, client_id AS clientId FROM tasks WHERE id = ?")
+    .bind(id)
+    .first<{ environment: string; product: string; clientId: string }>();
+
+  if (!existing) {
+    throw new Error("Task not found.");
+  }
+
+  const dependentRows = await d1
+    .prepare("SELECT id, dependencies FROM tasks WHERE environment = ? AND product = ? AND client_id = ? AND dependencies LIKE ?")
+    .bind(existing.environment, existing.product, existing.clientId, `%${id}%`)
+    .all<Pick<TaskRow, "id" | "dependencies">>();
+  const dependencyUpdates = (dependentRows.results ?? [])
+    .map((row) => {
+      const dependencies = parseDependencies(row.dependencies);
+      const nextDependencies = dependencies.filter((dependencyId) => dependencyId !== id);
+
+      return dependencies.length === nextDependencies.length
+        ? null
+        : d1.prepare("UPDATE tasks SET dependencies = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(JSON.stringify(nextDependencies), row.id);
+    })
+    .filter((statement): statement is D1PreparedStatement => Boolean(statement));
+
+  await d1.batch([...dependencyUpdates, d1.prepare("DELETE FROM tasks WHERE id = ?").bind(id)]);
+
+  return { id };
+}
+
 async function nextClientId(name: string, environment: EnvironmentKey, product: ProductKey) {
   const d1 = getD1();
   const slug = slugify(name);
