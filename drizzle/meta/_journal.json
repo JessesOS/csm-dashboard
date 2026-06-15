@@ -71,6 +71,13 @@
       "when": 1781433196536,
       "tag": "0009_parallel_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1781517336483,
+      "tag": "0010_curvy_black_crow",
+      "breakpoints": true
     }
   ]
 }

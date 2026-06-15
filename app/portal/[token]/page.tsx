@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
+import { isOnboardingFormTaskTitle } from "../../../lib/onboardingForm";
 import { productConfig } from "../../../lib/productWorkspaces";
 import { getPortalWorkspace } from "../../../lib/taskStore";
 import { statusLabels, type Phase, type Task, type TaskStatus } from "../../../lib/types";
+import { PortalOnboardingForm } from "./PortalOnboardingForm";
 
 export const dynamic = "force-dynamic";
 
@@ -73,6 +75,10 @@ function portalActionLabel(task: Task) {
   return task.portalActionLabel?.trim() || "Complete this item";
 }
 
+function isOnboardingFormTask(task: Task) {
+  return isOnboardingFormTaskTitle(task.portalTitle) || isOnboardingFormTaskTitle(task.title);
+}
+
 function portalStepState(task: Task, index: number, activeIndex: number) {
   if (task.status === "complete") {
     return "complete";
@@ -119,14 +125,14 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
     return <PortalUnavailable />;
   }
 
-  return <ClientPortalView {...workspace} />;
+  return <ClientPortalView token={token} {...workspace} />;
 }
 
 function RespondMark({ className }: { className: string }) {
   return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
 }
 
-function ClientPortalView({ client, tasks }: PortalWorkspace) {
+function ClientPortalView({ client, tasks, formSubmission, token }: PortalWorkspace & { token: string }) {
   const product = productConfig(client.product);
   const progressTasks = tasks.filter((task) => task.portalVisible);
   const completed = progressTasks.filter((task) => task.status === "complete").length;
@@ -145,6 +151,7 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
   const activeGuidedStep = activeGuidedStepIndex >= 0 ? guidedSteps[activeGuidedStepIndex] : null;
   const activeGuidedStepUrl = activeGuidedStep ? portalActionUrl(activeGuidedStep) : "";
   const activeGuidedStepLoomUrl = activeGuidedStep ? portalLoomUrl(activeGuidedStep) : "";
+  const activeGuidedStepIsForm = activeGuidedStep ? isOnboardingFormTask(activeGuidedStep) : false;
   const guidedComplete = guidedSteps.filter((task) => task.status === "complete").length;
   const guidedProgress = guidedSteps.length > 0 ? Math.round((guidedComplete / guidedSteps.length) * 100) : 0;
   const guidedProgressLabel = guidedSteps.length > 0
@@ -201,7 +208,7 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
           </div>
 
           {guidedSteps.length > 0 ? (
-            <div className="portal-guided-layout">
+            <div className={`portal-guided-layout${activeGuidedStepIsForm ? " portal-guided-layout-has-form" : ""}`}>
               <ol className="portal-stepper-list">
                 {guidedSteps.map((task, index) => {
                   const stepState = portalStepState(task, index, activeGuidedStepIndex);
@@ -217,6 +224,7 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
                           <em>{isComplete ? "Complete" : isActive ? "Current step" : isLocked ? "Locked" : statusLabels[task.status]}</em>
                         </div>
                         <p>{portalDetail(task)}</p>
+                        {isOnboardingFormTask(task) && isActive ? <small>Use the collapsible form in the current step panel.</small> : null}
                         {isLocked ? <small>Unlocks after the current step is completed.</small> : null}
                       </div>
                     </li>
@@ -224,26 +232,39 @@ function ClientPortalView({ client, tasks }: PortalWorkspace) {
                 })}
               </ol>
 
-              <aside className="portal-focus-card" aria-label="Current portal step">
+              <aside className={`portal-focus-card${activeGuidedStepIsForm ? " portal-focus-card-form" : ""}`} aria-label="Current portal step">
                 {activeGuidedStep ? (
                   <>
                     <span className="portal-focus-eyebrow">Current step</span>
                     <h3>{portalTitle(activeGuidedStep)}</h3>
                     <p>{portalDetail(activeGuidedStep)}</p>
-                    <div className="portal-focus-actions">
-                      {activeGuidedStepUrl ? (
-                        <a className="portal-primary-action" href={activeGuidedStepUrl} target="_blank" rel="noreferrer">
-                          {portalActionLabel(activeGuidedStep)}
-                        </a>
-                      ) : (
-                        <span className="portal-action-placeholder">Your CSM will confirm this step with you.</span>
-                      )}
-                      {activeGuidedStepLoomUrl ? (
-                        <a className="portal-secondary-action" href={activeGuidedStepLoomUrl} target="_blank" rel="noreferrer">
-                          Watch walkthrough
-                        </a>
-                      ) : null}
-                    </div>
+                    {activeGuidedStepIsForm ? (
+                      <>
+                        <PortalOnboardingForm token={token} initialSubmission={formSubmission} />
+                        {activeGuidedStepLoomUrl ? (
+                          <div className="portal-focus-actions">
+                            <a className="portal-secondary-action" href={activeGuidedStepLoomUrl} target="_blank" rel="noreferrer">
+                              Watch walkthrough
+                            </a>
+                          </div>
+                        ) : null}
+                      </>
+                    ) : (
+                      <div className="portal-focus-actions">
+                        {activeGuidedStepUrl ? (
+                          <a className="portal-primary-action" href={activeGuidedStepUrl} target="_blank" rel="noreferrer">
+                            {portalActionLabel(activeGuidedStep)}
+                          </a>
+                        ) : (
+                          <span className="portal-action-placeholder">Your CSM will confirm this step with you.</span>
+                        )}
+                        {activeGuidedStepLoomUrl ? (
+                          <a className="portal-secondary-action" href={activeGuidedStepLoomUrl} target="_blank" rel="noreferrer">
+                            Watch walkthrough
+                          </a>
+                        ) : null}
+                      </div>
+                    )}
                     <small className="portal-focus-note">Once this is complete, the next step becomes your focus.</small>
                   </>
                 ) : (

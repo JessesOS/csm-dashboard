@@ -86,6 +86,22 @@ export interface TaskUpdatePayload {
   portalActionLabel?: string;
 }
 
+export type PortalFormValue = string | string[];
+
+export type PortalFormResponses = Record<string, PortalFormValue>;
+
+export interface PortalFormSubmission {
+  id: string;
+  environment: EnvironmentKey;
+  product: ProductKey;
+  clientId: string;
+  formId: string;
+  status: "draft" | "submitted";
+  responses: PortalFormResponses;
+  submittedAt: string;
+  updatedAt: string;
+}
+
 export type ClientHealth = "on_track" | "at_risk" | "off_track" | "on_hold";
 
 export type ClientRisk = "low" | "medium" | "high";

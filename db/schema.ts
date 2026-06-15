@@ -63,3 +63,15 @@ export const appMeta = sqliteTable("app_meta", {
   value: text("value").notNull(),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const portalFormSubmissions = sqliteTable("portal_form_submissions", {
+  id: text("id").primaryKey(),
+  environment: text("environment").notNull().default("demo"),
+  product: text("product").notNull().default("respond"),
+  clientId: text("client_id").notNull(),
+  formId: text("form_id").notNull(),
+  status: text("status").notNull().default("draft"),
+  responses: text("responses").notNull().default("{}"),
+  submittedAt: text("submitted_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

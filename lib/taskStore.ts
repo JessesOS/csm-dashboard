@@ -1,4 +1,10 @@
 import { getD1 } from "../db";
+import {
+  isOnboardingFormTaskTitle,
+  onboardingFormId,
+  onboardingFormMissingRequired,
+  sanitizeOnboardingFormResponses,
+} from "./onboardingForm";
 import { portalDefaultsForTask } from "./portalDefaults";
 import {
   allSeedClients,
@@ -20,6 +26,8 @@ import {
   type ClientRisk,
   type ClientTimelineSegment,
   type EnvironmentKey,
+  type PortalFormResponses,
+  type PortalFormSubmission,
   type Priority,
   type ProductKey,
   type RespondClient,
@@ -71,14 +79,23 @@ type MetaRow = {
   value: string;
 };
 
+type PortalFormSubmissionRow = Omit<PortalFormSubmission, "environment" | "product" | "responses" | "status"> & {
+  environment: string;
+  product: string;
+  responses: string;
+  status: string;
+};
+
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-14-portal-action-links";
+const currentStorageVersion = "2026-06-15-portal-form-submissions";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
   "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
+const portalFormSubmissionSelectFields =
+  "id, environment, product, client_id AS clientId, form_id AS formId, status, responses, submitted_at AS submittedAt, updated_at AS updatedAt";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -109,6 +126,18 @@ function parseJsonArray<T>(value: string | null | undefined, guard: (item: unkno
 
 function parseDependencies(value: string | null | undefined) {
   return parseJsonArray(value, (item): item is string => typeof item === "string");
+}
+
+function parsePortalFormResponses(value: string | null | undefined): PortalFormResponses {
+  if (!value) {
+    return {};
+  }
+
+  try {
+    return sanitizeOnboardingFormResponses(JSON.parse(value));
+  } catch {
+    return {};
+  }
 }
 
 function isTimelineSegment(item: unknown): item is ClientTimelineSegment {
@@ -177,6 +206,16 @@ function fromClientRow(row: ClientRow): RespondClient {
     risk,
     timeline: parseJsonArray(row.timeline, isTimelineSegment),
     attention: parseJsonArray(row.attention, isAttentionItem),
+  };
+}
+
+function fromPortalFormSubmissionRow(row: PortalFormSubmissionRow): PortalFormSubmission {
+  return {
+    ...row,
+    environment: normalizeEnvironment(row.environment),
+    product: normalizeProduct(row.product),
+    status: row.status === "submitted" ? "submitted" : "draft",
+    responses: parsePortalFormResponses(row.responses),
   };
 }
 
@@ -359,7 +398,11 @@ async function ensureAppMetaTable(d1 = getD1()) {
 
 async function seedWorkspaceShapeReady() {
   const d1 = getD1();
-  const [taskColumns, clientColumns] = await Promise.all([tableColumns("tasks"), tableColumns("clients")]);
+  const [taskColumns, clientColumns, portalFormColumns] = await Promise.all([
+    tableColumns("tasks"),
+    tableColumns("clients"),
+    tableColumns("portal_form_submissions"),
+  ]);
   const requiredTaskColumns = [
     "client_id",
     "environment",
@@ -376,8 +419,21 @@ async function seedWorkspaceShapeReady() {
     "portal_configured",
   ];
   const requiredClientColumns = ["portal_token", "environment", "product", "company_name"];
+  const requiredPortalFormColumns = [
+    "client_id",
+    "environment",
+    "product",
+    "form_id",
+    "status",
+    "responses",
+    "submitted_at",
+  ];
 
-  if (!requiredTaskColumns.every((column) => taskColumns.has(column)) || !requiredClientColumns.every((column) => clientColumns.has(column))) {
+  if (
+    !requiredTaskColumns.every((column) => taskColumns.has(column)) ||
+    !requiredClientColumns.every((column) => clientColumns.has(column)) ||
+    !requiredPortalFormColumns.every((column) => portalFormColumns.has(column))
+  ) {
     return false;
   }
 
@@ -827,6 +883,19 @@ async function prepareTaskStorage() {
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     `),
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS portal_form_submissions (
+        id TEXT PRIMARY KEY,
+        environment TEXT NOT NULL DEFAULT 'demo',
+        product TEXT NOT NULL DEFAULT 'respond',
+        client_id TEXT NOT NULL,
+        form_id TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'draft',
+        responses TEXT NOT NULL DEFAULT '{}',
+        submitted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
   ]);
 
   await ensureTaskColumns();
@@ -859,6 +928,9 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_name_idx ON clients (name)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS clients_company_name_idx ON clients (company_name)"),
     d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS clients_portal_token_idx ON clients (portal_token)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_client_idx ON portal_form_submissions (client_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_environment_product_idx ON portal_form_submissions (environment, product)"),
+    d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS portal_form_submissions_client_form_idx ON portal_form_submissions (client_id, form_id)"),
   ]);
 
   await migrateGlobalTasksToClient();
@@ -1657,12 +1729,18 @@ export async function createClient(payload: ClientCreatePayload) {
   };
 }
 
-export async function getPortalWorkspace(token: string) {
+function normalizePortalToken(token: string) {
   const portalToken = token.trim();
 
   if (!/^[a-zA-Z0-9_-]{20,80}$/.test(portalToken)) {
     throw new Error("Portal not found.");
   }
+
+  return portalToken;
+}
+
+async function getClientByPortalToken(token: string) {
+  const portalToken = normalizePortalToken(token);
 
   await ensureTaskStorage();
 
@@ -1675,10 +1753,100 @@ export async function getPortalWorkspace(token: string) {
     throw new Error("Portal not found.");
   }
 
-  const client = fromClientRow(row);
+  return fromClientRow(row);
+}
+
+async function getPortalFormSubmissionForClient(clientId: string, formId = onboardingFormId) {
+  await ensureTaskStorage();
+
+  const row = await getD1()
+    .prepare(`SELECT ${portalFormSubmissionSelectFields} FROM portal_form_submissions WHERE client_id = ? AND form_id = ?`)
+    .bind(clientId, formId)
+    .first<PortalFormSubmissionRow>();
+
+  return row ? fromPortalFormSubmissionRow(row) : null;
+}
+
+async function markOnboardingFormTaskInReview(client: RespondClient) {
+  const d1 = getD1();
+  const result = await d1
+    .prepare(
+      "SELECT id, title, portal_title AS portalTitle, status, notes FROM tasks WHERE environment = ? AND product = ? AND client_id = ? AND portal_visible = 1 ORDER BY sort_order ASC"
+    )
+    .bind(client.environment, client.product, client.id)
+    .all<Pick<TaskRow, "id" | "title" | "portalTitle" | "status" | "notes">>();
+  const task = (result.results ?? []).find((item) => isOnboardingFormTaskTitle(item.portalTitle) || isOnboardingFormTaskTitle(item.title));
+
+  if (!task || task.status === "complete") {
+    return;
+  }
+
+  const submittedNote = `Client submitted the native onboarding form via portal on ${new Date().toISOString().slice(0, 10)}.`;
+  const nextNotes = task.notes?.includes(submittedNote) ? task.notes : [task.notes, submittedNote].filter(Boolean).join("\n");
+
+  await d1
+    .prepare("UPDATE tasks SET status = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+    .bind("review", nextNotes, task.id)
+    .run();
+}
+
+export async function getPortalOnboardingFormSubmission(token: string) {
+  const client = await getClientByPortalToken(token);
+  return getPortalFormSubmissionForClient(client.id);
+}
+
+export async function savePortalOnboardingFormSubmission(token: string, responsesInput: unknown) {
+  const client = await getClientByPortalToken(token);
+  const responses = sanitizeOnboardingFormResponses(responsesInput);
+  const missingRequired = onboardingFormMissingRequired(responses);
+
+  if (missingRequired.length > 0) {
+    throw new Error(`Please complete: ${missingRequired.join(", ")}.`);
+  }
+
+  const id = `${client.id}__${onboardingFormId}`;
+  const d1 = getD1();
+
+  await d1
+    .prepare(
+      `
+        INSERT INTO portal_form_submissions (
+          id,
+          environment,
+          product,
+          client_id,
+          form_id,
+          status,
+          responses,
+          submitted_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, 'submitted', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT(id) DO UPDATE SET
+          status = 'submitted',
+          responses = excluded.responses,
+          updated_at = CURRENT_TIMESTAMP
+      `
+    )
+    .bind(id, client.environment, client.product, client.id, onboardingFormId, JSON.stringify(responses))
+    .run();
+
+  await markOnboardingFormTaskInReview(client);
+
+  const submission = await getPortalFormSubmissionForClient(client.id);
+
+  if (!submission) {
+    throw new Error("The onboarding form was submitted, but the saved response could not be reloaded.");
+  }
+
+  return submission;
+}
+
+export async function getPortalWorkspace(token: string) {
+  const client = await getClientByPortalToken(token);
 
   return {
     client,
     tasks: await listTasks(client.environment, client.product, client.id),
+    formSubmission: await getPortalFormSubmissionForClient(client.id),
   };
 }
