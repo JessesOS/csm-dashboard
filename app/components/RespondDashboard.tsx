@@ -1940,6 +1940,7 @@ export default function RespondDashboard({
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set());
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
@@ -2002,6 +2003,7 @@ export default function RespondDashboard({
     setAttachmentFilter("all");
     setNewTaskTitle("");
     setNewTaskCategory(nextCategories[0]?.name ?? "");
+    setExpandedCategories(new Set());
     setShowNewClientPanel(false);
     setStorageNotice("");
   }
@@ -2122,6 +2124,20 @@ export default function RespondDashboard({
   const detailTask = detailTaskId ? taskMap.get(detailTaskId) ?? null : null;
   const filteredTasks = useFilteredTasks(tasks, query, categoryFilter, ownerFilter, statusFilter, attachmentFilter);
   const taskNavigationOrder = useMemo(() => buildTaskNavigationOrder(categories, templateTasks), [categories, templateTasks]);
+  const orderedTasksForNavigation = useMemo(
+    () => [...tasks].sort((a, b) => compareTasksByNavigationOrder(a, b, taskNavigationOrder)),
+    [tasks, taskNavigationOrder]
+  );
+  const tasksByCategory = useMemo(() => {
+    const grouped = new Map<string, Task[]>();
+
+    for (const task of orderedTasksForNavigation) {
+      const current = grouped.get(task.category) ?? [];
+      grouped.set(task.category, [...current, task]);
+    }
+
+    return grouped;
+  }, [orderedTasksForNavigation]);
   const orderedFilteredTasks = useMemo(
     () => [...filteredTasks].sort((a, b) => compareTasksByNavigationOrder(a, b, taskNavigationOrder)),
     [filteredTasks, taskNavigationOrder]
@@ -2152,7 +2168,7 @@ export default function RespondDashboard({
   const categoryStats = useMemo(
     () =>
       categories.map((category) => {
-        const categoryTasks = tasks.filter((task) => task.category === category.name);
+        const categoryTasks = tasksByCategory.get(category.name) ?? [];
         const complete = categoryTasks.filter((task) => task.status === "complete").length;
         return {
           ...category,
@@ -2161,7 +2177,7 @@ export default function RespondDashboard({
           percent: categoryTasks.length > 0 ? Math.round((complete / categoryTasks.length) * 100) : 0,
         };
       }),
-    [categories, tasks]
+    [categories, tasksByCategory]
   );
 
   async function persistTask(id: string, payload: TaskUpdatePayload) {
@@ -2232,6 +2248,34 @@ export default function RespondDashboard({
     setSelectedId(task.id);
     setDetailReadyTaskId(task.id);
     setDetailTaskId(task.id);
+  }
+
+  function toggleCategory(categoryName: string) {
+    const isExpanded = expandedCategories.has(categoryName);
+
+    setCategoryFilter(isExpanded ? "all" : categoryName);
+    setExpandedCategories((current) => {
+      const next = new Set(current);
+
+      if (next.has(categoryName)) {
+        next.delete(categoryName);
+      } else {
+        next.add(categoryName);
+      }
+
+      return next;
+    });
+  }
+
+  function selectTaskFromCategory(task: Task) {
+    setSelectedId(task.id);
+    setDetailReadyTaskId(task.id);
+    setCategoryFilter(task.category);
+    setExpandedCategories((current) => {
+      const next = new Set(current);
+      next.add(task.category);
+      return next;
+    });
   }
 
   async function addTask() {
@@ -2492,18 +2536,57 @@ export default function RespondDashboard({
             return (
               <div key={phase} className="phase-group">
                 <span className="phase-label">{phase}</span>
-                {phaseCategories.map((category) => (
-                  <button
-                    type="button"
-                    key={category.id}
-                    className={categoryFilter === category.name ? "category-link active" : "category-link"}
-                    onClick={() => setCategoryFilter(categoryFilter === category.name ? "all" : category.name)}
-                  >
-                    <span className="category-dot" style={{ background: category.accent }} />
-                    <span>{category.name}</span>
-                    <strong>{category.complete}/{category.total}</strong>
-                  </button>
-                ))}
+                {phaseCategories.map((category) => {
+                  const isExpanded = expandedCategories.has(category.name);
+                  const isComplete = category.total > 0 && category.complete === category.total;
+                  const categoryTasks = tasksByCategory.get(category.name) ?? [];
+
+                  return (
+                    <div key={category.id} className={isExpanded ? "category-nav-group category-nav-group-open" : "category-nav-group"}>
+                      <button
+                        type="button"
+                        className={categoryFilter === category.name ? "category-link active" : "category-link"}
+                        aria-expanded={isExpanded}
+                        aria-controls={`category-tasks-${category.id}`}
+                        onClick={() => toggleCategory(category.name)}
+                      >
+                        <span className={isExpanded ? "category-chevron category-chevron-open" : "category-chevron"} aria-hidden="true" />
+                        <span className="category-dot" style={{ background: category.accent }} />
+                        <span>{category.name}</span>
+                        <span className={isComplete ? "category-state category-state-done" : "category-state"} title={isComplete ? "Complete" : "Not complete"}>
+                          {isComplete ? "✓" : ""}
+                        </span>
+                        <strong>{category.complete}/{category.total}</strong>
+                      </button>
+
+                      {isExpanded ? (
+                        <div className="category-nav-tasks" id={`category-tasks-${category.id}`}>
+                          {categoryTasks.map((task) => {
+                            const isTaskComplete = task.status === "complete";
+                            return (
+                              <button
+                                type="button"
+                                key={task.id}
+                                className={selectedId === task.id ? "category-nav-task active" : "category-nav-task"}
+                                onClick={() => selectTaskFromCategory(task)}
+                                title={task.title}
+                              >
+                                <span
+                                  className={isTaskComplete ? "category-task-state category-task-state-done" : "category-task-state"}
+                                  aria-label={isTaskComplete ? "Complete" : "Not complete"}
+                                >
+                                  {isTaskComplete ? "✓" : ""}
+                                </span>
+                                <span>{task.title}</span>
+                                <em>{statusLabels[task.status]}</em>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
               </div>
             );
           })}
