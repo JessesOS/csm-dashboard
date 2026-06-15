@@ -2802,7 +2802,9 @@ button:disabled {
   display: grid;
   gap: 6px;
   min-height: 62px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  margin: 8px 8px 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
   color: #111827;
   padding: 11px 12px;
 }
@@ -3751,7 +3753,7 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .column-header {
-  border-bottom-color: rgba(15, 23, 42, 0.12);
+  border-color: rgba(15, 23, 42, 0.12);
 }
 
 .dashboard-shell-dark .column-header strong,
