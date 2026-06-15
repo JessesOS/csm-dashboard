@@ -950,26 +950,26 @@ function TaskCard({
           {dependencyState.dependencies.length}
         </span>
         {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
+        <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+          {isDone ? (
+            <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
+              Review
+            </button>
+          ) : (
+            <button type="button" onClick={() => onQuickMove(task, "complete")} title="Mark complete">
+              <Icon name="check" />
+              Done
+            </button>
+          )}
+          {dependencyState.isBlockedByDependencies && task.status !== "blocked" ? (
+            <button type="button" onClick={() => onQuickMove(task, "blocked")} title="Mark blocked">
+              Block
+            </button>
+          ) : null}
+        </div>
         <span className="drag-handle" title="Drag to move status">
           <Icon name="move" />
         </span>
-      </div>
-      <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
-        {isDone ? (
-          <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
-            Review
-          </button>
-        ) : (
-          <button type="button" onClick={() => onQuickMove(task, "complete")} title="Mark complete">
-            <Icon name="check" />
-            Done
-          </button>
-        )}
-        {dependencyState.isBlockedByDependencies && task.status !== "blocked" ? (
-          <button type="button" onClick={() => onQuickMove(task, "blocked")} title="Mark blocked">
-            Block
-          </button>
-        ) : null}
       </div>
     </article>
   );

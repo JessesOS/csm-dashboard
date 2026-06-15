@@ -2771,7 +2771,7 @@ button:disabled {
 
 .board {
   display: grid;
-  grid-auto-columns: minmax(320px, 360px);
+  grid-auto-columns: minmax(380px, 430px);
   grid-auto-flow: column;
   gap: 12px;
   height: calc(100vh - 238px);
@@ -2789,7 +2789,7 @@ button:disabled {
 
 .board-column {
   display: flex;
-  min-width: 320px;
+  min-width: 380px;
   flex-direction: column;
   scroll-snap-align: start;
   border: 1px solid #d9e1ea;
@@ -2869,7 +2869,7 @@ button:disabled {
 
 .task-card {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid #d9e3ec;
   border-radius: 8px;
   background: #ffffff;
@@ -2929,21 +2929,22 @@ button:disabled {
 
 .task-card-details {
   display: grid;
-  gap: 7px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
   margin: 0;
 }
 
 .task-card-details div {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 8px;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 5px;
   align-items: start;
 }
 
 .task-card-details dt,
 .task-card-details dd {
   margin: 0;
-  font-size: 11px;
+  font-size: 10.5px;
   line-height: 1.35;
 }
 
@@ -2966,6 +2967,7 @@ button:disabled {
 }
 
 .task-card-footer {
+  align-items: center;
   flex-wrap: wrap;
   gap: 7px;
 }
@@ -3019,15 +3021,20 @@ button:disabled {
 }
 
 .task-actions {
-  justify-content: flex-end;
+  justify-content: flex-start;
   min-height: 28px;
+}
+
+.task-card-footer .task-actions {
+  display: inline-flex;
+  min-height: 26px;
 }
 
 .task-actions button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 28px;
+  min-height: 26px;
   background: #edf4ff;
   color: #1d4ed8;
   padding: 0 9px;
