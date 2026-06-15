@@ -2778,8 +2778,8 @@ button:disabled {
 }
 
 .dashboard-shell-overview-closed .board {
-  height: calc(100vh - 150px);
-  min-height: 610px;
+  height: calc(100vh - 205px);
+  min-height: 560px;
 }
 
 .board-column {

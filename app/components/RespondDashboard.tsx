@@ -2640,7 +2640,7 @@ export default function RespondDashboard({
           >
             <span>
               <strong>Task controls & progress</strong>
-              <small>Search, add tasks, filters, delivery stages, and checklist health</small>
+              <small>Search, add tasks, delivery stages, and checklist health</small>
             </span>
             <span className={isTaskOverviewOpen ? "task-overview-chevron task-overview-chevron-open" : "task-overview-chevron"} aria-hidden="true" />
           </button>
@@ -2723,47 +2723,47 @@ export default function RespondDashboard({
                   </article>
                 ))}
               </section>
-
-              <section className="filters-row" aria-label="Dashboard filters">
-                <div className="segmented">
-                  <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
-                  <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
-                </div>
-                <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => selectTaskClient(event.target.value)} disabled={clients.length === 0}>
-                  {clients.length === 0 ? <option value="">No clients yet</option> : null}
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
-                    </option>
-                  ))}
-                </select>
-                <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-                  <option value="all">All statuses</option>
-                  {taskStatuses.map((status) => (
-                    <option key={status} value={status}>
-                      {statusLabels[status]}
-                    </option>
-                  ))}
-                </select>
-                <select aria-label="Filter by owner" value={ownerFilter} onChange={(event) => setOwnerFilter(event.target.value)}>
-                  <option value="all">All owners</option>
-                  {teamMembers.map((member) => (
-                    <option key={member} value={member}>
-                      {member}
-                    </option>
-                  ))}
-                </select>
-                <select aria-label="Filter by category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-                  <option value="all">All categories</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </section>
             </div>
           ) : null}
+        </section>
+
+        <section className="filters-row" aria-label="Dashboard filters">
+          <div className="segmented">
+            <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
+            <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
+          </div>
+          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => selectTaskClient(event.target.value)} disabled={clients.length === 0}>
+            {clients.length === 0 ? <option value="">No clients yet</option> : null}
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
+              </option>
+            ))}
+          </select>
+          <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <option value="all">All statuses</option>
+            {taskStatuses.map((status) => (
+              <option key={status} value={status}>
+                {statusLabels[status]}
+              </option>
+            ))}
+          </select>
+          <select aria-label="Filter by owner" value={ownerFilter} onChange={(event) => setOwnerFilter(event.target.value)}>
+            <option value="all">All owners</option>
+            {teamMembers.map((member) => (
+              <option key={member} value={member}>
+                {member}
+              </option>
+            ))}
+          </select>
+          <select aria-label="Filter by category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <option value="all">All categories</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </section>
 
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
