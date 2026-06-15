@@ -2476,6 +2476,72 @@ button:disabled {
   color: #334155;
 }
 
+.task-overview {
+  margin-bottom: 8px;
+}
+
+.task-overview-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 8px 12px;
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+
+.task-overview-toggle > span:first-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.task-overview-toggle strong,
+.task-overview-toggle small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-overview-toggle strong {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.task-overview-toggle small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 680;
+}
+
+.task-overview-chevron {
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  color: var(--muted);
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.task-overview-chevron-open {
+  transform: rotate(225deg);
+}
+
+.task-overview-body {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
 .command-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(120px, 1fr));
@@ -2709,6 +2775,11 @@ button:disabled {
   gap: 12px;
   height: calc(100vh - 238px);
   min-height: 500px;
+}
+
+.dashboard-shell-overview-closed .board {
+  height: calc(100vh - 150px);
+  min-height: 610px;
 }
 
 .board-column {
@@ -3486,6 +3557,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .theme-toggle,
 .dashboard-shell-dark .search-box,
 .dashboard-shell-dark .icon-button,
+.dashboard-shell-dark .task-overview-toggle,
 .dashboard-shell-dark .new-task input,
 .dashboard-shell-dark .new-task select,
 .dashboard-shell-dark .filters-row select,
@@ -3517,6 +3589,10 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .icon-button {
   color: #c9d6e5;
+}
+
+.dashboard-shell-dark .task-overview-toggle {
+  box-shadow: var(--shadow);
 }
 
 .dashboard-shell-dark .theme-toggle button.active,

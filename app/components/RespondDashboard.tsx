@@ -1941,6 +1941,7 @@ export default function RespondDashboard({
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set());
+  const [isTaskOverviewOpen, setIsTaskOverviewOpen] = useState(false);
   const [storageNotice, setStorageNotice] = useState("");
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
@@ -2004,6 +2005,7 @@ export default function RespondDashboard({
     setNewTaskTitle("");
     setNewTaskCategory(nextCategories[0]?.name ?? "");
     setExpandedCategories(new Set());
+    setIsTaskOverviewOpen(false);
     setShowNewClientPanel(false);
     setStorageNotice("");
   }
@@ -2525,7 +2527,10 @@ export default function RespondDashboard({
   }
 
   return (
-    <main className={`dashboard-shell dashboard-shell-${theme}`} data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}>
+    <main
+      className={`dashboard-shell dashboard-shell-${theme} ${isTaskOverviewOpen ? "dashboard-shell-overview-open" : "dashboard-shell-overview-closed"}`}
+      data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}
+    >
       <aside className="side-rail">
         <div className="brand">
           <RespondMark className="brand-mark" />
@@ -2624,7 +2629,25 @@ export default function RespondDashboard({
               {selectedClient?.companyName ? ` - company: ${selectedClient.companyName}` : ""}
             </p>
           </div>
-          <div className="topbar-actions">
+        </header>
+
+        <section className={isTaskOverviewOpen ? "task-overview task-overview-open" : "task-overview"} aria-label="Task controls and progress">
+          <button
+            type="button"
+            className="task-overview-toggle"
+            aria-expanded={isTaskOverviewOpen}
+            onClick={() => setIsTaskOverviewOpen((current) => !current)}
+          >
+            <span>
+              <strong>Task controls & progress</strong>
+              <small>Search, add tasks, filters, delivery stages, and checklist health</small>
+            </span>
+            <span className={isTaskOverviewOpen ? "task-overview-chevron task-overview-chevron-open" : "task-overview-chevron"} aria-hidden="true" />
+          </button>
+
+          {isTaskOverviewOpen ? (
+            <div className="task-overview-body">
+              <div className="topbar-actions">
             <div className="task-header-tools">
               <ThemeToggle theme={theme} onThemeChange={setTheme} />
               <button type="button" className="walkthrough-button" onClick={() => goToTourStep(0)}>
@@ -2678,67 +2701,69 @@ export default function RespondDashboard({
               </button>
             </div>
           </div>
-        </header>
 
-        <section className="command-strip">
-          <Metric label="Progress" value={`${metrics.percent}%`} detail={`${metrics.completed} of ${tasks.length} complete`} />
-          <Metric label="Active" value={metrics.active} detail="In progress or review" />
-          <Metric label="Waiting" value={metrics.blocked} detail="Open dependencies or holds" />
-          <Metric label="Categories" value={categories.length} detail="Onboarding to support" />
-        </section>
+              <section className="command-strip">
+                <Metric label="Progress" value={`${metrics.percent}%`} detail={`${metrics.completed} of ${tasks.length} complete`} />
+                <Metric label="Active" value={metrics.active} detail="In progress or review" />
+                <Metric label="Waiting" value={metrics.blocked} detail="Open dependencies or holds" />
+                <Metric label="Categories" value={categories.length} detail="Onboarding to support" />
+              </section>
 
-        <section className="stage-strip" aria-label="Stage progress">
-          {phaseStats.map((stage) => (
-            <article className="stage-window" key={stage.phase}>
-              <div className="stage-window-head">
-                <span>{stage.phase.replace(/-/g, " ")}</span>
-                <strong>{stage.percent}%</strong>
-              </div>
-              <div className="stage-progress-track" aria-label={`${stage.phase} progress`}>
-                <span style={{ width: `${stage.percent}%`, background: stage.accent }} />
-              </div>
-              <small>{stage.complete} of {stage.total} complete</small>
-            </article>
-          ))}
-        </section>
+              <section className="stage-strip" aria-label="Stage progress">
+                {phaseStats.map((stage) => (
+                  <article className="stage-window" key={stage.phase}>
+                    <div className="stage-window-head">
+                      <span>{stage.phase.replace(/-/g, " ")}</span>
+                      <strong>{stage.percent}%</strong>
+                    </div>
+                    <div className="stage-progress-track" aria-label={`${stage.phase} progress`}>
+                      <span style={{ width: `${stage.percent}%`, background: stage.accent }} />
+                    </div>
+                    <small>{stage.complete} of {stage.total} complete</small>
+                  </article>
+                ))}
+              </section>
 
-        <section className="filters-row" aria-label="Dashboard filters">
-          <div className="segmented">
-            <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
-            <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
-          </div>
-          <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => selectTaskClient(event.target.value)} disabled={clients.length === 0}>
-            {clients.length === 0 ? <option value="">No clients yet</option> : null}
-            {clients.map((client) => (
-              <option key={client.id} value={client.id}>
-                {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
-              </option>
-            ))}
-          </select>
-          <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
-            <option value="all">All statuses</option>
-            {taskStatuses.map((status) => (
-              <option key={status} value={status}>
-                {statusLabels[status]}
-              </option>
-            ))}
-          </select>
-          <select aria-label="Filter by owner" value={ownerFilter} onChange={(event) => setOwnerFilter(event.target.value)}>
-            <option value="all">All owners</option>
-            {teamMembers.map((member) => (
-              <option key={member} value={member}>
-                {member}
-              </option>
-            ))}
-          </select>
-          <select aria-label="Filter by category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-            <option value="all">All categories</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.name}>
-                {category.name}
-              </option>
-            ))}
-          </select>
+              <section className="filters-row" aria-label="Dashboard filters">
+                <div className="segmented">
+                  <button type="button" className={view === "board" ? "active" : ""} onClick={() => setView("board")}>Board</button>
+                  <button type="button" className={view === "categories" ? "active" : ""} onClick={() => setView("categories")}>Categories</button>
+                </div>
+                <select aria-label="Selected client" value={activeTaskClientId} onChange={(event) => selectTaskClient(event.target.value)} disabled={clients.length === 0}>
+                  {clients.length === 0 ? <option value="">No clients yet</option> : null}
+                  {clients.map((client) => (
+                    <option key={client.id} value={client.id}>
+                      {client.name}{client.companyName ? ` - ${client.companyName}` : ""}
+                    </option>
+                  ))}
+                </select>
+                <select aria-label="Filter by status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                  <option value="all">All statuses</option>
+                  {taskStatuses.map((status) => (
+                    <option key={status} value={status}>
+                      {statusLabels[status]}
+                    </option>
+                  ))}
+                </select>
+                <select aria-label="Filter by owner" value={ownerFilter} onChange={(event) => setOwnerFilter(event.target.value)}>
+                  <option value="all">All owners</option>
+                  {teamMembers.map((member) => (
+                    <option key={member} value={member}>
+                      {member}
+                    </option>
+                  ))}
+                </select>
+                <select aria-label="Filter by category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+                  <option value="all">All categories</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </section>
+            </div>
+          ) : null}
         </section>
 
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
