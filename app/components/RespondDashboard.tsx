@@ -2179,6 +2179,24 @@ export default function RespondDashboard({
       }),
     [categories, tasksByCategory]
   );
+  const phaseStats = useMemo(
+    () =>
+      phaseOrder.map((phase) => {
+        const phaseCategories = categoryStats.filter((category) => category.phase === phase);
+        const total = phaseCategories.reduce((sum, category) => sum + category.total, 0);
+        const complete = phaseCategories.reduce((sum, category) => sum + category.complete, 0);
+        const percent = total > 0 ? Math.round((complete / total) * 100) : 0;
+
+        return {
+          phase,
+          total,
+          complete,
+          percent,
+          accent: phaseCategories[0]?.accent ?? "#2563eb",
+        };
+      }),
+    [categoryStats]
+  );
 
   async function persistTask(id: string, payload: TaskUpdatePayload) {
     const response = await fetch(`/api/tasks/${id}`, {
@@ -2667,6 +2685,21 @@ export default function RespondDashboard({
           <Metric label="Active" value={metrics.active} detail="In progress or review" />
           <Metric label="Waiting" value={metrics.blocked} detail="Open dependencies or holds" />
           <Metric label="Categories" value={categories.length} detail="Onboarding to support" />
+        </section>
+
+        <section className="stage-strip" aria-label="Stage progress">
+          {phaseStats.map((stage) => (
+            <article className="stage-window" key={stage.phase}>
+              <div className="stage-window-head">
+                <span>{stage.phase.replace(/-/g, " ")}</span>
+                <strong>{stage.percent}%</strong>
+              </div>
+              <div className="stage-progress-track" aria-label={`${stage.phase} progress`}>
+                <span style={{ width: `${stage.percent}%`, background: stage.accent }} />
+              </div>
+              <small>{stage.complete} of {stage.total} complete</small>
+            </article>
+          ))}
         </section>
 
         <section className="filters-row" aria-label="Dashboard filters">

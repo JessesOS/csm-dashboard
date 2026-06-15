@@ -2484,6 +2484,7 @@ button:disabled {
 }
 
 .metric,
+.stage-window,
 .new-task,
 .storage-notice,
 .category-panel {
@@ -2523,6 +2524,67 @@ button:disabled {
   font-size: 22px;
   font-weight: 790;
   line-height: 1;
+}
+
+.stage-strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(96px, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.stage-window {
+  display: grid;
+  gap: 7px;
+  min-height: 58px;
+  padding: 9px 10px;
+}
+
+.stage-window-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stage-window-head span {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stage-window-head strong {
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.stage-progress-track {
+  overflow: hidden;
+  height: 7px;
+  border-radius: 999px;
+  background: #dbe4ee;
+}
+
+.stage-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.stage-window small {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .new-task {
@@ -2645,8 +2707,8 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(5, minmax(230px, 1fr));
   gap: 12px;
-  height: calc(100vh - 172px);
-  min-height: 570px;
+  height: calc(100vh - 238px);
+  min-height: 500px;
 }
 
 .board-column {
@@ -3347,6 +3409,8 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .topbar p,
 .dashboard-shell-dark .metric span,
 .dashboard-shell-dark .metric small,
+.dashboard-shell-dark .stage-window-head span,
+.dashboard-shell-dark .stage-window small,
 .dashboard-shell-dark .task-meta-line,
 .dashboard-shell-dark .category-panel-head span,
 .dashboard-shell-dark .inspector p,
@@ -3472,6 +3536,7 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .metric,
+.dashboard-shell-dark .stage-window,
 .dashboard-shell-dark .new-task,
 .dashboard-shell-dark .storage-notice,
 .dashboard-shell-dark .category-panel,
@@ -3484,6 +3549,10 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .metric strong {
   color: #f8fbff;
+}
+
+.dashboard-shell-dark .stage-progress-track {
+  background: rgba(148, 163, 184, 0.18);
 }
 
 .dashboard-shell-dark .segmented {
@@ -4445,6 +4514,7 @@ progress::-webkit-progress-value {
   }
 
   .command-strip,
+  .stage-strip,
   .category-view {
     grid-template-columns: 1fr;
   }
