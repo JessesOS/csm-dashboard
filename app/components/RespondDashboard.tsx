@@ -148,6 +148,121 @@ const clientRiskLabels: Record<ClientRisk, string> = {
 const missionToday = Date.parse("2026-06-13T00:00:00Z");
 const missionThirtyDayLimit = Date.parse("2026-07-13T00:00:00Z");
 
+type ActiveClientPipelineOpportunity = {
+  id: string;
+  title: string;
+  businessName?: string;
+  source?: string;
+  value: number;
+  valueLabel: string;
+  owner?: string;
+  initials: string;
+  updatedAt?: string;
+};
+
+type ActiveClientPipelineStage = {
+  id: string;
+  name: string;
+  tone: string;
+  count: number;
+  value: number;
+  valueLabel: string;
+  opportunities: ActiveClientPipelineOpportunity[];
+};
+
+type ActiveClientPipelineData = {
+  id: string;
+  name: string;
+  syncedAt: string;
+  stages: ActiveClientPipelineStage[];
+};
+
+function demoPipelineOpportunity(
+  id: string,
+  title: string,
+  businessName: string,
+  source: string,
+  valueLabel: string,
+  initials: string
+): ActiveClientPipelineOpportunity {
+  return {
+    id,
+    title,
+    businessName,
+    source,
+    value: 0,
+    valueLabel,
+    initials,
+  };
+}
+
+function demoPipelineStage(
+  id: string,
+  name: string,
+  tone: string,
+  count: number,
+  valueLabel: string,
+  opportunities: ActiveClientPipelineOpportunity[]
+): ActiveClientPipelineStage {
+  return {
+    id,
+    name,
+    tone,
+    count,
+    value: 0,
+    valueLabel,
+    opportunities,
+  };
+}
+
+const demoActiveClientPipeline: ActiveClientPipelineData = {
+  id: "demo-active-clients",
+  name: "Active Clients",
+  syncedAt: "2026-06-15T00:00:00.000Z",
+  stages: [
+    demoPipelineStage("urgent", "Urgent", "urgent", 3, "AU$250.00", [
+      demoPipelineOpportunity("shiva-smyth", "Shiva Smyth", "Geoscape", "Rich Latimer 60 Min", "AU$0.00", "SS"),
+      demoPipelineOpportunity("kevin-french", "Kevin French", "CWP Painting", "Inbound: RESPOND Meta Ad", "AU$250.00", "KF"),
+      demoPipelineOpportunity("lance-murphy", "Lance Murphy - TAI Respond", "Murphy's Fencing", "Resvita - TradeAi Demo Booking", "AU$0.00", "LM"),
+    ]),
+    demoPipelineStage("onboarding", "Onboarding", "onboarding", 1, "AU$1,250.00", [
+      demoPipelineOpportunity("bruce-chaplin", "Bruce Chaplin - BCTD Management", "BCTD Management PTY LTD", "Outbound", "AU$1,250.00", "BC"),
+    ]),
+    demoPipelineStage("building", "Building", "building", 3, "AU$12,500.00", [
+      demoPipelineOpportunity("ben-baker", "Ben Baker", "AT", "Outbound", "AU$0.00", "BB"),
+      demoPipelineOpportunity("scott-lambert", "Scott Lambert", "Doctor Damp", "Outbound", "AU$7,500.00", "SL"),
+      demoPipelineOpportunity("bear-olive", "Bear Olive - MiracleMint", "MiracleMint", "Inbound: Lenderly AI Typeform", "AU$5,000.00", "BO"),
+    ]),
+    demoPipelineStage("recently-active", "Recently Active", "recent", 2, "AU$1,250.00", [
+      demoPipelineOpportunity("melissa-arlitsch", "Melissa Arlitsch", "Discovery Coast Build Pty Ltd", "Inbound: RESPOND Meta Ad", "AU$1,250.00", "MA"),
+      demoPipelineOpportunity("nicole-cannon", "Nicole Cannon", "Pink Finance", "Rich Latimer 60 Min", "AU$0.00", "NC"),
+    ]),
+    demoPipelineStage("live-month", "Live > 1 month", "live", 15, "AU$16,100.00", [
+      demoPipelineOpportunity("troy-rudoll", "Troy Rudoll", "Patriot Homes", "Inbound: ActiveCampaign", "AU$0.00", "TR"),
+      demoPipelineOpportunity("patrick-franzini", "Patrick Franzini", "Good News Electrical", "TradeAI - Demo Bookings", "AU$1,100.00", "PF"),
+      demoPipelineOpportunity("david-evan", "David and Evan", "MDS Solar", "Inbound: ActiveCampaign", "AU$0.00", "DE"),
+      demoPipelineOpportunity("veronica-jones", "Veronica Jones", "Anstey Homes", "Outbound", "AU$0.00", "VJ"),
+      demoPipelineOpportunity("jason-king", "Jason King", "KYTEK Joinery Pty Ltd", "Outbound", "AU$0.00", "JK"),
+    ]),
+    demoPipelineStage("paused", "Paused", "paused", 3, "AU$5,000.00", [
+      demoPipelineOpportunity("kane-bannam", "Kane Bannam", "Bannam Building", "Inbound voice", "AU$0.00", "KB"),
+      demoPipelineOpportunity("adam-donnelly", "Adam Donnelly", "High Quality Roofworx Pty Ltd", "Inbound: TradeAI Typeform", "AU$0.00", "AD"),
+      demoPipelineOpportunity("robert-de-marcellis", "Robert De Marcellis", "Foresight Constructions", "Inbound: ActiveCampaign", "AU$5,000.00", "RD"),
+    ]),
+    demoPipelineStage("exiting", "Exiting", "exiting", 2, "AU$5,000.00", [
+      demoPipelineOpportunity("darren-oke", "Darren Oke", "Oke Builders", "WSC Webinar", "AU$0.00", "DO"),
+      demoPipelineOpportunity("daniel-scothern", "TSA - Daniel Scothern", "TradeAi Basic", "TSA - TradeAi Demo Booking", "AU$5,000.00", "DS"),
+    ]),
+    demoPipelineStage("cancelled", "Cancelled", "cancelled", 23, "AU$161,000.00", [
+      demoPipelineOpportunity("josh-waldron", "Josh Waldron", "Resvita Coaching", "Inbound voice", "AU$0.00", "JW"),
+      demoPipelineOpportunity("chris-ling", "Chris Ling - TAI Respond", "Champion Accountants", "Checkout Funnel (AUD)", "AU$1,250.00", "CL"),
+      demoPipelineOpportunity("camille-williams", "Camille Williams", "MD Wealth Fortress", "Rich Latimer 60 Min", "AU$15,000.00", "CW"),
+      demoPipelineOpportunity("marko-jelinic", "Marko Jelinic - Dinamo Group", "Dinamo Group", "Outbound", "AU$7,500.00", "MJ"),
+      demoPipelineOpportunity("sophie-mclean", "Sophie McLean", "Your Property Profits", "Typeform Onboarding", "AU$5,000.00", "SM"),
+    ]),
+  ],
+};
+
 function Icon({
   name,
 }: {
@@ -1221,6 +1336,150 @@ function NewClientPanel({
   );
 }
 
+function ActiveClientPipelineBoard() {
+  const [pipeline, setPipeline] = useState<ActiveClientPipelineData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch("/api/ghl/pipeline", { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error ?? "Could not load GHL pipeline.");
+        }
+
+        return data.pipeline as ActiveClientPipelineData;
+      })
+      .then((remotePipeline) => {
+        if (!active) {
+          return;
+        }
+
+        setPipeline(remotePipeline);
+        setLoadFailed(false);
+      })
+      .catch(() => {
+        if (!active) {
+          return;
+        }
+
+        setPipeline(null);
+        setLoadFailed(true);
+      })
+      .finally(() => {
+        if (active) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [refreshKey]);
+
+  function refreshPipeline() {
+    setIsLoading(true);
+    setLoadFailed(false);
+    setRefreshKey((current) => current + 1);
+  }
+
+  const visiblePipeline = pipeline ?? demoActiveClientPipeline;
+  const visibleCount = visiblePipeline.stages.reduce((total, stage) => total + stage.count, 0);
+  const syncLabel = pipeline
+    ? `Synced from GHL - ${formatPipelineSyncTime(pipeline.syncedAt)}`
+    : isLoading
+      ? "Connecting to GHL Active Clients"
+      : "GHL layout preview";
+
+  return (
+    <section className="mission-panel ghl-pipeline-panel" aria-label="Active client pipeline">
+      <div className="mission-panel-head ghl-pipeline-head">
+        <div>
+          <h2>Active client pipeline</h2>
+          <p>{visibleCount} opportunities across {visiblePipeline.name}.</p>
+        </div>
+        <div className="ghl-pipeline-actions">
+          <span className={loadFailed ? "ghl-sync-pill ghl-sync-preview" : "ghl-sync-pill"}>
+            <span />
+            {syncLabel}
+          </span>
+          <button type="button" onClick={refreshPipeline} disabled={isLoading}>
+            {isLoading ? "Refreshing" : "Refresh"}
+          </button>
+        </div>
+      </div>
+
+      <div className="ghl-pipeline-board" aria-label="GHL Active Clients stages">
+        {visiblePipeline.stages.map((stage) => (
+          <section className="ghl-pipeline-stage" key={stage.id} aria-label={`${stage.name} stage`}>
+            <header className={`ghl-pipeline-stage-head ghl-stage-${stage.tone}`}>
+              <strong>{stage.name}</strong>
+              <div>
+                <span>{stage.count} {stage.count === 1 ? "Opportunity" : "Opportunities"}</span>
+                <b>{stage.valueLabel}</b>
+              </div>
+            </header>
+
+            <div className="ghl-pipeline-cards">
+              {stage.opportunities.length === 0 ? (
+                <p className="ghl-pipeline-empty">No opportunities in this stage.</p>
+              ) : null}
+              {stage.opportunities.slice(0, 8).map((opportunity) => (
+                <article className="ghl-opportunity-card" key={opportunity.id}>
+                  <div className="ghl-opportunity-card-top">
+                    <strong>{opportunity.title}</strong>
+                    <span>{opportunity.initials}</span>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Business Name:</dt>
+                      <dd>{opportunity.businessName ?? "-"}</dd>
+                    </div>
+                    <div>
+                      <dt>Source:</dt>
+                      <dd>{opportunity.source ?? "-"}</dd>
+                    </div>
+                    <div>
+                      <dt>Value:</dt>
+                      <dd>{opportunity.valueLabel}</dd>
+                    </div>
+                  </dl>
+                  <div className="ghl-opportunity-card-foot">
+                    <span><Icon name="link" /> GHL</span>
+                    {opportunity.owner ? <span>{opportunity.owner}</span> : null}
+                  </div>
+                </article>
+              ))}
+              {stage.opportunities.length > 8 ? (
+                <div className="ghl-pipeline-more">+{stage.opportunities.length - 8} more in {stage.name}</div>
+              ) : null}
+            </div>
+          </section>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function formatPipelineSyncTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "just now";
+  }
+
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
 function MissionControl({
   environment,
   activeEnvironment,
@@ -1637,6 +1896,8 @@ function MissionControl({
             ))}
           </div>
         </section>
+
+        {activeEnvironment === "demo" && activeProduct === "respond" ? <ActiveClientPipelineBoard /> : null}
       </section>
       {walkthroughPanel}
     </main>

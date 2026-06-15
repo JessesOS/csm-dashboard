@@ -15,12 +15,14 @@ type GhlOpportunity = {
   contactId?: string;
   name: string;
   status: string;
+  pipelineStageId?: string;
   stageName?: string;
   contactName?: string;
   companyName?: string;
   assignedTo?: string;
   source?: string;
   tags: string[];
+  value: number;
   updatedAt?: string;
 };
 
@@ -39,9 +41,42 @@ type GhlClientImport = {
   preview: GhlClientImportPreview;
 };
 
+export type GhlPipelineOpportunitySummary = {
+  id: string;
+  title: string;
+  businessName?: string;
+  source?: string;
+  value: number;
+  valueLabel: string;
+  owner?: string;
+  initials: string;
+  updatedAt?: string;
+};
+
+export type GhlPipelineStageSummary = {
+  id: string;
+  name: string;
+  tone: string;
+  count: number;
+  value: number;
+  valueLabel: string;
+  opportunities: GhlPipelineOpportunitySummary[];
+};
+
+export type GhlActiveClientPipeline = {
+  id: string;
+  name: string;
+  syncedAt: string;
+  stages: GhlPipelineStageSummary[];
+};
+
 const DEFAULT_GHL_API_BASE_URL = "https://services.leadconnectorhq.com";
 const DEFAULT_GHL_API_VERSION = "2021-07-28";
 const ACTIVE_CLIENT_PIPELINE = "active clients";
+const currencyFormatter = new Intl.NumberFormat("en-AU", {
+  style: "currency",
+  currency: "AUD",
+});
 
 export async function specifiedGhlClientImport(selectorInput: string, product: ProductKey): Promise<GhlClientImport> {
   const selector = selectorInput.trim();
@@ -102,6 +137,58 @@ export async function specifiedGhlClientImport(selectorInput: string, product: P
       companyName: cleanCompanyName,
       status: selectedOpportunity.status,
     },
+  };
+}
+
+export async function loadActiveClientPipeline(): Promise<GhlActiveClientPipeline> {
+  const [pipelinesResponse, opportunitiesResponse] = await loadActiveClientSources();
+  const pipelines = getRecords(pipelinesResponse, "pipelines");
+  const activePipeline = pipelines.find((pipeline) =>
+    readString(pipeline, ["name"])?.toLowerCase().includes(ACTIVE_CLIENT_PIPELINE)
+  );
+
+  if (!activePipeline) {
+    throw new Error("GHL Active Clients pipeline was not found.");
+  }
+
+  const pipelineId = readString(activePipeline, ["id"]) ?? "active-clients";
+  const pipelineName = readString(activePipeline, ["name"]) ?? "Active Clients";
+  const stageLookup = buildStageLookup(pipelines);
+  const opportunities = getRecords(opportunitiesResponse, "opportunities")
+    .map((opportunity, index) => normalizeOpportunity(opportunity, index, stageLookup))
+    .sort((a, b) => compareDateDesc(a.updatedAt, b.updatedAt));
+  const pipelineStages = getRecords(activePipeline, "stages")
+    .map((stage, index) => {
+      const id = readString(stage, ["id"]) ?? `stage-${index}`;
+      return {
+        id,
+        name: readString(stage, ["name"]) ?? `Stage ${index + 1}`,
+      };
+    });
+  const stageGroups = new Map<string, GhlPipelineStageSummary>();
+
+  for (const [index, stage] of pipelineStages.entries()) {
+    stageGroups.set(stage.id, emptyPipelineStage(stage.id, stage.name, index));
+  }
+
+  for (const opportunity of opportunities) {
+    const stageId = opportunity.pipelineStageId ?? opportunity.stageName ?? "unassigned";
+    const existingStage = stageGroups.get(stageId);
+    const stage = existingStage ?? emptyPipelineStage(stageId, opportunity.stageName ?? "Unassigned", stageGroups.size);
+    const summary = summarizeOpportunity(opportunity);
+
+    stage.opportunities.push(summary);
+    stage.count += 1;
+    stage.value += opportunity.value;
+    stage.valueLabel = currencyFormatter.format(stage.value);
+    stageGroups.set(stageId, stage);
+  }
+
+  return {
+    id: pipelineId,
+    name: pipelineName,
+    syncedAt: new Date().toISOString(),
+    stages: Array.from(stageGroups.values()),
   };
 }
 
@@ -238,20 +325,91 @@ function normalizeOpportunity(
 ): GhlOpportunity {
   const stageId = readString(opportunity, ["pipelineStageId", "pipelineStageUId"]);
   const stage = stageId ? stageLookup.get(stageId) : undefined;
+  const value = readNumber(opportunity, ["monetaryValue", "value", "amount", "opportunityValue"]);
 
   return {
     id: readString(opportunity, ["id"]) ?? `ghl-opportunity-${index}`,
     contactId: readString(opportunity, ["contactId"]),
     name: readString(opportunity, ["name"]) ?? "Untitled GHL client",
     status: (readString(opportunity, ["status"]) ?? "open").toLowerCase(),
-    stageName: stage?.stageName,
+    pipelineStageId: stageId,
+    stageName: stage?.stageName ?? readString(opportunity, ["stageName", "pipelineStageName"]),
     contactName: readPathString(opportunity, ["contact.name", "contact.fullName", "contact.contactName"]),
     companyName: readPathString(opportunity, ["contact.companyName", "contact.businessName", "contact.company", "companyName", "businessName"]),
     assignedTo: readString(opportunity, ["assignedTo"]),
     source: readString(opportunity, ["source"]),
     tags: readPathStringArray(opportunity, ["contact.tags", "tags"]),
+    value: value ?? 0,
     updatedAt: readString(opportunity, ["updatedAt", "lastStatusChangeAt", "createdAt"]),
   };
+}
+
+function emptyPipelineStage(id: string, name: string, index: number): GhlPipelineStageSummary {
+  return {
+    id,
+    name,
+    tone: pipelineStageTone(name, index),
+    count: 0,
+    value: 0,
+    valueLabel: currencyFormatter.format(0),
+    opportunities: [],
+  };
+}
+
+function summarizeOpportunity(opportunity: GhlOpportunity): GhlPipelineOpportunitySummary {
+  const title = cleanImportText(opportunity.name);
+  const businessName = cleanOptionalImportText(opportunity.companyName);
+  const source = cleanOptionalImportText(opportunity.source ?? opportunity.tags[0]);
+
+  return {
+    id: opportunity.id,
+    title,
+    businessName,
+    source,
+    value: opportunity.value,
+    valueLabel: currencyFormatter.format(opportunity.value),
+    owner: cleanOptionalImportText(opportunity.assignedTo),
+    initials: initialsFor(opportunity.contactName ?? title),
+    updatedAt: opportunity.updatedAt,
+  };
+}
+
+function pipelineStageTone(name: string, index: number) {
+  const normalizedName = normalizeLookup(name);
+
+  if (normalizedName.includes("urgent")) {
+    return "urgent";
+  }
+
+  if (normalizedName.includes("onboarding")) {
+    return "onboarding";
+  }
+
+  if (normalizedName.includes("building") || normalizedName.includes("build")) {
+    return "building";
+  }
+
+  if (normalizedName.includes("recent")) {
+    return "recent";
+  }
+
+  if (normalizedName.includes("live")) {
+    return "live";
+  }
+
+  if (normalizedName.includes("paused")) {
+    return "paused";
+  }
+
+  if (normalizedName.includes("exiting")) {
+    return "exiting";
+  }
+
+  if (normalizedName.includes("cancel")) {
+    return "cancelled";
+  }
+
+  return ["urgent", "onboarding", "building", "recent", "live", "paused", "exiting", "cancelled"][index % 8];
 }
 
 function buildStageLookup(pipelines: GhlRecord[]) {
@@ -287,6 +445,24 @@ function readString(record: GhlRecord, keys: string[]) {
     const value = record[key];
     if (typeof value === "string" && value.trim()) {
       return value.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function readNumber(record: GhlRecord, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value.replace(/[^0-9.-]+/g, ""));
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
     }
   }
 
@@ -352,6 +528,12 @@ function cleanOptionalImportText(value?: string | null) {
 
 function normalizeLookup(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function initialsFor(value: string) {
+  const words = normalizeLookup(value).split(" ").filter(Boolean);
+  const initials = words.slice(0, 2).map((word) => word[0]?.toUpperCase()).join("");
+  return initials || "AC";
 }
 
 function compareDateDesc(left?: string, right?: string) {
