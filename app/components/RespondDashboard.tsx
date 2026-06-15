@@ -40,6 +40,13 @@ interface DashboardProps {
 }
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
+const statusColumnDetails: Record<TaskStatus, string> = {
+  queued: "Ready to start",
+  in_progress: "Being worked",
+  blocked: "Needs attention",
+  review: "Awaiting review",
+  complete: "Done",
+};
 
 type ThemeMode = "dark" | "light";
 type AppSection = "home" | "tasks";
@@ -884,6 +891,12 @@ function TaskCard({
   const dependencyState = getDependencyState(task, taskMap);
   const isDone = task.status === "complete";
   const loomUrl = safeInstructionUrl(task.loomUrl);
+  const dependencySummary =
+    dependencyState.dependencies.length === 0
+      ? "None"
+      : dependencyState.isBlockedByDependencies
+        ? `${dependencyState.open.length} open`
+        : `${dependencyState.dependencies.length} cleared`;
 
   return (
     <article
@@ -902,33 +915,44 @@ function TaskCard({
       aria-pressed={active}
     >
       <div className="task-card-topline">
-        <span className={`priority priority-${task.priority}`}>{task.priority}</span>
-        <span className="drag-handle" title="Drag to move status">
-          <Icon name="move" />
+        <h3>{task.title}</h3>
+        <span className="avatar" title={task.assignee}>
+          {initials(task.assignee)}
         </span>
       </div>
-      <h3>{task.title}</h3>
-      <div className="task-meta-line">
-        <span>{task.category}</span>
-      </div>
+      <dl className="task-card-details">
+        <div>
+          <dt>Category:</dt>
+          <dd>{task.category}</dd>
+        </div>
+        <div>
+          <dt>Owner:</dt>
+          <dd>{task.assignee}</dd>
+        </div>
+        <div>
+          <dt>Due:</dt>
+          <dd>{task.dueWindow || "-"}</dd>
+        </div>
+        <div>
+          <dt>Dependencies:</dt>
+          <dd>{dependencySummary}</dd>
+        </div>
+      </dl>
       <div className="task-card-footer">
+        <span className={`priority priority-${task.priority}`}>{task.priority}</span>
         {loomUrl ? (
           <span className="loom-card-indicator" title={task.loomTitle || "Loom instructions attached"}>
             <Icon name="video" />
           </span>
         ) : null}
-        <span className="avatar" title={task.assignee}>
-          {initials(task.assignee)}
-        </span>
-        <span className="mini-meta" title="Due window">
-          <Icon name="calendar" />
-          {task.dueWindow || "No date"}
-        </span>
         <span className={`dependency-chip ${dependencyState.isBlockedByDependencies ? "dependency-open" : ""}`}>
           <Icon name="link" />
           {dependencyState.dependencies.length}
         </span>
         {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
+        <span className="drag-handle" title="Drag to move status">
+          <Icon name="move" />
+        </span>
       </div>
       <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
         {isDone ? (
@@ -2807,9 +2831,12 @@ export default function RespondDashboard({
                   }
                 }}
               >
-                <div className="column-header">
+                <div className={`column-header task-stage-${status}`}>
                   <strong>{statusLabels[status]}</strong>
-                  <span>{columnTasks.length}</span>
+                  <div>
+                    <span>{columnTasks.length} {columnTasks.length === 1 ? "Task" : "Tasks"}</span>
+                    <b>{statusColumnDetails[status]}</b>
+                  </div>
                 </div>
                 <div className="column-scroll">
                   {columnTasks.map((task) => (
