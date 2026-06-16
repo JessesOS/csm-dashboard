@@ -94,8 +94,14 @@ type TrainingVideoRow = Omit<TrainingVideo, "product" | "tags"> & {
   tags: string;
 };
 
+type TrainingCategoryRow = {
+  product: string;
+  category: string;
+  sortOrder: number;
+};
+
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-16-training-room";
+const currentStorageVersion = "2026-06-16-training-category-order";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
@@ -496,11 +502,12 @@ async function ensureAppMetaTable(d1 = getD1()) {
 
 async function seedWorkspaceShapeReady() {
   const d1 = getD1();
-  const [taskColumns, clientColumns, portalFormColumns, trainingVideoColumns] = await Promise.all([
+  const [taskColumns, clientColumns, portalFormColumns, trainingVideoColumns, trainingCategoryColumns] = await Promise.all([
     tableColumns("tasks"),
     tableColumns("clients"),
     tableColumns("portal_form_submissions"),
     tableColumns("training_videos"),
+    tableColumns("training_categories"),
   ]);
   const requiredTaskColumns = [
     "client_id",
@@ -528,12 +535,14 @@ async function seedWorkspaceShapeReady() {
     "submitted_at",
   ];
   const requiredTrainingVideoColumns = ["product", "category", "title", "description", "loom_url", "tags", "sort_order"];
+  const requiredTrainingCategoryColumns = ["product", "category", "sort_order"];
 
   if (
     !requiredTaskColumns.every((column) => taskColumns.has(column)) ||
     !requiredClientColumns.every((column) => clientColumns.has(column)) ||
     !requiredPortalFormColumns.every((column) => portalFormColumns.has(column)) ||
-    !requiredTrainingVideoColumns.every((column) => trainingVideoColumns.has(column))
+    !requiredTrainingVideoColumns.every((column) => trainingVideoColumns.has(column)) ||
+    !requiredTrainingCategoryColumns.every((column) => trainingCategoryColumns.has(column))
   ) {
     return false;
   }
@@ -933,6 +942,53 @@ async function seedTrainingVideos() {
   );
 }
 
+function trainingCategoryId(product: ProductKey, category: string) {
+  const slug = normalizeClientIdentity(category).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "category";
+  return `training-category-${product}-${slug}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+async function ensureTrainingCategory(product: ProductKey, category: string) {
+  const d1 = getD1();
+  const cleanCategory = cleanTrainingText(category, "General");
+  const existing = await d1
+    .prepare("SELECT id FROM training_categories WHERE product = ? AND category = ?")
+    .bind(product, cleanCategory)
+    .first<{ id: string }>();
+
+  if (existing) {
+    return;
+  }
+
+  const nextOrder = await d1
+    .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM training_categories WHERE product = ?")
+    .bind(product)
+    .first<{ nextOrder: number }>();
+
+  await d1
+    .prepare(`
+      INSERT OR IGNORE INTO training_categories (
+        id,
+        product,
+        category,
+        sort_order
+      ) VALUES (?, ?, ?, ?)
+    `)
+    .bind(trainingCategoryId(product, cleanCategory), product, cleanCategory, nextOrder?.nextOrder ?? 1)
+    .run();
+}
+
+async function seedTrainingCategoryOrders() {
+  const rows = await getD1()
+    .prepare(
+      "SELECT product, category, MIN(sort_order) AS sortOrder FROM training_videos GROUP BY product, category ORDER BY product ASC, sortOrder ASC, category ASC"
+    )
+    .all<TrainingCategoryRow>();
+
+  for (const row of rows.results ?? []) {
+    await ensureTrainingCategory(normalizeProduct(row.product), row.category);
+  }
+}
+
 async function prepareTaskStorage() {
   const d1 = getD1();
 
@@ -1034,6 +1090,16 @@ async function prepareTaskStorage() {
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     `),
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS training_categories (
+        id TEXT PRIMARY KEY,
+        product TEXT NOT NULL DEFAULT 'respond',
+        category TEXT NOT NULL,
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
   ]);
 
   await ensureTaskColumns();
@@ -1072,12 +1138,16 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_idx ON training_videos (product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_category_idx ON training_videos (product, category)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_sort_idx ON training_videos (product, sort_order)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS training_categories_product_idx ON training_categories (product)"),
+    d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS training_categories_product_category_idx ON training_categories (product, category)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS training_categories_product_sort_idx ON training_categories (product, sort_order)"),
   ]);
 
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
+  await seedTrainingCategoryOrders();
   await markStoragePrepared(d1);
 }
 
@@ -1491,8 +1561,27 @@ function cleanTrainingTags(value: unknown) {
 export async function listTrainingVideos(productInput: string | null | undefined = defaultProduct) {
   await ensureTaskStorage();
   const product = normalizeProduct(productInput);
+  await seedTrainingCategoryOrders();
   const result = await getD1()
-    .prepare(`SELECT ${trainingVideoSelectFields} FROM training_videos WHERE product = ? ORDER BY sort_order ASC, category ASC, title ASC`)
+    .prepare(`
+      SELECT
+        training_videos.id AS id,
+        training_videos.product AS product,
+        training_videos.category AS category,
+        training_videos.title AS title,
+        training_videos.description AS description,
+        training_videos.loom_url AS loomUrl,
+        training_videos.tags AS tags,
+        training_videos.sort_order AS sortOrder,
+        training_videos.created_at AS createdAt,
+        training_videos.updated_at AS updatedAt
+      FROM training_videos
+      LEFT JOIN training_categories
+        ON training_categories.product = training_videos.product
+        AND training_categories.category = training_videos.category
+      WHERE training_videos.product = ?
+      ORDER BY COALESCE(training_categories.sort_order, training_videos.sort_order) ASC, training_videos.sort_order ASC, training_videos.title ASC
+    `)
     .bind(product)
     .all<TrainingVideoRow>();
 
@@ -1509,6 +1598,8 @@ export async function createTrainingVideo(productInput: string | null | undefine
   if (!title) {
     throw new Error("Training title is required.");
   }
+
+  await ensureTrainingCategory(product, category);
 
   const nextOrder = await d1
     .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM training_videos WHERE product = ?")
@@ -1559,6 +1650,73 @@ export async function deleteTrainingVideo(id: string) {
   }
 
   return { id };
+}
+
+function cleanTrainingCategories(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => cleanTrainingText(item))
+        .filter(Boolean)
+    )
+  ).slice(0, 50);
+}
+
+export async function reorderTrainingCategories(productInput: string | null | undefined, categoryInput: unknown) {
+  await ensureTaskStorage();
+  const d1 = getD1();
+  const product = normalizeProduct(productInput);
+  await seedTrainingCategoryOrders();
+
+  const requestedCategories = cleanTrainingCategories(categoryInput);
+  const categoryRows = await d1
+    .prepare(`
+      SELECT
+        training_videos.category AS category,
+        MIN(training_videos.sort_order) AS sortOrder
+      FROM training_videos
+      WHERE training_videos.product = ?
+      GROUP BY training_videos.category
+      ORDER BY sortOrder ASC, category ASC
+    `)
+    .bind(product)
+    .all<{ category: string; sortOrder: number }>();
+  const existingCategories = (categoryRows.results ?? []).map((row) => row.category);
+  const existingSet = new Set(existingCategories);
+  const nextCategories = [
+    ...requestedCategories.filter((category) => existingSet.has(category)),
+    ...existingCategories.filter((category) => !requestedCategories.includes(category)),
+  ];
+
+  if (nextCategories.length === 0) {
+    throw new Error("No training categories found.");
+  }
+
+  await d1.batch(
+    nextCategories.map((category, index) =>
+      d1
+        .prepare(`
+          INSERT INTO training_categories (
+            id,
+            product,
+            category,
+            sort_order,
+            updated_at
+          ) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+          ON CONFLICT(product, category) DO UPDATE SET
+            sort_order = excluded.sort_order,
+            updated_at = CURRENT_TIMESTAMP
+        `)
+        .bind(trainingCategoryId(product, category), product, category, index + 1)
+    )
+  );
+
+  return listTrainingVideos(product);
 }
 
 async function nextClientId(name: string, environment: EnvironmentKey, product: ProductKey) {

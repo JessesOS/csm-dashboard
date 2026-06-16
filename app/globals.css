@@ -3731,6 +3731,63 @@ progress::-webkit-progress-value {
   padding: 12px;
 }
 
+.training-category-order {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 8px;
+  background: rgba(45, 212, 191, 0.055);
+  padding: 12px;
+}
+
+.training-category-order-list {
+  display: grid;
+  gap: 7px;
+}
+
+.training-category-order-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 6px 6px 6px 10px;
+}
+
+.training-category-order-row span {
+  overflow: hidden;
+  color: #e9f2fb;
+  font-size: 12px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.training-category-order-row div {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.training-category-order-row button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 7px;
+  background: rgba(10, 32, 53, 0.82);
+  color: #c9f82b;
+  cursor: pointer;
+}
+
+.training-category-order-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.36;
+}
+
 .training-add-form button {
   display: inline-flex;
   align-items: center;
@@ -3972,6 +4029,26 @@ progress::-webkit-progress-value {
 .training-room-light .training-add-form {
   border-color: rgba(36, 94, 232, 0.18);
   background: #eff5ff;
+}
+
+.training-room-light .training-category-order {
+  border-color: rgba(20, 184, 166, 0.18);
+  background: #eefbf8;
+}
+
+.training-room-light .training-category-order-row {
+  border-color: #d9e3ec;
+  background: #ffffff;
+}
+
+.training-room-light .training-category-order-row span {
+  color: #172033;
+}
+
+.training-room-light .training-category-order-row button {
+  border-color: #d9e3ec;
+  background: #f8fbff;
+  color: #174ac9;
 }
 
 .training-room-light .training-video-frame {

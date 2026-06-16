@@ -29,7 +29,7 @@ function loomEmbedUrl(value: string | null | undefined) {
 function TrainingIcon({
   name,
 }: {
-  name: "search" | "plus" | "book" | "video" | "play" | "trash" | "settings" | "moon" | "sun" | "arrow";
+  name: "search" | "plus" | "book" | "video" | "play" | "trash" | "settings" | "moon" | "sun" | "arrow" | "arrow-up" | "arrow-down";
 }) {
   const common = {
     width: 16,
@@ -130,6 +130,22 @@ function TrainingIcon({
     );
   }
 
+  if (name === "arrow-up") {
+    return (
+      <svg {...common}>
+        <path d="m18 15-6-6-6 6" />
+      </svg>
+    );
+  }
+
+  if (name === "arrow-down") {
+    return (
+      <svg {...common}>
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="m15 18-6-6 6-6" />
@@ -139,6 +155,24 @@ function TrainingIcon({
 
 function productName(product: ProductWorkspace) {
   return `${product.shortLabel} learning library`;
+}
+
+function sortVideosByCategoryOrder(videos: TrainingVideo[], categories: string[]) {
+  const order = new Map(categories.map((category, index) => [category, index]));
+  return [...videos].sort((a, b) => {
+    const aCategory = order.get(a.category) ?? Number.MAX_SAFE_INTEGER;
+    const bCategory = order.get(b.category) ?? Number.MAX_SAFE_INTEGER;
+
+    if (aCategory !== bCategory) {
+      return aCategory - bCategory;
+    }
+
+    if (a.sortOrder !== b.sortOrder) {
+      return a.sortOrder - b.sortOrder;
+    }
+
+    return a.title.localeCompare(b.title);
+  });
 }
 
 export function TrainingRoomPage({
@@ -171,6 +205,7 @@ export function TrainingRoomPage({
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isReorderingCategories, setIsReorderingCategories] = useState(false);
   const [form, setForm] = useState({
     title: "",
     category: "Start here",
@@ -180,7 +215,7 @@ export function TrainingRoomPage({
   });
 
   const product = productConfig(activeProduct);
-  const categories = useMemo(() => Array.from(new Set(videos.map((video) => video.category))).sort(), [videos]);
+  const categories = useMemo(() => Array.from(new Set(videos.map((video) => video.category))), [videos]);
   const filteredVideos = useMemo(() => {
     const cleanQuery = normalizeText(query);
 
@@ -257,7 +292,11 @@ export function TrainingRoomPage({
           .map((tag) => tag.trim())
           .filter(Boolean),
       });
-      setVideos((current) => [...current.filter((item) => item.id !== video.id), video].sort((a, b) => a.sortOrder - b.sortOrder));
+      setVideos((current) => {
+        const nextVideos = [...current.filter((item) => item.id !== video.id), video];
+        const nextCategories = categories.includes(video.category) ? categories : [...categories, video.category];
+        return sortVideosByCategoryOrder(nextVideos, nextCategories);
+      });
       setForm((current) => ({ ...current, title: "", description: "", loomUrl: "", tags: "" }));
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Could not add training lesson.");
@@ -282,6 +321,42 @@ export function TrainingRoomPage({
       setVideos((current) => current.filter((item) => item.id !== video.id));
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Could not delete training lesson.");
+    }
+  }
+
+  async function moveTrainingCategory(category: string, direction: -1 | 1) {
+    const currentIndex = categories.indexOf(category);
+    const nextIndex = currentIndex + direction;
+
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= categories.length) {
+      return;
+    }
+
+    const nextCategories = [...categories];
+    [nextCategories[currentIndex], nextCategories[nextIndex]] = [nextCategories[nextIndex], nextCategories[currentIndex]];
+    const previousVideos = videos;
+    setVideos(sortVideosByCategoryOrder(videos, nextCategories));
+    setCategoryFilter("all");
+    setError("");
+    setIsReorderingCategories(true);
+
+    try {
+      const response = await fetch("/api/training/categories", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: activeProduct, categories: nextCategories }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not reorder categories.");
+      }
+
+      setVideos(data.videos as TrainingVideo[]);
+    } catch (reorderError) {
+      setVideos(previousVideos);
+      setError(reorderError instanceof Error ? reorderError.message : "Could not reorder categories.");
+    } finally {
+      setIsReorderingCategories(false);
     }
   }
 
@@ -381,6 +456,42 @@ export function TrainingRoomPage({
                 <span>Portal</span>
                 <strong>{contextLabel}</strong>
                 {contextDetail ? <small>{contextDetail}</small> : null}
+              </div>
+            ) : null}
+
+            {mode === "admin" && adminEditing && categories.length > 1 ? (
+              <div className="training-category-order" aria-label="Training category order">
+                <div className="inspector-section-title">
+                  <TrainingIcon name="settings" />
+                  Category order
+                </div>
+                <div className="training-category-order-list">
+                  {categories.map((category, index) => (
+                    <div className="training-category-order-row" key={category}>
+                      <span>{category}</span>
+                      <div>
+                        <button
+                          type="button"
+                          aria-label={`Move ${category} up`}
+                          title={`Move ${category} up`}
+                          disabled={isReorderingCategories || index === 0}
+                          onClick={() => moveTrainingCategory(category, -1)}
+                        >
+                          <TrainingIcon name="arrow-up" />
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={`Move ${category} down`}
+                          title={`Move ${category} down`}
+                          disabled={isReorderingCategories || index === categories.length - 1}
+                          onClick={() => moveTrainingCategory(category, 1)}
+                        >
+                          <TrainingIcon name="arrow-down" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : null}
 
