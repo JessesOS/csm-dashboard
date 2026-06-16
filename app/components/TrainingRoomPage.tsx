@@ -622,12 +622,7 @@ export function TrainingRoomPage({
                                 className="training-video-preview-button"
                                 aria-label={`Play ${video.title}`}
                                 onClick={() => setActiveVideo(video)}
-                              >
-                                <span>
-                                  <TrainingIcon name="play" />
-                                </span>
-                                <strong>Play video</strong>
-                              </button>
+                              />
                             </div>
                           ) : (
                             <div className="training-video-placeholder">
