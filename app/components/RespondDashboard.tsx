@@ -1584,7 +1584,11 @@ function TrainingRoomModal({
             {isLoading ? <div className="training-empty">Loading training room...</div> : null}
             {!isLoading && filteredVideos.length === 0 ? <div className="training-empty">No lessons found.</div> : null}
             {groupedVideos.map((group, index) => (
-              <details className="training-category" key={group.category} open={query.trim() ? true : index === 0}>
+              <details
+                className="training-category"
+                key={group.category}
+                open={categoryFilter === "all" || query.trim() ? true : groupedVideos.length === 1 || index === 0}
+              >
                 <summary>
                   <span>{group.category}</span>
                   <strong>{group.videos.length}</strong>
