@@ -146,6 +146,7 @@ export function TrainingRoomPage({
   initialVideos,
   mode,
   initialTheme = "dark",
+  initialAdminEditing = false,
   backHref = "/",
   backLabel = "Back to Mission Control",
   contextLabel,
@@ -155,6 +156,7 @@ export function TrainingRoomPage({
   initialVideos: TrainingVideo[];
   mode: TrainingMode;
   initialTheme?: TrainingTheme;
+  initialAdminEditing?: boolean;
   backHref?: string;
   backLabel?: string;
   contextLabel?: string;
@@ -163,7 +165,7 @@ export function TrainingRoomPage({
   const [activeProduct, setActiveProduct] = useState<ProductKey>(initialProduct);
   const [videos, setVideos] = useState<TrainingVideo[]>(initialVideos);
   const [theme, setTheme] = useState<TrainingTheme>(initialTheme);
-  const [adminEditing, setAdminEditing] = useState(mode === "admin");
+  const [adminEditing, setAdminEditing] = useState(mode === "admin" && initialAdminEditing);
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [error, setError] = useState("");
