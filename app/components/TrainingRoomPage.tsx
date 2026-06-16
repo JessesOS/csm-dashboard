@@ -609,12 +609,26 @@ export function TrainingRoomPage({
                       <article className="training-card" key={video.id}>
                         <div className="training-video-frame">
                           {embedUrl ? (
-                            <button type="button" className="training-video-preview-button" onClick={() => setActiveVideo(video)}>
-                              <span>
-                                <TrainingIcon name="play" />
-                              </span>
-                              <strong>Play video</strong>
-                            </button>
+                            <div className="training-video-preview">
+                              <iframe
+                                src={embedUrl}
+                                title={`${video.title} thumbnail preview`}
+                                loading="lazy"
+                                tabIndex={-1}
+                                aria-hidden="true"
+                              />
+                              <button
+                                type="button"
+                                className="training-video-preview-button"
+                                aria-label={`Play ${video.title}`}
+                                onClick={() => setActiveVideo(video)}
+                              >
+                                <span>
+                                  <TrainingIcon name="play" />
+                                </span>
+                                <strong>Play video</strong>
+                              </button>
+                            </div>
                           ) : (
                             <div className="training-video-placeholder">
                               <TrainingIcon name="video" />
