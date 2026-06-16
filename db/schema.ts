@@ -75,3 +75,16 @@ export const portalFormSubmissions = sqliteTable("portal_form_submissions", {
   submittedAt: text("submitted_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const trainingVideos = sqliteTable("training_videos", {
+  id: text("id").primaryKey(),
+  product: text("product").notNull().default("respond"),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  loomUrl: text("loom_url").notNull().default(""),
+  tags: text("tags").notNull().default("[]"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});

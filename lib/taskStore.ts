@@ -35,6 +35,8 @@ import {
   type Task,
   type TaskStatus,
   type TaskUpdatePayload,
+  type TrainingVideo,
+  type TrainingVideoCreatePayload,
 } from "./types";
 
 type TaskRow = Omit<
@@ -87,8 +89,13 @@ type PortalFormSubmissionRow = Omit<PortalFormSubmission, "environment" | "produ
   status: string;
 };
 
+type TrainingVideoRow = Omit<TrainingVideo, "product" | "tags"> & {
+  product: string;
+  tags: string;
+};
+
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-15-portal-form-submissions";
+const currentStorageVersion = "2026-06-16-training-room";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const taskSelectFields =
@@ -97,6 +104,8 @@ const clientSelectFields =
   "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const portalFormSubmissionSelectFields =
   "id, environment, product, client_id AS clientId, form_id AS formId, status, responses, submitted_at AS submittedAt, updated_at AS updatedAt";
+const trainingVideoSelectFields =
+  "id, product, category, title, description, loom_url AS loomUrl, tags, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -111,6 +120,79 @@ const validClientPhases = new Set<ClientDeliveryPhase>([
 const validClientHealth = new Set<ClientHealth>(["on_track", "at_risk", "off_track", "on_hold"]);
 const validClientRisk = new Set<ClientRisk>(["low", "medium", "high"]);
 let storageReadyPromise: Promise<void> | null = null;
+
+const starterTrainingVideos: TrainingVideo[] = [
+  {
+    id: "respond-start-here",
+    product: "respond",
+    category: "Start here",
+    title: "Respond overview and first login",
+    description: "A short orientation for new users before they begin working through the Respond system.",
+    loomUrl: "",
+    tags: ["overview", "login", "start"],
+    sortOrder: 1,
+  },
+  {
+    id: "respond-client-portal",
+    product: "respond",
+    category: "Client portal",
+    title: "Using the client portal and onboarding steps",
+    description: "How clients move through guided onboarding, complete forms, and find the next action.",
+    loomUrl: "",
+    tags: ["portal", "onboarding", "forms"],
+    sortOrder: 2,
+  },
+  {
+    id: "respond-conversations",
+    product: "respond",
+    category: "Daily usage",
+    title: "Managing conversations, calls, and follow-up",
+    description: "A practical walkthrough for reviewing conversations, call notes, and follow-up activity.",
+    loomUrl: "",
+    tags: ["calls", "conversations", "follow-up"],
+    sortOrder: 3,
+  },
+  {
+    id: "respond-troubleshooting",
+    product: "respond",
+    category: "Troubleshooting",
+    title: "Fixing common Respond setup issues",
+    description: "Quick answers for the common things clients get stuck on during setup and go-live.",
+    loomUrl: "",
+    tags: ["troubleshooting", "setup", "support"],
+    sortOrder: 4,
+  },
+  {
+    id: "scale-start-here",
+    product: "scale",
+    category: "Start here",
+    title: "Scale overview and onboarding expectations",
+    description: "A simple starting point for Scale clients before ad setup, tracking, and launch work begins.",
+    loomUrl: "",
+    tags: ["overview", "onboarding", "start"],
+    sortOrder: 1,
+  },
+  {
+    id: "scale-access-assets",
+    product: "scale",
+    category: "Access and assets",
+    title: "Providing access, assets, and approvals",
+    description: "How to share the items needed for Google, Meta, domains, tracking, creative, and launch approval.",
+    loomUrl: "",
+    tags: ["access", "assets", "approval"],
+    sortOrder: 2,
+  },
+  {
+    id: "scale-performance",
+    product: "scale",
+    category: "Performance review",
+    title: "Reading campaign updates and next steps",
+    description: "How clients should review reporting, recommendations, and follow-up actions after launch.",
+    loomUrl: "",
+    tags: ["reporting", "campaigns", "review"],
+    sortOrder: 3,
+  },
+];
 
 function parseJsonArray<T>(value: string | null | undefined, guard: (item: unknown) => item is T) {
   if (!value) {
@@ -139,6 +221,10 @@ function parsePortalFormResponses(value: string | null | undefined, formId: stri
   } catch {
     return {};
   }
+}
+
+function parseTags(value: string | null | undefined) {
+  return parseJsonArray(value, (item): item is string => typeof item === "string");
 }
 
 function isTimelineSegment(item: unknown): item is ClientTimelineSegment {
@@ -219,6 +305,15 @@ function fromPortalFormSubmissionRow(row: PortalFormSubmissionRow): PortalFormSu
     product,
     status: row.status === "submitted" ? "submitted" : "draft",
     responses: parsePortalFormResponses(row.responses, row.formId, product),
+  };
+}
+
+function fromTrainingVideoRow(row: TrainingVideoRow): TrainingVideo {
+  return {
+    ...row,
+    product: normalizeProduct(row.product),
+    tags: parseTags(row.tags),
+    loomUrl: row.loomUrl ?? "",
   };
 }
 
@@ -401,10 +496,11 @@ async function ensureAppMetaTable(d1 = getD1()) {
 
 async function seedWorkspaceShapeReady() {
   const d1 = getD1();
-  const [taskColumns, clientColumns, portalFormColumns] = await Promise.all([
+  const [taskColumns, clientColumns, portalFormColumns, trainingVideoColumns] = await Promise.all([
     tableColumns("tasks"),
     tableColumns("clients"),
     tableColumns("portal_form_submissions"),
+    tableColumns("training_videos"),
   ]);
   const requiredTaskColumns = [
     "client_id",
@@ -431,11 +527,13 @@ async function seedWorkspaceShapeReady() {
     "responses",
     "submitted_at",
   ];
+  const requiredTrainingVideoColumns = ["product", "category", "title", "description", "loom_url", "tags", "sort_order"];
 
   if (
     !requiredTaskColumns.every((column) => taskColumns.has(column)) ||
     !requiredClientColumns.every((column) => clientColumns.has(column)) ||
-    !requiredPortalFormColumns.every((column) => portalFormColumns.has(column))
+    !requiredPortalFormColumns.every((column) => portalFormColumns.has(column)) ||
+    !requiredTrainingVideoColumns.every((column) => trainingVideoColumns.has(column))
   ) {
     return false;
   }
@@ -812,6 +910,29 @@ async function seedTaskWorkspaces() {
   }
 }
 
+async function seedTrainingVideos() {
+  const d1 = getD1();
+
+  await d1.batch(
+    starterTrainingVideos.map((video) =>
+      d1
+        .prepare(`
+          INSERT OR IGNORE INTO training_videos (
+            id,
+            product,
+            category,
+            title,
+            description,
+            loom_url,
+            tags,
+            sort_order
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `)
+        .bind(video.id, video.product, video.category, video.title, video.description, video.loomUrl, JSON.stringify(video.tags), video.sortOrder)
+    )
+  );
+}
+
 async function prepareTaskStorage() {
   const d1 = getD1();
 
@@ -899,6 +1020,20 @@ async function prepareTaskStorage() {
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     `),
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS training_videos (
+        id TEXT PRIMARY KEY,
+        product TEXT NOT NULL DEFAULT 'respond',
+        category TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        loom_url TEXT NOT NULL DEFAULT '',
+        tags TEXT NOT NULL DEFAULT '[]',
+        sort_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
   ]);
 
   await ensureTaskColumns();
@@ -934,11 +1069,15 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_client_idx ON portal_form_submissions (client_id)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_environment_product_idx ON portal_form_submissions (environment, product)"),
     d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS portal_form_submissions_client_form_idx ON portal_form_submissions (client_id, form_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_idx ON training_videos (product)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_category_idx ON training_videos (product, category)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_sort_idx ON training_videos (product, sort_order)"),
   ]);
 
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
   await applyPortalDefaultsToUnconfiguredTasks();
+  await seedTrainingVideos();
   await markStoragePrepared(d1);
 }
 
@@ -1317,6 +1456,107 @@ export async function deleteTask(id: string) {
     .filter((statement): statement is D1PreparedStatement => Boolean(statement));
 
   await d1.batch([...dependencyUpdates, d1.prepare("DELETE FROM tasks WHERE id = ?").bind(id)]);
+
+  return { id };
+}
+
+function cleanTrainingText(value: string | null | undefined, fallback = "") {
+  return (value ?? fallback).replace(/\s+/g, " ").trim().slice(0, 240);
+}
+
+function cleanTrainingDescription(value: string | null | undefined) {
+  return (value ?? "").replace(/\r\n/g, "\n").trim().slice(0, 900);
+}
+
+function cleanTrainingLoomUrl(value: string | null | undefined) {
+  const clean = (value ?? "").trim();
+  return !clean || /^https:\/\/(www\.)?loom\.com\/(share|embed)\//i.test(clean) ? clean.slice(0, 420) : "";
+}
+
+function cleanTrainingTags(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.replace(/\s+/g, " ").trim().toLowerCase())
+        .filter(Boolean)
+    )
+  ).slice(0, 10);
+}
+
+export async function listTrainingVideos(productInput: string | null | undefined = defaultProduct) {
+  await ensureTaskStorage();
+  const product = normalizeProduct(productInput);
+  const result = await getD1()
+    .prepare(`SELECT ${trainingVideoSelectFields} FROM training_videos WHERE product = ? ORDER BY sort_order ASC, category ASC, title ASC`)
+    .bind(product)
+    .all<TrainingVideoRow>();
+
+  return (result.results ?? []).map(fromTrainingVideoRow);
+}
+
+export async function createTrainingVideo(productInput: string | null | undefined, payload: TrainingVideoCreatePayload) {
+  await ensureTaskStorage();
+  const d1 = getD1();
+  const product = normalizeProduct(productInput ?? payload.product);
+  const title = cleanTrainingText(payload.title);
+  const category = cleanTrainingText(payload.category, "General");
+
+  if (!title) {
+    throw new Error("Training title is required.");
+  }
+
+  const nextOrder = await d1
+    .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM training_videos WHERE product = ?")
+    .bind(product)
+    .first<{ nextOrder: number }>();
+  const id = `training-${product}-${crypto.randomUUID().slice(0, 10)}`;
+
+  await d1
+    .prepare(`
+      INSERT INTO training_videos (
+        id,
+        product,
+        category,
+        title,
+        description,
+        loom_url,
+        tags,
+        sort_order
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `)
+    .bind(
+      id,
+      product,
+      category,
+      title,
+      cleanTrainingDescription(payload.description),
+      cleanTrainingLoomUrl(payload.loomUrl),
+      JSON.stringify(cleanTrainingTags(payload.tags)),
+      nextOrder?.nextOrder ?? 1
+    )
+    .run();
+
+  const video = await d1.prepare(`SELECT ${trainingVideoSelectFields} FROM training_videos WHERE id = ?`).bind(id).first<TrainingVideoRow>();
+
+  if (!video) {
+    throw new Error("Training video was created, but could not be loaded.");
+  }
+
+  return fromTrainingVideoRow(video);
+}
+
+export async function deleteTrainingVideo(id: string) {
+  await ensureTaskStorage();
+  const result = await getD1().prepare("DELETE FROM training_videos WHERE id = ?").bind(id).run();
+
+  if (!result.meta?.changes) {
+    throw new Error("Training video not found.");
+  }
 
   return { id };
 }

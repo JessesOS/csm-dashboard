@@ -86,6 +86,28 @@ export interface TaskUpdatePayload {
   portalActionLabel?: string;
 }
 
+export interface TrainingVideo {
+  id: string;
+  product: ProductKey;
+  category: string;
+  title: string;
+  description: string;
+  loomUrl: string;
+  tags: string[];
+  sortOrder: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TrainingVideoCreatePayload {
+  product?: ProductKey;
+  category?: string;
+  title?: string;
+  description?: string;
+  loomUrl?: string;
+  tags?: string[];
+}
+
 export type PortalFormValue = string | string[];
 
 export type PortalFormResponses = Record<string, PortalFormValue>;

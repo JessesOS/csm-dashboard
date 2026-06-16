@@ -3433,6 +3433,402 @@ progress::-webkit-progress-value {
   gap: 8px;
 }
 
+.training-room-backdrop {
+  align-items: center;
+  overflow: auto;
+}
+
+.training-room {
+  display: flex;
+  width: min(1180px, calc(100vw - 36px));
+  max-height: min(90vh, 900px);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(193, 255, 36, 0.24);
+  border-radius: 8px;
+  background: #07121f;
+  color: #e9f2fb;
+  box-shadow: 0 34px 110px rgba(0, 0, 0, 0.46);
+}
+
+.training-room-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px;
+  gap: 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 20px;
+}
+
+.training-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #c9f82b;
+  font-size: 11px;
+  font-weight: 880;
+  text-transform: uppercase;
+}
+
+.training-room-head h2 {
+  margin: 8px 0 5px;
+  color: #f8fbff;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.training-room-head p {
+  margin: 0;
+  color: #8fa2b7;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.training-room-toolbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(180px, 260px);
+  gap: 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 14px 20px;
+}
+
+.training-search {
+  width: 100%;
+}
+
+.training-room-toolbar select,
+.training-add-form input,
+.training-add-form textarea {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: #0d2236;
+  color: #e9f2fb;
+  outline: 0;
+}
+
+.training-room-toolbar select,
+.training-add-form input {
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.training-add-form textarea {
+  resize: vertical;
+  padding: 10px 12px;
+}
+
+.training-room-toolbar select:focus,
+.training-add-form input:focus,
+.training-add-form textarea:focus {
+  border-color: rgba(193, 255, 36, 0.56);
+  box-shadow: 0 0 0 3px rgba(193, 255, 36, 0.12);
+}
+
+.training-room-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: 280px minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.training-room-side {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+  border-right: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(255, 255, 255, 0.025);
+  padding: 16px;
+}
+
+.training-room-stat {
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+
+.training-room-stat span,
+.training-room-stat small {
+  color: #8fa2b7;
+  font-size: 11px;
+  font-weight: 760;
+}
+
+.training-room-stat strong {
+  color: #f8fbff;
+  font-size: 28px;
+}
+
+.training-add-form {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(193, 255, 36, 0.2);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.06);
+  padding: 12px;
+}
+
+.training-add-form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  border: 1px solid rgba(193, 255, 36, 0.34);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.14);
+  color: #c9f82b;
+  font-weight: 850;
+}
+
+.training-admin-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: rgba(148, 163, 184, 0.08);
+  color: #8fa2b7;
+  padding: 12px;
+  font-size: 12px;
+  font-weight: 820;
+}
+
+.training-library {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+  padding: 16px;
+}
+
+.training-empty {
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  color: #8fa2b7;
+  padding: 24px;
+  text-align: center;
+}
+
+.training-category {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: rgba(13, 34, 54, 0.72);
+  overflow: hidden;
+}
+
+.training-category summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  cursor: pointer;
+  list-style: none;
+  padding: 0 16px;
+}
+
+.training-category summary::-webkit-details-marker {
+  display: none;
+}
+
+.training-category summary span {
+  color: #f8fbff;
+  font-size: 15px;
+  font-weight: 880;
+}
+
+.training-category summary strong {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+  font-size: 12px;
+}
+
+.training-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 12px;
+}
+
+.training-card {
+  display: grid;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: #0a2035;
+}
+
+.training-video-frame {
+  display: grid;
+  aspect-ratio: 16 / 9;
+  background: #04111f;
+}
+
+.training-video-frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.training-video-placeholder {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: #8fa2b7;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.training-card-body {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.training-card-category {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.12);
+  color: #2dd4bf;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.training-card h3 {
+  margin: 9px 0 6px;
+  color: #f8fbff;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.training-card p {
+  margin: 0;
+  color: #a8b8ca;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.training-tags,
+.training-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.training-tags span {
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.13);
+  color: #a8b8ca;
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 820;
+}
+
+.training-card-actions a,
+.training-card-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  border: 1px solid rgba(193, 255, 36, 0.26);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.training-card-actions button {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
+}
+
+.training-room-light {
+  border-color: #d9e3ec;
+  background: #f8fbff;
+  color: #172033;
+  box-shadow: 0 34px 110px rgba(15, 23, 42, 0.28);
+}
+
+.training-room-light .training-room-head,
+.training-room-light .training-room-toolbar,
+.training-room-light .training-card-grid {
+  border-color: #d9e3ec;
+}
+
+.training-room-light .training-kicker {
+  color: #174ac9;
+}
+
+.training-room-light .training-room-head h2,
+.training-room-light .training-room-stat strong,
+.training-room-light .training-category summary span,
+.training-room-light .training-card h3 {
+  color: #0f172a;
+}
+
+.training-room-light .training-room-head p,
+.training-room-light .training-room-stat span,
+.training-room-light .training-room-stat small,
+.training-room-light .training-card p,
+.training-room-light .training-empty,
+.training-room-light .training-admin-hint {
+  color: #647084;
+}
+
+.training-room-light .training-room-toolbar select,
+.training-room-light .training-add-form input,
+.training-room-light .training-add-form textarea,
+.training-room-light .training-room-stat,
+.training-room-light .training-category,
+.training-room-light .training-card {
+  border-color: #d9e3ec;
+  background: #ffffff;
+  color: #172033;
+}
+
+.training-room-light .training-room-side {
+  border-color: #d9e3ec;
+  background: #f2f6fb;
+}
+
+.training-room-light .training-add-form {
+  border-color: rgba(36, 94, 232, 0.18);
+  background: #eff5ff;
+}
+
+.training-room-light .training-video-frame {
+  background: #e7eef8;
+}
+
+.training-room-light .training-category summary strong,
+.training-room-light .training-tags span {
+  background: #edf4ff;
+  color: #1d4ed8;
+}
+
+.training-room-light .training-card-category {
+  background: #e8f5f1;
+  color: #087f5b;
+}
+
 .task-loom-trigger,
 .task-loom-open,
 .task-portal-action-trigger,
@@ -5290,6 +5686,41 @@ progress::-webkit-progress-value {
   .task-detail-modal {
     width: 100%;
     max-height: 92vh;
+  }
+
+  .training-room {
+    width: 100%;
+    max-height: 92vh;
+  }
+
+  .training-room-head {
+    padding: 16px 14px 14px;
+  }
+
+  .training-room-head h2 {
+    font-size: 22px;
+  }
+
+  .training-room-toolbar,
+  .training-room-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .training-room-toolbar {
+    padding: 12px 14px;
+  }
+
+  .training-room-side {
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .training-library {
+    padding: 12px;
+  }
+
+  .training-card-grid {
+    grid-template-columns: 1fr;
   }
 
   .task-modal-head {

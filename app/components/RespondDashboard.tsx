@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import {
   defaultEnvironment,
   defaultProduct,
@@ -27,6 +27,8 @@ import type {
   Task,
   TaskStatus,
   TaskUpdatePayload,
+  TrainingVideo,
+  TrainingVideoCreatePayload,
 } from "../../lib/types";
 import { statusLabels, taskStatuses } from "../../lib/types";
 
@@ -294,6 +296,7 @@ function Icon({
     | "video"
     | "settings"
     | "download"
+    | "book"
     | "trash"
     | "x";
 }) {
@@ -360,6 +363,17 @@ function Icon({
         <path d="M12 3v12" />
         <path d="m7 10 5 5 5-5" />
         <path d="M5 21h14" />
+      </svg>
+    );
+  }
+
+  if (name === "book") {
+    return (
+      <svg {...common}>
+        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z" />
+        <path d="M4 5.5A2.5 2.5 0 0 0 6.5 8H20" />
+        <path d="M8 12h8" />
+        <path d="M8 16h6" />
       </svg>
     );
   }
@@ -536,6 +550,7 @@ function AttachmentLensSettings({
   onAttachmentFilterChange,
   adminEditing,
   onAdminEditingChange,
+  onOpenTrainingRoom,
   variant = "rail",
 }: {
   attachmentFilter: AttachmentFilter;
@@ -543,6 +558,7 @@ function AttachmentLensSettings({
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
   adminEditing: boolean;
   onAdminEditingChange: (enabled: boolean) => void;
+  onOpenTrainingRoom: () => void;
   variant?: "rail" | "compact";
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -602,6 +618,16 @@ function AttachmentLensSettings({
                 Forms
               </span>
               <strong>{attachmentCounts.forms}</strong>
+            </button>
+          </div>
+          <div className="rail-settings-divider" />
+          <div className="attachment-lenses training-settings" aria-label="Training controls">
+            <button type="button" onClick={onOpenTrainingRoom}>
+              <span>
+                <Icon name="book" />
+                Training room
+              </span>
+              <strong>Open</strong>
             </button>
           </div>
           <div className="rail-settings-divider" />
@@ -792,6 +818,13 @@ function normalizeText(value: string) {
 function safeInstructionUrl(value: string | null | undefined) {
   const clean = value?.trim() ?? "";
   return /^https?:\/\//i.test(clean) ? clean : "";
+}
+
+function loomEmbedUrl(value: string | null | undefined) {
+  const url = safeInstructionUrl(value);
+  const match = url.match(/loom\.com\/(?:share|embed)\/([a-zA-Z0-9]+)/);
+
+  return match ? `https://www.loom.com/embed/${match[1]}` : "";
 }
 
 function taskHasLoom(task: Task) {
@@ -1369,6 +1402,255 @@ function TaskDetailModal({
   );
 }
 
+function TrainingRoomModal({
+  product,
+  theme,
+  videos,
+  adminEditing,
+  isLoading,
+  error,
+  onClose,
+  onCreateVideo,
+  onDeleteVideo,
+}: {
+  product: ProductWorkspace;
+  theme: ThemeMode;
+  videos: TrainingVideo[];
+  adminEditing: boolean;
+  isLoading: boolean;
+  error: string;
+  onClose: () => void;
+  onCreateVideo: (payload: TrainingVideoCreatePayload) => Promise<void>;
+  onDeleteVideo: (video: TrainingVideo) => Promise<void>;
+}) {
+  const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [form, setForm] = useState({
+    title: "",
+    category: "Start here",
+    description: "",
+    loomUrl: "",
+    tags: "",
+  });
+  const [isSaving, setIsSaving] = useState(false);
+  const categories = useMemo(() => Array.from(new Set(videos.map((video) => video.category))).sort(), [videos]);
+  const filteredVideos = useMemo(() => {
+    const cleanQuery = normalizeText(query);
+
+    return videos.filter((video) => {
+      const matchesCategory = categoryFilter === "all" || video.category === categoryFilter;
+      const matchesQuery =
+        !cleanQuery ||
+        normalizeText(video.title).includes(cleanQuery) ||
+        normalizeText(video.description).includes(cleanQuery) ||
+        video.tags.some((tag) => normalizeText(tag).includes(cleanQuery));
+
+      return matchesCategory && matchesQuery;
+    });
+  }, [categoryFilter, query, videos]);
+  const groupedVideos = useMemo(
+    () =>
+      categories
+        .map((category) => ({
+          category,
+          videos: filteredVideos.filter((video) => video.category === category),
+        }))
+        .filter((group) => group.videos.length > 0),
+    [categories, filteredVideos]
+  );
+
+  async function submitTrainingVideo(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSaving(true);
+
+    try {
+      await onCreateVideo({
+        title: form.title,
+        category: form.category,
+        description: form.description,
+        loomUrl: form.loomUrl,
+        tags: form.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      });
+      setForm((current) => ({ ...current, title: "", description: "", loomUrl: "", tags: "" }));
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <div className="modal-backdrop training-room-backdrop" role="presentation">
+      <section className={`training-room training-room-${theme}`} role="dialog" aria-modal="true" aria-labelledby="training-room-title">
+        <header className="training-room-head">
+          <div>
+            <span className="training-kicker">
+              <Icon name="book" />
+              Training room
+            </span>
+            <h2 id="training-room-title">{product.shortLabel} learning library</h2>
+            <p>{videos.length} lessons across {categories.length || 1} categories.</p>
+          </div>
+          <button type="button" className="modal-close-button" onClick={onClose} aria-label="Close training room">
+            <Icon name="x" />
+          </button>
+        </header>
+
+        <div className="training-room-toolbar">
+          <div className="search-box training-search">
+            <Icon name="search" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search training" />
+          </div>
+          <select aria-label="Training category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
+            <option value="all">All categories</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {error ? <div className="storage-notice">{error}</div> : null}
+
+        <div className="training-room-grid">
+          <aside className="training-room-side">
+            <div className="training-room-stat">
+              <span>Lessons</span>
+              <strong>{videos.length}</strong>
+              <small>{filteredVideos.length} visible</small>
+            </div>
+            <div className="training-room-stat">
+              <span>Categories</span>
+              <strong>{categories.length}</strong>
+              <small>{product.clientLabel}</small>
+            </div>
+
+            {adminEditing ? (
+              <form className="training-add-form" onSubmit={submitTrainingVideo}>
+                <div className="inspector-section-title">
+                  <Icon name="plus" />
+                  Add Loom
+                </div>
+                <input
+                  value={form.title}
+                  onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+                  placeholder="Lesson title"
+                  required
+                />
+                <input
+                  value={form.category}
+                  onChange={(event) => setForm((current) => ({ ...current, category: event.target.value }))}
+                  placeholder="Category"
+                  list="training-categories"
+                  required
+                />
+                <datalist id="training-categories">
+                  {categories.map((category) => (
+                    <option key={category} value={category} />
+                  ))}
+                </datalist>
+                <input
+                  value={form.loomUrl}
+                  onChange={(event) => setForm((current) => ({ ...current, loomUrl: event.target.value }))}
+                  placeholder="https://www.loom.com/share/..."
+                />
+                <textarea
+                  value={form.description}
+                  onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
+                  placeholder="Short lesson note"
+                  rows={3}
+                />
+                <input
+                  value={form.tags}
+                  onChange={(event) => setForm((current) => ({ ...current, tags: event.target.value }))}
+                  placeholder="Tags, separated by commas"
+                />
+                <button type="submit" disabled={isSaving || !form.title.trim()}>
+                  <Icon name="plus" />
+                  {isSaving ? "Adding" : "Add lesson"}
+                </button>
+              </form>
+            ) : (
+              <div className="training-admin-hint">
+                <Icon name="settings" />
+                <span>Admin editing is off</span>
+              </div>
+            )}
+          </aside>
+
+          <section className="training-library" aria-label="Training lessons">
+            {isLoading ? <div className="training-empty">Loading training room...</div> : null}
+            {!isLoading && filteredVideos.length === 0 ? <div className="training-empty">No lessons found.</div> : null}
+            {groupedVideos.map((group, index) => (
+              <details className="training-category" key={group.category} open={query.trim() ? true : index === 0}>
+                <summary>
+                  <span>{group.category}</span>
+                  <strong>{group.videos.length}</strong>
+                </summary>
+                <div className="training-card-grid">
+                  {group.videos.map((video) => {
+                    const embedUrl = loomEmbedUrl(video.loomUrl);
+
+                    return (
+                      <article className="training-card" key={video.id}>
+                        <div className="training-video-frame">
+                          {embedUrl ? (
+                            <iframe
+                              src={embedUrl}
+                              title={video.title}
+                              allow="autoplay; fullscreen; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <div className="training-video-placeholder">
+                              <Icon name="video" />
+                              <span>Loom pending</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="training-card-body">
+                          <div>
+                            <span className="training-card-category">{video.category}</span>
+                            <h3>{video.title}</h3>
+                            {video.description ? <p>{video.description}</p> : null}
+                          </div>
+                          {video.tags.length > 0 ? (
+                            <div className="training-tags">
+                              {video.tags.map((tag) => (
+                                <span key={tag}>{tag}</span>
+                              ))}
+                            </div>
+                          ) : null}
+                          <div className="training-card-actions">
+                            {video.loomUrl ? (
+                              <a href={video.loomUrl} target="_blank" rel="noreferrer">
+                                <Icon name="play" />
+                                Open Loom
+                              </a>
+                            ) : null}
+                            {adminEditing ? (
+                              <button type="button" onClick={() => onDeleteVideo(video)}>
+                                <Icon name="trash" />
+                                Delete
+                              </button>
+                            ) : null}
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </details>
+            ))}
+          </section>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 function Metric({ label, value, detail }: { label: string; value: string | number; detail: string }) {
   return (
     <div className="metric">
@@ -1625,6 +1907,7 @@ function MissionControl({
   onAttachmentFilterChange,
   adminEditing,
   onAdminEditingChange,
+  onOpenTrainingRoom,
 }: {
   environment: OperatingEnvironment;
   activeEnvironment: EnvironmentKey;
@@ -1653,6 +1936,7 @@ function MissionControl({
   onAttachmentFilterChange: (filter: AttachmentFilter) => void;
   adminEditing: boolean;
   onAdminEditingChange: (enabled: boolean) => void;
+  onOpenTrainingRoom: () => void;
 }) {
   const [activeLens, setActiveLens] = useState<"all" | "waiting" | "golive" | "high">("all");
   const selectedClient = clients.find((client) => client.id === selectedClientId);
@@ -1765,6 +2049,7 @@ function MissionControl({
             onAttachmentFilterChange={onAttachmentFilterChange}
             adminEditing={adminEditing}
             onAdminEditingChange={onAdminEditingChange}
+            onOpenTrainingRoom={onOpenTrainingRoom}
             variant="compact"
           />
         </div>
@@ -2061,6 +2346,10 @@ export default function RespondDashboard({
   const [statusFilter, setStatusFilter] = useState("all");
   const [attachmentFilter, setAttachmentFilter] = useState<AttachmentFilter>("all");
   const [adminEditing, setAdminEditing] = useState(false);
+  const [trainingRoomOpen, setTrainingRoomOpen] = useState(false);
+  const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
+  const [isTrainingLoading, setIsTrainingLoading] = useState(false);
+  const [trainingError, setTrainingError] = useState("");
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
@@ -2245,6 +2534,46 @@ export default function RespondDashboard({
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
   }, [detailTaskId]);
+
+  useEffect(() => {
+    if (!trainingRoomOpen) {
+      return;
+    }
+
+    let active = true;
+
+    fetch(`/api/training?product=${encodeURIComponent(activeProduct)}`, { cache: "no-store" })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error ?? "Could not load training room.");
+        }
+
+        return data.videos as TrainingVideo[];
+      })
+      .then((videos) => {
+        if (!active) {
+          return;
+        }
+
+        setTrainingVideos(videos);
+        setTrainingError("");
+      })
+      .catch((error: Error) => {
+        if (active) {
+          setTrainingError(error.message);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsTrainingLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [activeProduct, trainingRoomOpen]);
 
   const taskMap = useMemo(() => new Map(tasks.map((task) => [task.id, task])), [tasks]);
   const selectedTask = tasks.find((task) => task.id === selectedId) ?? tasks[0];
@@ -2526,6 +2855,55 @@ export default function RespondDashboard({
     }
   }
 
+  function openTrainingRoom() {
+    setTrainingRoomOpen(true);
+    setIsTrainingLoading(true);
+    setTrainingError("");
+  }
+
+  async function createTrainingResource(payload: TrainingVideoCreatePayload) {
+    try {
+      const response = await fetch("/api/training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...payload, product: activeProduct }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not add training lesson.");
+      }
+
+      const video = data.video as TrainingVideo;
+      setTrainingVideos((current) => [...current.filter((item) => item.id !== video.id), video].sort((a, b) => a.sortOrder - b.sortOrder));
+      setTrainingError("");
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not add training lesson.";
+      setTrainingError(message);
+      throw new Error(message);
+    }
+  }
+
+  async function removeTrainingResource(video: TrainingVideo) {
+    if (!window.confirm(`Delete "${video.title}" from the training room?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/training/${encodeURIComponent(video.id)}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not delete training lesson.");
+      }
+
+      setTrainingVideos((current) => current.filter((item) => item.id !== video.id));
+      setTrainingError("");
+    } catch (error) {
+      setTrainingError(error instanceof Error ? error.message : "Could not delete training lesson.");
+    }
+  }
+
   async function createClientWorkspace(payload: ClientCreatePayload) {
     setIsCreatingClient(true);
 
@@ -2638,6 +3016,19 @@ export default function RespondDashboard({
       onSkip={() => setTourStepIndex(null)}
     />
   );
+  const trainingRoomPanel = trainingRoomOpen ? (
+    <TrainingRoomModal
+      product={currentProduct}
+      theme={theme}
+      videos={trainingVideos}
+      adminEditing={adminEditing}
+      isLoading={isTrainingLoading}
+      error={trainingError}
+      onClose={() => setTrainingRoomOpen(false)}
+      onCreateVideo={createTrainingResource}
+      onDeleteVideo={removeTrainingResource}
+    />
+  ) : null;
 
   function openTasks(clientId?: string) {
     setSelectedClientId(clientId ?? activeTaskClientId);
@@ -2683,6 +3074,7 @@ export default function RespondDashboard({
           onAttachmentFilterChange={changeMissionAttachmentFilter}
           adminEditing={adminEditing}
           onAdminEditingChange={setAdminEditing}
+          onOpenTrainingRoom={openTrainingRoom}
         />
         <NewClientPanel
           key={`home-${activeEnvironment}-${activeProduct}`}
@@ -2694,6 +3086,7 @@ export default function RespondDashboard({
           onClose={() => setShowNewClientPanel(false)}
           onSubmit={createClientWorkspace}
         />
+        {trainingRoomPanel}
       </>
     );
   }
@@ -2794,6 +3187,7 @@ export default function RespondDashboard({
           onAttachmentFilterChange={setAttachmentFilter}
           adminEditing={adminEditing}
           onAdminEditingChange={setAdminEditing}
+          onOpenTrainingRoom={openTrainingRoom}
         />
       </aside>
 
@@ -3071,6 +3465,7 @@ export default function RespondDashboard({
           onOpenDependency={openTaskInModal}
         />
       ) : null}
+      {trainingRoomPanel}
       {walkthroughPanel}
     </main>
   );
