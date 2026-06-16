@@ -188,7 +188,12 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
               <span>Private project portal</span>
             </div>
           </div>
-          <span className={`portal-health portal-health-${client.health}`}>{client.phase}</span>
+          <div className="portal-topline-actions">
+            <a className="portal-training-link" href={`/portal/${token}/training`}>
+              Training room
+            </a>
+            <span className={`portal-health portal-health-${client.health}`}>{client.phase}</span>
+          </div>
         </nav>
 
         <section className="portal-guided-panel" aria-label="Guided onboarding steps">

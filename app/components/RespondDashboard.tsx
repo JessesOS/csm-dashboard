@@ -2856,9 +2856,7 @@ export default function RespondDashboard({
   }
 
   function openTrainingRoom() {
-    setTrainingRoomOpen(true);
-    setIsTrainingLoading(true);
-    setTrainingError("");
+    window.location.assign(`/training?product=${encodeURIComponent(activeProduct)}&theme=${theme}`);
   }
 
   async function createTrainingResource(payload: TrainingVideoCreatePayload) {

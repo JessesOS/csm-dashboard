@@ -3451,6 +3451,166 @@ progress::-webkit-progress-value {
   box-shadow: 0 34px 110px rgba(0, 0, 0, 0.46);
 }
 
+.training-page-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.12), transparent 28%),
+    linear-gradient(180deg, #061321 0%, #071a2b 46%, #061321 100%);
+  color: #e9f2fb;
+  padding: 22px;
+}
+
+.training-page-shell-light {
+  background:
+    radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.1), transparent 28%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  color: #172033;
+}
+
+.training-page-topbar,
+.training-page-actions,
+.training-product-switcher,
+.training-theme-toggle,
+.training-page-back,
+.training-admin-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.training-page-topbar {
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1440px;
+  margin: 0 auto 16px;
+}
+
+.training-page-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.training-page-back,
+.training-admin-toggle,
+.training-product-switcher,
+.training-theme-toggle {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(13, 34, 54, 0.78);
+  color: #e9f2fb;
+  text-decoration: none;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14);
+}
+
+.training-page-shell-light .training-page-back,
+.training-page-shell-light .training-admin-toggle,
+.training-page-shell-light .training-product-switcher,
+.training-page-shell-light .training-theme-toggle {
+  border-color: #d9e3ec;
+  background: rgba(255, 255, 255, 0.88);
+  color: #172033;
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+}
+
+.training-page-back,
+.training-admin-toggle {
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 13px;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.training-admin-toggle {
+  cursor: pointer;
+}
+
+.training-admin-toggle.active {
+  border-color: rgba(193, 255, 36, 0.38);
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+}
+
+.training-product-switcher,
+.training-theme-toggle {
+  gap: 4px;
+  padding: 4px;
+}
+
+.training-product-switcher button,
+.training-theme-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  padding: 0 11px;
+  font-size: 12px;
+  font-weight: 840;
+  cursor: pointer;
+}
+
+.training-product-switcher button.active,
+.training-theme-toggle button.active {
+  background: rgba(193, 255, 36, 0.16);
+  color: #c9f82b;
+}
+
+.training-page-shell-light .training-product-switcher button.active,
+.training-page-shell-light .training-theme-toggle button.active,
+.training-page-shell-light .training-admin-toggle.active {
+  background: #e7efff;
+  color: #174ac9;
+}
+
+.training-room-page {
+  width: min(1440px, 100%);
+  min-height: calc(100vh - 82px);
+  max-height: none;
+  margin: 0 auto;
+}
+
+.training-room-page .training-room-head {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.training-room-page .training-room-head h1 {
+  margin: 8px 0 5px;
+  color: #f8fbff;
+  font-size: clamp(28px, 3vw, 46px);
+  line-height: 1.02;
+}
+
+.training-room-light.training-room-page .training-room-head h1 {
+  color: #0f172a;
+}
+
+.training-room-page .training-room-grid {
+  min-height: calc(100vh - 280px);
+}
+
+.training-room-page .training-library,
+.training-room-page .training-room-side {
+  overflow: visible;
+}
+
+.training-room-page .training-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.training-page-notice {
+  margin: 14px 20px 0;
+}
+
+.training-context-card strong {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
 .training-room-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 38px;
@@ -4472,6 +4632,29 @@ progress::-webkit-progress-value {
 
 .portal-brand {
   gap: 12px;
+}
+
+.portal-topline-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.portal-training-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border: 1px solid rgba(193, 255, 36, 0.32);
+  border-radius: 999px;
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: 880;
+  text-decoration: none;
+  text-transform: uppercase;
 }
 
 .portal-brand-mark {
@@ -5693,10 +5876,36 @@ progress::-webkit-progress-value {
     max-height: 92vh;
   }
 
+  .training-page-shell {
+    padding: 12px;
+  }
+
+  .training-page-topbar,
+  .training-page-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .training-page-back,
+  .training-admin-toggle {
+    justify-content: center;
+  }
+
+  .training-product-switcher,
+  .training-theme-toggle {
+    justify-content: center;
+  }
+
+  .training-room-page {
+    min-height: 0;
+    max-height: none;
+  }
+
   .training-room-head {
     padding: 16px 14px 14px;
   }
 
+  .training-room-head h1,
   .training-room-head h2 {
     font-size: 22px;
   }
