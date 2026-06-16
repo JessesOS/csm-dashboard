@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   productConfig,
   productWorkspaces,
@@ -29,7 +29,20 @@ function loomEmbedUrl(value: string | null | undefined) {
 function TrainingIcon({
   name,
 }: {
-  name: "search" | "plus" | "book" | "video" | "play" | "trash" | "settings" | "moon" | "sun" | "arrow" | "arrow-up" | "arrow-down";
+  name:
+    | "search"
+    | "plus"
+    | "book"
+    | "video"
+    | "play"
+    | "trash"
+    | "settings"
+    | "moon"
+    | "sun"
+    | "arrow"
+    | "arrow-up"
+    | "arrow-down"
+    | "x";
 }) {
   const common = {
     width: 16,
@@ -146,6 +159,15 @@ function TrainingIcon({
     );
   }
 
+  if (name === "x") {
+    return (
+      <svg {...common}>
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+    );
+  }
+
   return (
     <svg {...common}>
       <path d="m15 18-6-6 6-6" />
@@ -206,6 +228,7 @@ export function TrainingRoomPage({
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isReorderingCategories, setIsReorderingCategories] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<TrainingVideo | null>(null);
   const [form, setForm] = useState({
     title: "",
     category: "Start here",
@@ -215,6 +238,7 @@ export function TrainingRoomPage({
   });
 
   const product = productConfig(activeProduct);
+  const activeVideoEmbedUrl = activeVideo ? loomEmbedUrl(activeVideo.loomUrl) : "";
   const categories = useMemo(() => Array.from(new Set(videos.map((video) => video.category))), [videos]);
   const filteredVideos = useMemo(() => {
     const cleanQuery = normalizeText(query);
@@ -240,6 +264,21 @@ export function TrainingRoomPage({
         .filter((group) => group.videos.length > 0),
     [categories, filteredVideos]
   );
+
+  useEffect(() => {
+    if (!activeVideo) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setActiveVideo(null);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [activeVideo]);
 
   async function loadProduct(productKey: ProductKey) {
     setActiveProduct(productKey);
@@ -319,6 +358,7 @@ export function TrainingRoomPage({
       }
 
       setVideos((current) => current.filter((item) => item.id !== video.id));
+      setActiveVideo((current) => (current?.id === video.id ? null : current));
     } catch (deleteError) {
       setError(deleteError instanceof Error ? deleteError.message : "Could not delete training lesson.");
     }
@@ -569,12 +609,12 @@ export function TrainingRoomPage({
                       <article className="training-card" key={video.id}>
                         <div className="training-video-frame">
                           {embedUrl ? (
-                            <iframe
-                              src={embedUrl}
-                              title={video.title}
-                              allow="autoplay; fullscreen; picture-in-picture"
-                              allowFullScreen
-                            />
+                            <button type="button" className="training-video-preview-button" onClick={() => setActiveVideo(video)}>
+                              <span>
+                                <TrainingIcon name="play" />
+                              </span>
+                              <strong>Play video</strong>
+                            </button>
                           ) : (
                             <div className="training-video-placeholder">
                               <TrainingIcon name="video" />
@@ -597,13 +637,13 @@ export function TrainingRoomPage({
                           ) : null}
                           <div className="training-card-actions">
                             {video.loomUrl ? (
-                              <a href={video.loomUrl} target="_blank" rel="noreferrer">
+                              <button type="button" onClick={() => setActiveVideo(video)}>
                                 <TrainingIcon name="play" />
-                                Open Loom
-                              </a>
+                                Play video
+                              </button>
                             ) : null}
                             {mode === "admin" && adminEditing ? (
-                              <button type="button" onClick={() => deleteTrainingVideo(video)}>
+                              <button type="button" className="training-delete-action" onClick={() => deleteTrainingVideo(video)}>
                                 <TrainingIcon name="trash" />
                                 Delete
                               </button>
@@ -619,6 +659,41 @@ export function TrainingRoomPage({
           </section>
         </div>
       </section>
+      {activeVideo && activeVideoEmbedUrl ? (
+        <div className="training-player-backdrop" role="presentation" onMouseDown={() => setActiveVideo(null)}>
+          <section
+            className={`training-player training-player-${theme}`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="training-player-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <header className="training-player-head">
+              <div>
+                <span>{activeVideo.category}</span>
+                <h2 id="training-player-title">{activeVideo.title}</h2>
+              </div>
+              <button type="button" aria-label="Close video player" onClick={() => setActiveVideo(null)}>
+                <TrainingIcon name="x" />
+              </button>
+            </header>
+            <div className="training-player-frame">
+              <iframe
+                src={activeVideoEmbedUrl}
+                title={activeVideo.title}
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <footer className="training-player-foot">
+              {activeVideo.description ? <p>{activeVideo.description}</p> : <p>Watch this lesson here or open it directly in Loom.</p>}
+              <a href={activeVideo.loomUrl} target="_blank" rel="noreferrer">
+                Watch on Loom
+              </a>
+            </footer>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }
