@@ -33,9 +33,11 @@ import {
   type ProductKey,
   type RespondClient,
   type Task,
+  type TaskSnapshotCollection,
   type TaskSnapshot,
   type TaskSnapshotCreatePayload,
   type TaskSnapshotDetail,
+  type TaskSnapshotPointers,
   type TaskStatus,
   type TaskUpdatePayload,
   type TrainingVideo,
@@ -84,6 +86,8 @@ type CountRow = {
 type MetaRow = {
   value: string;
 };
+
+type TemplatePointerKey = "legacySnapshotId" | "masterSnapshotId";
 
 type PortalFormSubmissionRow = Omit<PortalFormSubmission, "environment" | "product" | "responses" | "status"> & {
   environment: string;
@@ -138,6 +142,48 @@ const validClientPhases = new Set<ClientDeliveryPhase>([
 const validClientHealth = new Set<ClientHealth>(["on_track", "at_risk", "off_track", "on_hold"]);
 const validClientRisk = new Set<ClientRisk>(["low", "medium", "high"]);
 let storageReadyPromise: Promise<void> | null = null;
+const legacyTaskSnapshotName = "Legacy original build";
+const masterTaskSnapshotName = "Current working master";
+
+function taskSnapshotPointerMetaKey(environment: EnvironmentKey, product: ProductKey, clientId: string, kind: TemplatePointerKey) {
+  return `task_snapshot_pointer:${environment}:${product}:${clientId}:${kind}`;
+}
+
+async function getMetaValue(key: string) {
+  await ensureAppMetaTable(getD1());
+  const row = await getD1().prepare("SELECT value FROM app_meta WHERE key = ?").bind(key).first<MetaRow>();
+  return row?.value ?? "";
+}
+
+async function setMetaValue(key: string, value: string) {
+  await ensureAppMetaTable(getD1());
+  await getD1()
+    .prepare("INSERT INTO app_meta (key, value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP")
+    .bind(key, value)
+    .run();
+}
+
+async function getTaskSnapshotPointers(environment: EnvironmentKey, product: ProductKey, clientId: string): Promise<TaskSnapshotPointers> {
+  const [legacySnapshotId, masterSnapshotId] = await Promise.all([
+    getMetaValue(taskSnapshotPointerMetaKey(environment, product, clientId, "legacySnapshotId")),
+    getMetaValue(taskSnapshotPointerMetaKey(environment, product, clientId, "masterSnapshotId")),
+  ]);
+
+  return {
+    legacySnapshotId: legacySnapshotId || null,
+    masterSnapshotId: masterSnapshotId || null,
+  };
+}
+
+async function setTaskSnapshotPointer(
+  environment: EnvironmentKey,
+  product: ProductKey,
+  clientId: string,
+  kind: TemplatePointerKey,
+  snapshotId: string | null
+) {
+  await setMetaValue(taskSnapshotPointerMetaKey(environment, product, clientId, kind), snapshotId ?? "");
+}
 
 const starterTrainingVideos: TrainingVideo[] = [
   {
@@ -1641,6 +1687,85 @@ function parseSnapshotTasks(payload: string): Task[] {
   }
 }
 
+async function fetchTaskSnapshotSummaries(
+  environmentInput: string | null | undefined = defaultEnvironment,
+  productInput: string | null | undefined = defaultProduct,
+  clientIdInput?: string | null
+) {
+  const environment = normalizeEnvironment(environmentInput);
+  const product = normalizeProduct(productInput);
+  const clientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : await firstClientId(environment, product);
+
+  if (!clientId) {
+    return {
+      snapshots: [] as TaskSnapshot[],
+      templatePointers: { legacySnapshotId: null, masterSnapshotId: null } satisfies TaskSnapshotPointers,
+    };
+  }
+
+  const rows = await getD1()
+    .prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE environment = ? AND product = ? AND client_id = ? ORDER BY created_at DESC`)
+    .bind(environment, product, clientId)
+    .all<TaskSnapshotRow>();
+
+  return {
+    snapshots: (rows.results ?? []).map(taskSnapshotSummary),
+    templatePointers: await getTaskSnapshotPointers(environment, product, clientId),
+  };
+}
+
+async function ensureLegacyTaskSnapshot(
+  environmentInput: string | null | undefined = defaultEnvironment,
+  productInput: string | null | undefined = defaultProduct,
+  clientIdInput?: string | null
+) {
+  const environment = normalizeEnvironment(environmentInput);
+  const product = normalizeProduct(productInput);
+  const clientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : await firstClientId(environment, product);
+
+  if (!clientId) {
+    return null;
+  }
+
+  await requireClient(environment, product, clientId);
+
+  const pointers = await getTaskSnapshotPointers(environment, product, clientId);
+  if (pointers.legacySnapshotId) {
+    const existing = await getD1()
+      .prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE id = ?`)
+      .bind(pointers.legacySnapshotId)
+      .first<TaskSnapshotRow>();
+
+    if (existing) {
+      return taskSnapshotSummary(existing);
+    }
+  }
+
+  const existingSnapshots = await getD1()
+    .prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE environment = ? AND product = ? AND client_id = ? ORDER BY created_at ASC`)
+    .bind(environment, product, clientId)
+    .all<TaskSnapshotRow>();
+  const orderedSnapshots = (existingSnapshots.results ?? []).map(taskSnapshotSummary);
+
+  if (orderedSnapshots.length > 0) {
+    const legacySnapshot = orderedSnapshots[0];
+    await setTaskSnapshotPointer(environment, product, clientId, "legacySnapshotId", legacySnapshot.id);
+    return legacySnapshot;
+  }
+
+  const snapshot = await createTaskSnapshot({
+    environment,
+    product,
+    clientId,
+    name: legacyTaskSnapshotName,
+    description: "Archived original build captured before template editing.",
+    kind: "backup",
+  });
+
+  await setTaskSnapshotPointer(environment, product, clientId, "legacySnapshotId", snapshot.id);
+  return snapshot;
+}
+
 async function getTaskSnapshotRow(id: string) {
   await ensureTaskStorage();
   const row = await getD1().prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE id = ?`).bind(id).first<TaskSnapshotRow>();
@@ -1663,17 +1788,16 @@ export async function listTaskSnapshots(
   const clientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : await firstClientId(environment, product);
 
   if (!clientId) {
-    return [];
+    return {
+      snapshots: [],
+      templatePointers: { legacySnapshotId: null, masterSnapshotId: null },
+    } satisfies TaskSnapshotCollection;
   }
 
   await requireClient(environment, product, clientId);
 
-  const rows = await getD1()
-    .prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE environment = ? AND product = ? AND client_id = ? ORDER BY created_at DESC`)
-    .bind(environment, product, clientId)
-    .all<TaskSnapshotRow>();
-
-  return (rows.results ?? []).map(taskSnapshotSummary);
+  await ensureLegacyTaskSnapshot(environment, product, clientId);
+  return fetchTaskSnapshotSummaries(environment, product, clientId);
 }
 
 export async function getTaskSnapshot(id: string): Promise<TaskSnapshotDetail> {
@@ -1727,6 +1851,10 @@ export async function createTaskSnapshot(payload: TaskSnapshotCreatePayload) {
     )
     .bind(snapshotId, environment, product, clientId, name, description, tasks.length, snapshotPayload)
     .run();
+
+  if (payload.kind === "master") {
+    await setTaskSnapshotPointer(environment, product, clientId, "masterSnapshotId", snapshotId);
+  }
 
   return getTaskSnapshot(snapshotId);
 }

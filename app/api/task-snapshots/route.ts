@@ -6,10 +6,13 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const snapshots = await listTaskSnapshots(searchParams.get("environment"), searchParams.get("product"), searchParams.get("clientId"));
-    return NextResponse.json({ snapshots });
+    const collection = await listTaskSnapshots(searchParams.get("environment"), searchParams.get("product"), searchParams.get("clientId"));
+    return NextResponse.json(collection);
   } catch (error) {
-    return NextResponse.json({ error: routeErrorMessage(error), snapshots: [] }, { status: 400 });
+    return NextResponse.json(
+      { error: routeErrorMessage(error), snapshots: [], templatePointers: { legacySnapshotId: null, masterSnapshotId: null } },
+      { status: 400 }
+    );
   }
 }
 

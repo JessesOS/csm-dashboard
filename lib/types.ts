@@ -101,12 +101,23 @@ export interface TaskSnapshotDetail extends TaskSnapshot {
   tasks: Task[];
 }
 
+export interface TaskSnapshotPointers {
+  legacySnapshotId: string | null;
+  masterSnapshotId: string | null;
+}
+
+export interface TaskSnapshotCollection {
+  snapshots: TaskSnapshot[];
+  templatePointers: TaskSnapshotPointers;
+}
+
 export interface TaskSnapshotCreatePayload {
   environment?: EnvironmentKey;
   product?: ProductKey;
   clientId?: string;
   name?: string;
   description?: string;
+  kind?: "backup" | "master";
 }
 
 export interface TrainingVideo {
