@@ -86,6 +86,29 @@ export interface TaskUpdatePayload {
   portalActionLabel?: string;
 }
 
+export interface TaskSnapshot {
+  id: string;
+  environment: EnvironmentKey;
+  product: ProductKey;
+  clientId: string;
+  name: string;
+  description: string;
+  taskCount: number;
+  createdAt: string;
+}
+
+export interface TaskSnapshotDetail extends TaskSnapshot {
+  tasks: Task[];
+}
+
+export interface TaskSnapshotCreatePayload {
+  environment?: EnvironmentKey;
+  product?: ProductKey;
+  clientId?: string;
+  name?: string;
+  description?: string;
+}
+
 export interface TrainingVideo {
   id: string;
   product: ProductKey;

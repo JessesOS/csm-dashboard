@@ -25,6 +25,7 @@ import type {
   ProductKey,
   RespondClient,
   Task,
+  TaskSnapshot,
   TaskStatus,
   TaskUpdatePayload,
   TrainingVideo,
@@ -544,6 +545,86 @@ function Icon({
   );
 }
 
+function TaskBackupSettings({
+  client,
+  snapshots,
+  snapshotName,
+  isLoading,
+  isCreating,
+  restoringSnapshotId,
+  error,
+  onSnapshotNameChange,
+  onCreateSnapshot,
+  onRestoreSnapshot,
+}: {
+  client?: RespondClient;
+  snapshots: TaskSnapshot[];
+  snapshotName: string;
+  isLoading: boolean;
+  isCreating: boolean;
+  restoringSnapshotId: string | null;
+  error: string;
+  onSnapshotNameChange: (name: string) => void;
+  onCreateSnapshot: () => void;
+  onRestoreSnapshot: (snapshot: TaskSnapshot) => void;
+}) {
+  const latestSnapshots = snapshots.slice(0, 3);
+
+  return (
+    <div className="backup-settings" aria-label="Task backup controls">
+      <div className="backup-settings-head">
+        <span>
+          <Icon name="download" />
+          Task backups
+        </span>
+        <strong>{snapshots.length}</strong>
+      </div>
+      {client ? (
+        <>
+          <p>{client.name}{client.companyName ? ` - ${client.companyName}` : ""}</p>
+          <input value={snapshotName} onChange={(event) => onSnapshotNameChange(event.target.value)} placeholder="Master backup before edits" />
+          <button type="button" className="backup-primary-action" onClick={onCreateSnapshot} disabled={isCreating || isLoading}>
+            <Icon name="plus" />
+            {isCreating ? "Saving" : "Create snapshot"}
+          </button>
+          {error ? <small className="backup-error">{error}</small> : null}
+          {isLoading ? <small>Loading backups...</small> : null}
+          {!isLoading && latestSnapshots.length === 0 ? <small>No backups yet.</small> : null}
+          {latestSnapshots.length > 0 ? (
+            <div className="backup-list">
+              {latestSnapshots.map((snapshot) => (
+                <div className="backup-row" key={snapshot.id}>
+                  <div>
+                    <strong>{snapshot.name}</strong>
+                    <span>
+                      {snapshot.taskCount} tasks - {formatSnapshotTime(snapshot.createdAt)}
+                    </span>
+                  </div>
+                  <div className="backup-row-actions">
+                    <button
+                      type="button"
+                      onClick={() => onRestoreSnapshot(snapshot)}
+                      disabled={Boolean(restoringSnapshotId)}
+                      title={`Restore ${snapshot.name}`}
+                    >
+                      {restoringSnapshotId === snapshot.id ? "Restoring" : "Restore"}
+                    </button>
+                    <a href={`/api/task-snapshots/${encodeURIComponent(snapshot.id)}?download=1`} target="_blank" rel="noreferrer">
+                      JSON
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <small>Select a client before creating a backup.</small>
+      )}
+    </div>
+  );
+}
+
 function AttachmentLensSettings({
   attachmentFilter,
   attachmentCounts,
@@ -551,6 +632,16 @@ function AttachmentLensSettings({
   adminEditing,
   onAdminEditingChange,
   onOpenTrainingRoom,
+  backupClient,
+  snapshots,
+  snapshotName,
+  isSnapshotLoading,
+  isCreatingSnapshot,
+  restoringSnapshotId,
+  snapshotError,
+  onSnapshotNameChange,
+  onCreateSnapshot,
+  onRestoreSnapshot,
   variant = "rail",
 }: {
   attachmentFilter: AttachmentFilter;
@@ -559,6 +650,16 @@ function AttachmentLensSettings({
   adminEditing: boolean;
   onAdminEditingChange: (enabled: boolean) => void;
   onOpenTrainingRoom: () => void;
+  backupClient?: RespondClient;
+  snapshots: TaskSnapshot[];
+  snapshotName: string;
+  isSnapshotLoading: boolean;
+  isCreatingSnapshot: boolean;
+  restoringSnapshotId: string | null;
+  snapshotError: string;
+  onSnapshotNameChange: (name: string) => void;
+  onCreateSnapshot: () => void;
+  onRestoreSnapshot: (snapshot: TaskSnapshot) => void;
   variant?: "rail" | "compact";
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -640,6 +741,19 @@ function AttachmentLensSettings({
               <strong>{adminEditing ? "On" : "Off"}</strong>
             </button>
           </div>
+          <div className="rail-settings-divider" />
+          <TaskBackupSettings
+            client={backupClient}
+            snapshots={snapshots}
+            snapshotName={snapshotName}
+            isLoading={isSnapshotLoading}
+            isCreating={isCreatingSnapshot}
+            restoringSnapshotId={restoringSnapshotId}
+            error={snapshotError}
+            onSnapshotNameChange={onSnapshotNameChange}
+            onCreateSnapshot={onCreateSnapshot}
+            onRestoreSnapshot={onRestoreSnapshot}
+          />
         </div>
       ) : null}
       <button
@@ -1883,6 +1997,21 @@ function formatPipelineSyncTime(value: string) {
   }).format(date);
 }
 
+function formatSnapshotTime(value: string) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Saved backup";
+  }
+
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+}
+
 function MissionControl({
   environment,
   activeEnvironment,
@@ -1912,6 +2041,16 @@ function MissionControl({
   adminEditing,
   onAdminEditingChange,
   onOpenTrainingRoom,
+  backupClient,
+  snapshots,
+  snapshotName,
+  isSnapshotLoading,
+  isCreatingSnapshot,
+  restoringSnapshotId,
+  snapshotError,
+  onSnapshotNameChange,
+  onCreateSnapshot,
+  onRestoreSnapshot,
 }: {
   environment: OperatingEnvironment;
   activeEnvironment: EnvironmentKey;
@@ -1941,6 +2080,16 @@ function MissionControl({
   adminEditing: boolean;
   onAdminEditingChange: (enabled: boolean) => void;
   onOpenTrainingRoom: () => void;
+  backupClient?: RespondClient;
+  snapshots: TaskSnapshot[];
+  snapshotName: string;
+  isSnapshotLoading: boolean;
+  isCreatingSnapshot: boolean;
+  restoringSnapshotId: string | null;
+  snapshotError: string;
+  onSnapshotNameChange: (name: string) => void;
+  onCreateSnapshot: () => void;
+  onRestoreSnapshot: (snapshot: TaskSnapshot) => void;
 }) {
   const [activeLens, setActiveLens] = useState<"all" | "waiting" | "golive" | "high">("all");
   const selectedClient = clients.find((client) => client.id === selectedClientId);
@@ -2054,6 +2203,16 @@ function MissionControl({
             adminEditing={adminEditing}
             onAdminEditingChange={onAdminEditingChange}
             onOpenTrainingRoom={onOpenTrainingRoom}
+            backupClient={backupClient}
+            snapshots={snapshots}
+            snapshotName={snapshotName}
+            isSnapshotLoading={isSnapshotLoading}
+            isCreatingSnapshot={isCreatingSnapshot}
+            restoringSnapshotId={restoringSnapshotId}
+            snapshotError={snapshotError}
+            onSnapshotNameChange={onSnapshotNameChange}
+            onCreateSnapshot={onCreateSnapshot}
+            onRestoreSnapshot={onRestoreSnapshot}
             variant="compact"
           />
         </div>
@@ -2354,6 +2513,12 @@ export default function RespondDashboard({
   const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
   const [isTrainingLoading, setIsTrainingLoading] = useState(false);
   const [trainingError, setTrainingError] = useState("");
+  const [taskSnapshots, setTaskSnapshots] = useState<TaskSnapshot[]>([]);
+  const [snapshotName, setSnapshotName] = useState("");
+  const [snapshotError, setSnapshotError] = useState("");
+  const [isSnapshotLoading, setIsSnapshotLoading] = useState(false);
+  const [isCreatingSnapshot, setIsCreatingSnapshot] = useState(false);
+  const [restoringSnapshotId, setRestoringSnapshotId] = useState<string | null>(null);
   const [view, setView] = useState<"board" | "categories">("board");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
@@ -2516,6 +2681,53 @@ export default function RespondDashboard({
         if (active) {
           setLoadedTaskKey(requestKey);
           setStorageNotice(error.message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [activeEnvironment, activeProduct, activeTaskClientId]);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!activeTaskClientId) {
+      setTaskSnapshots([]);
+      setSnapshotName("");
+      return () => {
+        active = false;
+      };
+    }
+
+    setIsSnapshotLoading(true);
+    setSnapshotError("");
+    fetch(
+      `/api/task-snapshots?environment=${encodeURIComponent(activeEnvironment)}&product=${encodeURIComponent(activeProduct)}&clientId=${encodeURIComponent(activeTaskClientId)}`,
+      { cache: "no-store" }
+    )
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error ?? "Could not load backups.");
+        }
+        return data.snapshots as TaskSnapshot[];
+      })
+      .then((snapshots) => {
+        if (!active) {
+          return;
+        }
+        setTaskSnapshots(snapshots);
+      })
+      .catch((error: Error) => {
+        if (active) {
+          setSnapshotError(error.message);
+          setTaskSnapshots([]);
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setIsSnapshotLoading(false);
         }
       });
 
@@ -2745,6 +2957,76 @@ export default function RespondDashboard({
       setStorageNotice(error instanceof Error ? error.message : "Task delete failed.");
     } finally {
       setDeletingTaskId(null);
+    }
+  }
+
+  async function createTaskBoardSnapshot() {
+    if (!activeTaskClientId) {
+      setSnapshotError("Choose a client before creating a backup.");
+      return;
+    }
+
+    const client = clients.find((item) => item.id === activeTaskClientId);
+    const fallbackName = client ? `${client.name} master backup` : "Master task backup";
+    setIsCreatingSnapshot(true);
+    setSnapshotError("");
+
+    try {
+      const response = await fetch("/api/task-snapshots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          environment: activeEnvironment,
+          product: activeProduct,
+          clientId: activeTaskClientId,
+          name: snapshotName.trim() || fallbackName,
+          description: `${tasks.length} task backup from ${currentProduct.shortLabel} ${currentEnvironment.shortLabel}`,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not create backup.");
+      }
+
+      const snapshot = data.snapshot as TaskSnapshot;
+      setTaskSnapshots((current) => [snapshot, ...current.filter((item) => item.id !== snapshot.id)]);
+      setSnapshotName("");
+      setStorageNotice(`Backup saved: ${snapshot.name}`);
+    } catch (error) {
+      setSnapshotError(error instanceof Error ? error.message : "Could not create backup.");
+    } finally {
+      setIsCreatingSnapshot(false);
+    }
+  }
+
+  async function restoreTaskBoardSnapshot(snapshot: TaskSnapshot) {
+    if (!window.confirm(`Restore "${snapshot.name}"? This will replace the current task board for this client.`)) {
+      return;
+    }
+
+    setRestoringSnapshotId(snapshot.id);
+    setSnapshotError("");
+
+    try {
+      const response = await fetch(`/api/task-snapshots/${encodeURIComponent(snapshot.id)}`, { method: "PATCH" });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not restore backup.");
+      }
+
+      const restoredTasks = data.tasks as Task[];
+      setTasks(restoredTasks);
+      setSelectedId(restoredTasks[0]?.id ?? "");
+      setDetailReadyTaskId(null);
+      setDetailTaskId(null);
+      setLoadedTaskKey(taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId));
+      setStorageNotice(`Restored backup: ${snapshot.name}`);
+    } catch (error) {
+      setSnapshotError(error instanceof Error ? error.message : "Could not restore backup.");
+    } finally {
+      setRestoringSnapshotId(null);
     }
   }
 
@@ -3077,6 +3359,16 @@ export default function RespondDashboard({
           adminEditing={adminEditing}
           onAdminEditingChange={setAdminEditing}
           onOpenTrainingRoom={openTrainingRoom}
+          backupClient={selectedClient}
+          snapshots={taskSnapshots}
+          snapshotName={snapshotName}
+          isSnapshotLoading={isSnapshotLoading}
+          isCreatingSnapshot={isCreatingSnapshot}
+          restoringSnapshotId={restoringSnapshotId}
+          snapshotError={snapshotError}
+          onSnapshotNameChange={setSnapshotName}
+          onCreateSnapshot={createTaskBoardSnapshot}
+          onRestoreSnapshot={restoreTaskBoardSnapshot}
         />
         <NewClientPanel
           key={`home-${activeEnvironment}-${activeProduct}`}
@@ -3190,6 +3482,16 @@ export default function RespondDashboard({
           adminEditing={adminEditing}
           onAdminEditingChange={setAdminEditing}
           onOpenTrainingRoom={openTrainingRoom}
+          backupClient={selectedClient}
+          snapshots={taskSnapshots}
+          snapshotName={snapshotName}
+          isSnapshotLoading={isSnapshotLoading}
+          isCreatingSnapshot={isCreatingSnapshot}
+          restoringSnapshotId={restoringSnapshotId}
+          snapshotError={snapshotError}
+          onSnapshotNameChange={setSnapshotName}
+          onCreateSnapshot={createTaskBoardSnapshot}
+          onRestoreSnapshot={restoreTaskBoardSnapshot}
         />
       </aside>
 

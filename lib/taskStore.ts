@@ -33,6 +33,9 @@ import {
   type ProductKey,
   type RespondClient,
   type Task,
+  type TaskSnapshot,
+  type TaskSnapshotCreatePayload,
+  type TaskSnapshotDetail,
   type TaskStatus,
   type TaskUpdatePayload,
   type TrainingVideo,
@@ -100,10 +103,17 @@ type TrainingCategoryRow = {
   sortOrder: number;
 };
 
+type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
+  environment: string;
+  product: string;
+  payload: string;
+};
+
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-16-training-category-order";
+const currentStorageVersion = "2026-06-25-task-snapshots";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
+const restoreBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
@@ -112,6 +122,8 @@ const portalFormSubmissionSelectFields =
   "id, environment, product, client_id AS clientId, form_id AS formId, status, responses, submitted_at AS submittedAt, updated_at AS updatedAt";
 const trainingVideoSelectFields =
   "id, product, category, title, description, loom_url AS loomUrl, tags, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+const taskSnapshotSelectFields =
+  "id, environment, product, client_id AS clientId, name, description, task_count AS taskCount, payload, created_at AS createdAt";
 const validStatuses = new Set<string>(taskStatuses);
 const validPriorities = new Set<string>(["low", "normal", "high", "critical"]);
 const validClientPhases = new Set<ClientDeliveryPhase>([
@@ -323,6 +335,19 @@ function fromTrainingVideoRow(row: TrainingVideoRow): TrainingVideo {
   };
 }
 
+function taskSnapshotSummary(row: TaskSnapshotRow): TaskSnapshot {
+  return {
+    id: row.id,
+    environment: normalizeEnvironment(row.environment),
+    product: normalizeProduct(row.product),
+    clientId: row.clientId,
+    name: row.name,
+    description: row.description ?? "",
+    taskCount: row.taskCount,
+    createdAt: row.createdAt,
+  };
+}
+
 function scopedTaskId(clientId: string, templateId: string) {
   return `${clientId}__${templateId}`;
 }
@@ -502,12 +527,22 @@ async function ensureAppMetaTable(d1 = getD1()) {
 
 async function seedWorkspaceShapeReady() {
   const d1 = getD1();
-  const [taskColumns, clientColumns, portalFormColumns, trainingVideoColumns, trainingCategoryColumns] = await Promise.all([
+  const [
+    taskColumns,
+    clientColumns,
+    portalFormColumns,
+    trainingVideoColumns,
+    trainingCategoryColumns,
+    taskSnapshotColumns,
+    taskTemplateDeletionColumns,
+  ] = await Promise.all([
     tableColumns("tasks"),
     tableColumns("clients"),
     tableColumns("portal_form_submissions"),
     tableColumns("training_videos"),
     tableColumns("training_categories"),
+    tableColumns("task_snapshots"),
+    tableColumns("task_template_deletions"),
   ]);
   const requiredTaskColumns = [
     "client_id",
@@ -536,13 +571,17 @@ async function seedWorkspaceShapeReady() {
   ];
   const requiredTrainingVideoColumns = ["product", "category", "title", "description", "loom_url", "tags", "sort_order"];
   const requiredTrainingCategoryColumns = ["product", "category", "sort_order"];
+  const requiredTaskSnapshotColumns = ["environment", "product", "client_id", "name", "description", "task_count", "payload"];
+  const requiredTaskTemplateDeletionColumns = ["environment", "product", "client_id", "template_id"];
 
   if (
     !requiredTaskColumns.every((column) => taskColumns.has(column)) ||
     !requiredClientColumns.every((column) => clientColumns.has(column)) ||
     !requiredPortalFormColumns.every((column) => portalFormColumns.has(column)) ||
     !requiredTrainingVideoColumns.every((column) => trainingVideoColumns.has(column)) ||
-    !requiredTrainingCategoryColumns.every((column) => trainingCategoryColumns.has(column))
+    !requiredTrainingCategoryColumns.every((column) => trainingCategoryColumns.has(column)) ||
+    !requiredTaskSnapshotColumns.every((column) => taskSnapshotColumns.has(column)) ||
+    !requiredTaskTemplateDeletionColumns.every((column) => taskTemplateDeletionColumns.has(column))
   ) {
     return false;
   }
@@ -779,12 +818,15 @@ async function migrateGlobalTasksToClient() {
 
 async function seedTemplateTasksForClient(clientId: string, environment: EnvironmentKey, product: ProductKey, useTemplateState: boolean) {
   const d1 = getD1();
-  const existing = await d1
-    .prepare("SELECT template_id AS templateId FROM tasks WHERE client_id = ? AND environment = ? AND product = ?")
-    .bind(clientId, environment, product)
-    .all<{ templateId: string }>();
+  const [existing, deletedTemplates] = await Promise.all([
+    d1
+      .prepare("SELECT template_id AS templateId FROM tasks WHERE client_id = ? AND environment = ? AND product = ?")
+      .bind(clientId, environment, product)
+      .all<{ templateId: string }>(),
+    deletedTemplateIdsForClient(d1, environment, product, clientId),
+  ]);
   const existingTemplates = new Set((existing.results ?? []).map((item) => item.templateId));
-  const missing = productTasks(product).filter((item) => !existingTemplates.has(item.id));
+  const missing = productTasks(product).filter((item) => !existingTemplates.has(item.id) && !deletedTemplates.has(item.id));
 
   if (missing.length === 0) {
     return;
@@ -824,6 +866,15 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
         .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
   );
+}
+
+async function deletedTemplateIdsForClient(d1: D1Database, environment: EnvironmentKey, product: ProductKey, clientId: string) {
+  const rows = await d1
+    .prepare("SELECT template_id AS templateId FROM task_template_deletions WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(environment, product, clientId)
+    .all<{ templateId: string }>();
+
+  return new Set((rows.results ?? []).map((row) => row.templateId));
 }
 
 function taskInsertValues(clientId: string, environment: EnvironmentKey, product: ProductKey, item: Task, useTemplateState: boolean) {
@@ -1077,6 +1128,29 @@ async function prepareTaskStorage() {
       )
     `),
     d1.prepare(`
+      CREATE TABLE IF NOT EXISTS task_snapshots (
+        id TEXT PRIMARY KEY,
+        environment TEXT NOT NULL DEFAULT 'demo',
+        product TEXT NOT NULL DEFAULT 'respond',
+        client_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL DEFAULT '',
+        task_count INTEGER NOT NULL DEFAULT 0,
+        payload TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS task_template_deletions (
+        id TEXT PRIMARY KEY,
+        environment TEXT NOT NULL DEFAULT 'demo',
+        product TEXT NOT NULL DEFAULT 'respond',
+        client_id TEXT NOT NULL,
+        template_id TEXT NOT NULL,
+        deleted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
+    d1.prepare(`
       CREATE TABLE IF NOT EXISTS training_videos (
         id TEXT PRIMARY KEY,
         product TEXT NOT NULL DEFAULT 'respond',
@@ -1135,6 +1209,12 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_client_idx ON portal_form_submissions (client_id)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS portal_form_submissions_environment_product_idx ON portal_form_submissions (environment, product)"),
     d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS portal_form_submissions_client_form_idx ON portal_form_submissions (client_id, form_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_snapshots_workspace_idx ON task_snapshots (environment, product, client_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_snapshots_created_idx ON task_snapshots (created_at)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_template_deletions_workspace_idx ON task_template_deletions (environment, product, client_id)"),
+    d1.prepare(
+      "CREATE UNIQUE INDEX IF NOT EXISTS task_template_deletions_workspace_template_idx ON task_template_deletions (environment, product, client_id, template_id)"
+    ),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_idx ON training_videos (product)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_category_idx ON training_videos (product, category)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_videos_product_sort_idx ON training_videos (product, sort_order)"),
@@ -1502,9 +1582,9 @@ export async function deleteTask(id: string) {
   await ensureTaskStorage();
   const d1 = getD1();
   const existing = await d1
-    .prepare("SELECT environment, product, client_id AS clientId FROM tasks WHERE id = ?")
+    .prepare("SELECT environment, product, client_id AS clientId, template_id AS templateId FROM tasks WHERE id = ?")
     .bind(id)
-    .first<{ environment: string; product: string; clientId: string }>();
+    .first<{ environment: string; product: string; clientId: string; templateId: string }>();
 
   if (!existing) {
     throw new Error("Task not found.");
@@ -1525,9 +1605,283 @@ export async function deleteTask(id: string) {
     })
     .filter((statement): statement is D1PreparedStatement => Boolean(statement));
 
-  await d1.batch([...dependencyUpdates, d1.prepare("DELETE FROM tasks WHERE id = ?").bind(id)]);
+  const deletionStatements = [...dependencyUpdates, d1.prepare("DELETE FROM tasks WHERE id = ?").bind(id)];
+
+  if (existing.templateId && !existing.templateId.startsWith("custom-")) {
+    deletionStatements.push(
+      d1
+        .prepare(
+          `
+            INSERT INTO task_template_deletions (
+              id,
+              environment,
+              product,
+              client_id,
+              template_id
+            ) VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(environment, product, client_id, template_id)
+            DO UPDATE SET deleted_at = CURRENT_TIMESTAMP
+          `
+        )
+        .bind(`task-template-deletion-${crypto.randomUUID().slice(0, 12)}`, existing.environment, existing.product, existing.clientId, existing.templateId)
+    );
+  }
+
+  await d1.batch(deletionStatements);
 
   return { id };
+}
+
+function parseSnapshotTasks(payload: string): Task[] {
+  try {
+    const parsed = JSON.parse(payload) as { tasks?: unknown };
+    return Array.isArray(parsed.tasks) ? (parsed.tasks as Task[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function getTaskSnapshotRow(id: string) {
+  await ensureTaskStorage();
+  const row = await getD1().prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE id = ?`).bind(id).first<TaskSnapshotRow>();
+
+  if (!row) {
+    throw new Error("Task backup not found.");
+  }
+
+  return row;
+}
+
+export async function listTaskSnapshots(
+  environmentInput: string | null | undefined = defaultEnvironment,
+  productInput: string | null | undefined = defaultProduct,
+  clientIdInput?: string | null
+) {
+  await ensureTaskStorage();
+  const environment = normalizeEnvironment(environmentInput);
+  const product = normalizeProduct(productInput);
+  const clientId = clientIdInput && clientIdInput !== "all" ? clientIdInput : await firstClientId(environment, product);
+
+  if (!clientId) {
+    return [];
+  }
+
+  await requireClient(environment, product, clientId);
+
+  const rows = await getD1()
+    .prepare(`SELECT ${taskSnapshotSelectFields} FROM task_snapshots WHERE environment = ? AND product = ? AND client_id = ? ORDER BY created_at DESC`)
+    .bind(environment, product, clientId)
+    .all<TaskSnapshotRow>();
+
+  return (rows.results ?? []).map(taskSnapshotSummary);
+}
+
+export async function getTaskSnapshot(id: string): Promise<TaskSnapshotDetail> {
+  const row = await getTaskSnapshotRow(id);
+
+  return {
+    ...taskSnapshotSummary(row),
+    tasks: parseSnapshotTasks(row.payload),
+  };
+}
+
+export async function createTaskSnapshot(payload: TaskSnapshotCreatePayload) {
+  await ensureTaskStorage();
+  const environment = normalizeEnvironment(payload.environment);
+  const product = normalizeProduct(payload.product);
+  const clientId = payload.clientId && payload.clientId !== "all" ? payload.clientId : await firstClientId(environment, product);
+
+  if (!clientId) {
+    throw new Error("Choose a client before creating a backup.");
+  }
+
+  await requireClient(environment, product, clientId);
+
+  const tasks = await listTasks(environment, product, clientId);
+  const name = (payload.name?.trim() || `Backup ${new Date().toISOString().slice(0, 10)}`).slice(0, 120);
+  const description = (payload.description?.trim() ?? "").slice(0, 240);
+  const snapshotId = `task-snapshot-${crypto.randomUUID().slice(0, 12)}`;
+  const snapshotPayload = JSON.stringify({
+    version: 1,
+    environment,
+    product,
+    clientId,
+    createdAt: new Date().toISOString(),
+    tasks,
+  });
+
+  await getD1()
+    .prepare(
+      `
+        INSERT INTO task_snapshots (
+          id,
+          environment,
+          product,
+          client_id,
+          name,
+          description,
+          task_count,
+          payload
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `
+    )
+    .bind(snapshotId, environment, product, clientId, name, description, tasks.length, snapshotPayload)
+    .run();
+
+  return getTaskSnapshot(snapshotId);
+}
+
+function taskRestoreValues(task: Task, environment: EnvironmentKey, product: ProductKey, clientId: string) {
+  const status = validStatuses.has(task.status) ? task.status : "queued";
+  const priority = validPriorities.has(task.priority) ? task.priority : "normal";
+
+  return [
+    task.id,
+    environment,
+    product,
+    clientId,
+    task.templateId ?? "",
+    task.title,
+    task.category,
+    task.phase,
+    status,
+    task.assignee,
+    task.dueWindow,
+    priority,
+    JSON.stringify(task.dependencies ?? []),
+    task.notes,
+    task.loomUrl ?? "",
+    task.loomTitle ?? "",
+    task.portalVisible ? 1 : 0,
+    task.portalTitle,
+    task.portalNote,
+    task.portalActionRequired ? 1 : 0,
+    task.portalActionUrl ?? "",
+    task.portalActionLabel ?? "",
+    task.portalConfigured ? 1 : 0,
+    task.sortOrder,
+    task.createdAt ?? new Date().toISOString(),
+    new Date().toISOString(),
+  ];
+}
+
+function taskRestoreStatement(d1: D1Database, task: Task, environment: EnvironmentKey, product: ProductKey, clientId: string) {
+  return d1
+    .prepare(
+      `
+        INSERT INTO tasks (
+          id,
+          environment,
+          product,
+          client_id,
+          template_id,
+          title,
+          category,
+          phase,
+          status,
+          assignee,
+          due_window,
+          priority,
+          dependencies,
+          notes,
+          loom_url,
+          loom_title,
+          portal_visible,
+          portal_title,
+          portal_note,
+          portal_action_required,
+          portal_action_url,
+          portal_action_label,
+          portal_configured,
+          sort_order,
+          created_at,
+          updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `
+    )
+    .bind(...taskRestoreValues(task, environment, product, clientId));
+}
+
+async function syncTemplateDeletionMarkersForTasks(d1: D1Database, environment: EnvironmentKey, product: ProductKey, clientId: string, tasks: Task[]) {
+  const defaultTemplateIds = new Set(productTasks(product).map((task) => task.id));
+  const restoredTemplateIds = new Set(
+    tasks
+      .map((task) => task.templateId ?? "")
+      .filter((templateId) => templateId && defaultTemplateIds.has(templateId))
+  );
+  const missingTemplateIds = [...defaultTemplateIds].filter((templateId) => !restoredTemplateIds.has(templateId));
+
+  await d1
+    .prepare("DELETE FROM task_template_deletions WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(environment, product, clientId)
+    .run();
+
+  for (let index = 0; index < missingTemplateIds.length; index += restoreBatchSize) {
+    const chunk = missingTemplateIds.slice(index, index + restoreBatchSize);
+
+    if (chunk.length === 0) {
+      continue;
+    }
+
+    await d1.batch(
+      chunk.map((templateId) =>
+        d1
+          .prepare(
+            `
+              INSERT OR IGNORE INTO task_template_deletions (
+                id,
+                environment,
+                product,
+                client_id,
+                template_id
+              ) VALUES (?, ?, ?, ?, ?)
+            `
+          )
+          .bind(`task-template-deletion-${crypto.randomUUID().slice(0, 12)}`, environment, product, clientId, templateId)
+      )
+    );
+  }
+}
+
+export async function restoreTaskSnapshot(id: string) {
+  const snapshot = await getTaskSnapshot(id);
+  const d1 = getD1();
+
+  await requireClient(snapshot.environment, snapshot.product, snapshot.clientId);
+
+  const tasks = [...snapshot.tasks]
+    .map((task) => ({
+      ...task,
+      environment: snapshot.environment,
+      product: snapshot.product,
+      clientId: snapshot.clientId,
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  await d1
+    .prepare("DELETE FROM tasks WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(snapshot.environment, snapshot.product, snapshot.clientId)
+    .run();
+
+  for (let index = 0; index < tasks.length; index += restoreBatchSize) {
+    const chunk = tasks.slice(index, index + restoreBatchSize);
+
+    if (chunk.length === 0) {
+      continue;
+    }
+
+    await d1.batch(chunk.map((task) => taskRestoreStatement(d1, task, snapshot.environment, snapshot.product, snapshot.clientId)));
+  }
+
+  await syncTemplateDeletionMarkersForTasks(d1, snapshot.environment, snapshot.product, snapshot.clientId, tasks);
+
+  return {
+    snapshot: taskSnapshotSummary({
+      ...snapshot,
+      payload: JSON.stringify({ tasks }),
+    }),
+    tasks: await listTasks(snapshot.environment, snapshot.product, snapshot.clientId),
+  };
 }
 
 function cleanTrainingText(value: string | null | undefined, fallback = "") {

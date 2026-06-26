@@ -76,6 +76,38 @@ export const portalFormSubmissions = sqliteTable("portal_form_submissions", {
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
+export const taskSnapshots = sqliteTable("task_snapshots", {
+  id: text("id").primaryKey(),
+  environment: text("environment").notNull().default("demo"),
+  product: text("product").notNull().default("respond"),
+  clientId: text("client_id").notNull(),
+  name: text("name").notNull(),
+  description: text("description").notNull().default(""),
+  taskCount: integer("task_count").notNull().default(0),
+  payload: text("payload").notNull().default("{}"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const taskTemplateDeletions = sqliteTable(
+  "task_template_deletions",
+  {
+    id: text("id").primaryKey(),
+    environment: text("environment").notNull().default("demo"),
+    product: text("product").notNull().default("respond"),
+    clientId: text("client_id").notNull(),
+    templateId: text("template_id").notNull(),
+    deletedAt: text("deleted_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    workspaceTemplate: uniqueIndex("task_template_deletions_workspace_template_idx").on(
+      table.environment,
+      table.product,
+      table.clientId,
+      table.templateId
+    ),
+  })
+);
+
 export const trainingVideos = sqliteTable("training_videos", {
   id: text("id").primaryKey(),
   product: text("product").notNull().default("respond"),

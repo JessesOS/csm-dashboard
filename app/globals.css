@@ -267,7 +267,7 @@ button:disabled {
 .rail-settings-compact .rail-settings-menu {
   right: 0;
   left: auto;
-  width: 220px;
+  width: 320px;
 }
 
 .rail-settings-compact .rail-settings-button {
@@ -345,6 +345,123 @@ button:disabled {
 
 .admin-settings button strong {
   min-width: 34px;
+}
+
+.backup-settings {
+  display: grid;
+  gap: 8px;
+}
+
+.backup-settings-head,
+.backup-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.backup-settings-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #c8d7e8;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.backup-settings-head strong {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(193, 255, 36, 0.16);
+  color: #c9f82b;
+  font-size: 10px;
+}
+
+.backup-settings p,
+.backup-settings small {
+  margin: 0;
+  color: #8fa2b7;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.backup-settings input {
+  width: 100%;
+  height: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #e9f2fb;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+.backup-primary-action,
+.backup-row-actions button,
+.backup-row-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  border: 1px solid rgba(193, 255, 36, 0.3);
+  border-radius: 8px;
+  background: rgba(193, 255, 36, 0.1);
+  color: #c9f82b;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.backup-primary-action {
+  width: 100%;
+}
+
+.backup-primary-action:disabled,
+.backup-row-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.backup-error {
+  color: #fca5a5 !important;
+}
+
+.backup-list {
+  display: grid;
+  gap: 7px;
+}
+
+.backup-row {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  padding: 9px;
+}
+
+.backup-row > div:first-child {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.backup-row strong {
+  overflow: hidden;
+  color: #e9f2fb;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.backup-row span {
+  color: #8fa2b7;
+  font-size: 10px;
 }
 
 .walkthrough-button {
@@ -1822,6 +1939,7 @@ button:disabled {
   border-top-color: #d9e1ea;
 }
 
+.mission-shell-light .rail-settings-menu,
 .dashboard-shell-light .rail-settings-menu {
   border-color: #d9e3ec;
   background: #ffffff;
@@ -1830,11 +1948,14 @@ button:disabled {
 
 .mission-shell-light .environment-switcher > span,
 .dashboard-shell-light .environment-switcher > span,
+.mission-shell-light .rail-settings-title,
 .dashboard-shell-light .rail-settings-title {
   color: #8791a2;
 }
 
 .mission-shell-light .environment-switcher button,
+.mission-shell-light .rail-settings-button,
+.mission-shell-light .attachment-lenses button,
 .dashboard-shell-light .environment-switcher button,
 .dashboard-shell-light .rail-settings-button,
 .dashboard-shell-light .attachment-lenses button {
@@ -1845,6 +1966,11 @@ button:disabled {
 
 .mission-shell-light .environment-switcher button:hover,
 .mission-shell-light .environment-switcher button.active,
+.mission-shell-light .rail-settings-button:hover,
+.mission-shell-light .rail-settings-button.active,
+.mission-shell-light .rail-settings-open .rail-settings-button,
+.mission-shell-light .attachment-lenses button:hover,
+.mission-shell-light .attachment-lenses button.active,
 .dashboard-shell-light .environment-switcher button:hover,
 .dashboard-shell-light .environment-switcher button.active,
 .dashboard-shell-light .rail-settings-button:hover,
@@ -1857,17 +1983,60 @@ button:disabled {
   color: #174ac9;
 }
 
+.mission-shell-light .attachment-lenses button strong,
 .dashboard-shell-light .attachment-lenses button strong {
   background: #edf4ff;
   color: #1d4ed8;
 }
 
+.mission-shell-light .rail-settings-divider,
 .dashboard-shell-light .rail-settings-divider {
   background: #d9e3ec;
 }
 
+.mission-shell-light .attachment-lenses button.active strong,
 .dashboard-shell-light .attachment-lenses button.active strong {
   background: #ffffff;
+  color: #174ac9;
+}
+
+.mission-shell-light .backup-settings-head span,
+.dashboard-shell-light .backup-settings-head span,
+.mission-shell-light .backup-row strong,
+.dashboard-shell-light .backup-row strong {
+  color: #172033;
+}
+
+.mission-shell-light .backup-settings p,
+.mission-shell-light .backup-settings small,
+.mission-shell-light .backup-row span,
+.dashboard-shell-light .backup-settings p,
+.dashboard-shell-light .backup-settings small,
+.dashboard-shell-light .backup-row span {
+  color: #647084;
+}
+
+.mission-shell-light .backup-settings input,
+.dashboard-shell-light .backup-settings input {
+  border-color: #d9e3ec;
+  background: #f8fbff;
+  color: #172033;
+}
+
+.mission-shell-light .backup-row,
+.dashboard-shell-light .backup-row {
+  border-color: #d9e3ec;
+  background: #f8fbff;
+}
+
+.mission-shell-light .backup-primary-action,
+.mission-shell-light .backup-row-actions button,
+.mission-shell-light .backup-row-actions a,
+.dashboard-shell-light .backup-primary-action,
+.dashboard-shell-light .backup-row-actions button,
+.dashboard-shell-light .backup-row-actions a {
+  border-color: rgba(36, 94, 232, 0.22);
+  background: #eff5ff;
   color: #174ac9;
 }
 
