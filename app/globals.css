@@ -3067,6 +3067,21 @@ button:disabled {
   font-size: 12px;
 }
 
+.action-notice {
+  border: 1px solid #d9e1ea;
+  border-radius: 8px;
+}
+
+.action-notice-success {
+  background: #eefbf0;
+  color: #166534;
+}
+
+.action-notice-error {
+  background: #fff1f2;
+  color: #be123c;
+}
+
 .board {
   display: grid;
   grid-auto-columns: minmax(380px, 430px);
@@ -4895,6 +4910,18 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .storage-notice {
   color: #f5b22c;
+}
+
+.dashboard-shell-dark .action-notice-success {
+  border-color: rgba(74, 222, 128, 0.24);
+  background: rgba(22, 101, 52, 0.28);
+  color: #9df7b4;
+}
+
+.dashboard-shell-dark .action-notice-error {
+  border-color: rgba(251, 113, 133, 0.22);
+  background: rgba(127, 29, 29, 0.34);
+  color: #ffb4c2;
 }
 
 .dashboard-shell-dark .board-column {

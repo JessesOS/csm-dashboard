@@ -64,6 +64,10 @@ const statusColumnDetails: Record<TaskStatus, string> = {
 type ThemeMode = "dark" | "light";
 type AppSection = "home" | "tasks";
 type AttachmentFilter = "all" | "loom" | "forms";
+type TaskActionNotice = {
+  message: string;
+  tone: "success" | "error";
+};
 type TourTarget =
   | "mission-header"
   | "portfolio"
@@ -2664,6 +2668,7 @@ export default function RespondDashboard({
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set());
   const [isTaskOverviewOpen, setIsTaskOverviewOpen] = useState(false);
   const [storageNotice, setStorageNotice] = useState("");
+  const [taskActionNotice, setTaskActionNotice] = useState<TaskActionNotice | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
@@ -2904,6 +2909,15 @@ export default function RespondDashboard({
   }, [detailTaskId]);
 
   useEffect(() => {
+    if (!taskActionNotice) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setTaskActionNotice(null), 2800);
+    return () => window.clearTimeout(timer);
+  }, [taskActionNotice]);
+
+  useEffect(() => {
     if (!trainingRoomOpen) {
       return;
     }
@@ -3050,7 +3064,7 @@ export default function RespondDashboard({
     return data.task as Pick<Task, "id">;
   }
 
-  function updateTask(id: string, payload: TaskUpdatePayload) {
+  function updateTask(id: string, payload: TaskUpdatePayload, successMessage?: string) {
     const previous = tasks;
     setTasks((current) =>
       current.map((task) => {
@@ -3072,10 +3086,14 @@ export default function RespondDashboard({
         .then((remoteTask) => {
           setTasks((current) => current.map((task) => (task.id === id ? remoteTask : task)));
           setStorageNotice("");
+          if (successMessage) {
+            setTaskActionNotice({ message: successMessage, tone: "success" });
+          }
         })
         .catch((error: Error) => {
           setTasks(previous);
           setStorageNotice(error.message);
+          setTaskActionNotice({ message: error.message, tone: "error" });
         });
     });
   }
@@ -3103,10 +3121,13 @@ export default function RespondDashboard({
     try {
       await persistDeleteTask(task.id);
       setStorageNotice("");
+      setTaskActionNotice({ message: `Task deleted: ${task.title}`, tone: "success" });
     } catch (error) {
       setTasks(previous);
       setSelectedId((current) => current || task.id);
-      setStorageNotice(error instanceof Error ? error.message : "Task delete failed.");
+      const message = error instanceof Error ? error.message : "Task delete failed.";
+      setStorageNotice(message);
+      setTaskActionNotice({ message, tone: "error" });
     } finally {
       setDeletingTaskId(null);
     }
@@ -3196,7 +3217,16 @@ export default function RespondDashboard({
   }
 
   function moveTask(task: Task, status: TaskStatus) {
-    updateTask(task.id, { status });
+    const successMessage =
+      status === "complete"
+        ? `Task completed: ${task.title}`
+        : status === "review"
+          ? `Task moved to Review: ${task.title}`
+          : status === "blocked"
+            ? `Task marked Blocked: ${task.title}`
+            : `Task moved to ${statusLabels[status]}: ${task.title}`;
+
+    updateTask(task.id, { status }, successMessage);
   }
 
   function selectTaskClient(clientId: string) {
@@ -3882,6 +3912,7 @@ export default function RespondDashboard({
           </select>
         </section>
 
+        {taskActionNotice ? <div className={`storage-notice action-notice action-notice-${taskActionNotice.tone}`}>{taskActionNotice.message}</div> : null}
         {storageNotice ? <div className="storage-notice">{storageNotice}</div> : null}
         {!storageNotice && isTaskBoardRefreshing ? <div className="storage-notice">Refreshing saved task statuses...</div> : null}
         {adminEditing ? (
