@@ -153,7 +153,11 @@ function taskSnapshotPointerMetaKey(environment: EnvironmentKey, product: Produc
   return `task_snapshot_pointer:${environment}:${product}:${clientId}:${kind}`;
 }
 
-function productMasterSnapshotPointerMetaKey(environment: EnvironmentKey, product: ProductKey) {
+function productMasterSnapshotPointerMetaKey(environment: EnvironmentKey, product: ProductKey, scaleVariant?: ScaleVariant) {
+  if (product === "scale" && scaleVariant) {
+    return `task_snapshot_pointer:${environment}:${product}:${scaleVariant}:masterSnapshotId`;
+  }
+
   return `task_snapshot_pointer:${environment}:${product}:masterSnapshotId`;
 }
 
@@ -172,14 +176,15 @@ async function setMetaValue(key: string, value: string) {
 }
 
 async function getTaskSnapshotPointers(environment: EnvironmentKey, product: ProductKey, clientId: string): Promise<TaskSnapshotPointers> {
+  const scaleVariant = product === "scale" ? await getClientScaleVariant(clientId, environment, product) : undefined;
   const [legacySnapshotId, masterSnapshotId] = await Promise.all([
     getMetaValue(taskSnapshotPointerMetaKey(environment, product, clientId, "legacySnapshotId")),
-    getMetaValue(productMasterSnapshotPointerMetaKey(environment, product)),
+    getMetaValue(productMasterSnapshotPointerMetaKey(environment, product, scaleVariant)),
   ]);
 
   return {
     legacySnapshotId: legacySnapshotId || null,
-    masterSnapshotId: masterSnapshotId || null,
+    masterSnapshotId: masterSnapshotId || (product === "scale" ? await getMetaValue(productMasterSnapshotPointerMetaKey(environment, product)) : "") || null,
   };
 }
 
@@ -193,8 +198,13 @@ async function setTaskSnapshotPointer(
   await setMetaValue(taskSnapshotPointerMetaKey(environment, product, clientId, kind), snapshotId ?? "");
 }
 
-async function setProductMasterSnapshotPointer(environment: EnvironmentKey, product: ProductKey, snapshotId: string | null) {
-  await setMetaValue(productMasterSnapshotPointerMetaKey(environment, product), snapshotId ?? "");
+async function setProductMasterSnapshotPointer(
+  environment: EnvironmentKey,
+  product: ProductKey,
+  snapshotId: string | null,
+  scaleVariant?: ScaleVariant
+) {
+  await setMetaValue(productMasterSnapshotPointerMetaKey(environment, product, scaleVariant), snapshotId ?? "");
 }
 
 const starterTrainingVideos: TrainingVideo[] = [
@@ -1929,6 +1939,7 @@ export async function createTaskSnapshot(payload: TaskSnapshotCreatePayload) {
   await requireClient(environment, product, clientId);
 
   const tasks = await listTasks(environment, product, clientId);
+  const scaleVariant = product === "scale" ? await getClientScaleVariant(clientId, environment, product) : undefined;
   const name = (payload.name?.trim() || `Backup ${new Date().toISOString().slice(0, 10)}`).slice(0, 120);
   const description = (payload.description?.trim() ?? "").slice(0, 240);
   const snapshotId = `task-snapshot-${crypto.randomUUID().slice(0, 12)}`;
@@ -1960,7 +1971,7 @@ export async function createTaskSnapshot(payload: TaskSnapshotCreatePayload) {
     .run();
 
   if (payload.kind === "master") {
-    await setProductMasterSnapshotPointer(environment, product, snapshotId);
+    await setProductMasterSnapshotPointer(environment, product, snapshotId, scaleVariant);
   }
 
   return getTaskSnapshot(snapshotId);
@@ -2870,7 +2881,10 @@ export async function deleteClient(
     taskSnapshotPointerMetaKey(environment, product, clientId, "legacySnapshotId"),
     taskSnapshotPointerMetaKey(environment, product, clientId, "masterSnapshotId"),
   ];
-  const productMasterSnapshotId = await getMetaValue(productMasterSnapshotPointerMetaKey(environment, product));
+  const clientScaleVariant = product === "scale" ? normalizeScaleVariant(client.scaleVariant) : undefined;
+  const productMasterPointerKey = productMasterSnapshotPointerMetaKey(environment, product, clientScaleVariant);
+  const legacyProductMasterPointerKey = productMasterSnapshotPointerMetaKey(environment, product);
+  const productMasterSnapshotId = await getMetaValue(productMasterPointerKey);
 
   if (productMasterSnapshotId) {
     const productMasterRow = await d1
@@ -2879,7 +2893,22 @@ export async function deleteClient(
       .first<{ clientId: string }>();
 
     if (productMasterRow?.clientId === clientId) {
-      metaKeys.push(productMasterSnapshotPointerMetaKey(environment, product));
+      metaKeys.push(productMasterPointerKey);
+    }
+  }
+
+  if (product === "scale") {
+    const legacyProductMasterSnapshotId = await getMetaValue(legacyProductMasterPointerKey);
+
+    if (legacyProductMasterSnapshotId) {
+      const legacyProductMasterRow = await d1
+        .prepare("SELECT client_id AS clientId FROM task_snapshots WHERE id = ?")
+        .bind(legacyProductMasterSnapshotId)
+        .first<{ clientId: string }>();
+
+      if (legacyProductMasterRow?.clientId === clientId) {
+        metaKeys.push(legacyProductMasterPointerKey);
+      }
     }
   }
 

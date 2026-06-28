@@ -60,6 +60,11 @@ const scaleVariantOptions: Array<{ key: ScaleVariant; label: string }> = [
   { key: "google", label: "Scale with Google ads" },
   { key: "meta_google", label: "Scale with Meta and Google" },
 ];
+const scaleVariantLabels: Record<ScaleVariant, string> = {
+  meta: "Meta ads",
+  google: "Google ads",
+  meta_google: "Meta + Google",
+};
 const statusColumnDetails: Record<TaskStatus, string> = {
   queued: "Ready to start",
   in_progress: "Being worked",
@@ -619,6 +624,10 @@ function TaskBackupSettings({
   onRestoreSnapshot: (snapshot: TaskSnapshot) => void;
 }) {
   const archiveSnapshots = snapshots.filter((snapshot) => snapshot.id !== legacySnapshot?.id && snapshot.id !== masterSnapshot?.id).slice(0, 3);
+  const masterScopeLabel =
+    client?.product === "scale"
+      ? `Variant master - ${scaleVariantLabels[client.scaleVariant ?? defaultScaleVariant]}`
+      : "Product master";
 
   return (
     <div className="backup-settings" aria-label="Task template controls">
@@ -663,6 +672,7 @@ function TaskBackupSettings({
               <strong>Current working master</strong>
               <span>{masterSnapshot ? `${masterSnapshot.taskCount} tasks` : "Not saved yet"}</span>
             </div>
+            <small>{masterScopeLabel}</small>
             {masterSnapshot ? (
               <>
                 <small>{masterSnapshot.name}</small>
