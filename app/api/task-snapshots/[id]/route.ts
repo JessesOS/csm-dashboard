@@ -47,8 +47,9 @@ export async function PATCH(
     const targetClientId = typeof payload?.targetClientId === "string" ? payload.targetClientId : "";
     const environment = typeof payload?.environment === "string" ? payload.environment : null;
     const product = typeof payload?.product === "string" ? payload.product : null;
+    const resetWorkflowState = payload?.resetWorkflowState === true;
     const result = targetClientId
-      ? await restoreTaskSnapshotToClient(id, targetClientId, environment, product)
+      ? await restoreTaskSnapshotToClient(id, targetClientId, environment, product, { resetWorkflowState })
       : await restoreTaskSnapshot(id);
     return NextResponse.json(result);
   } catch (error) {

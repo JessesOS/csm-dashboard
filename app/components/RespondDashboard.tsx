@@ -3241,6 +3241,7 @@ export default function RespondDashboard({
           targetClientId: activeTaskClientId,
           environment: activeEnvironment,
           product: activeProduct,
+          resetWorkflowState: snapshot.id === masterSnapshot?.id,
         }),
       });
       const data = await response.json();
@@ -3255,7 +3256,7 @@ export default function RespondDashboard({
       setDetailReadyTaskId(null);
       setDetailTaskId(null);
       setLoadedTaskKey(taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId));
-      setStorageNotice(`Restored backup: ${snapshot.name}`);
+      setStorageNotice(snapshot.id === masterSnapshot?.id ? `Applied master template: ${snapshot.name}` : `Restored backup: ${snapshot.name}`);
     } catch (error) {
       setSnapshotError(error instanceof Error ? error.message : "Could not restore backup.");
     } finally {

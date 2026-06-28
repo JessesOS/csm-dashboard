@@ -2121,7 +2121,13 @@ export async function restoreTaskSnapshot(id: string) {
   };
 }
 
-function cloneSnapshotTasksForClient(tasks: Task[], targetClientId: string, targetEnvironment: EnvironmentKey, targetProduct: ProductKey) {
+function cloneSnapshotTasksForClient(
+  tasks: Task[],
+  targetClientId: string,
+  targetEnvironment: EnvironmentKey,
+  targetProduct: ProductKey,
+  options?: { resetWorkflowState?: boolean }
+) {
   const idMap = new Map<string, string>();
 
   for (const task of tasks) {
@@ -2141,6 +2147,7 @@ function cloneSnapshotTasksForClient(tasks: Task[], targetClientId: string, targ
       product: targetProduct,
       clientId: targetClientId,
       templateId,
+      status: options?.resetWorkflowState ? "queued" : task.status,
       dependencies: nextDependencies,
     };
   });
@@ -2150,7 +2157,8 @@ export async function restoreTaskSnapshotToClient(
   id: string,
   targetClientIdInput: string,
   environmentInput: string | null | undefined = defaultEnvironment,
-  productInput: string | null | undefined = defaultProduct
+  productInput: string | null | undefined = defaultProduct,
+  options?: { resetWorkflowState?: boolean }
 ) {
   const snapshot = await getTaskSnapshot(id);
   const d1 = getD1();
@@ -2162,7 +2170,8 @@ export async function restoreTaskSnapshotToClient(
     [...snapshot.tasks].sort((a, b) => a.sortOrder - b.sortOrder),
     targetClientId,
     targetEnvironment,
-    targetProduct
+    targetProduct,
+    options
   );
 
   await d1
