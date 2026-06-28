@@ -3234,7 +3234,15 @@ export default function RespondDashboard({
     setSnapshotError("");
 
     try {
-      const response = await fetch(`/api/task-snapshots/${encodeURIComponent(snapshot.id)}`, { method: "PATCH" });
+      const response = await fetch(`/api/task-snapshots/${encodeURIComponent(snapshot.id)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetClientId: activeTaskClientId,
+          environment: activeEnvironment,
+          product: activeProduct,
+        }),
+      });
       const data = await response.json();
 
       if (!response.ok) {

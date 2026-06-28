@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getTaskSnapshot, restoreTaskSnapshot, routeErrorMessage } from "../../../../lib/taskStore";
+import { getTaskSnapshot, restoreTaskSnapshot, restoreTaskSnapshotToClient, routeErrorMessage } from "../../../../lib/taskStore";
 
 export const dynamic = "force-dynamic";
 
@@ -38,12 +38,18 @@ export async function GET(
 }
 
 export async function PATCH(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await context.params;
-    const result = await restoreTaskSnapshot(id);
+    const payload = await request.json().catch(() => ({}));
+    const targetClientId = typeof payload?.targetClientId === "string" ? payload.targetClientId : "";
+    const environment = typeof payload?.environment === "string" ? payload.environment : null;
+    const product = typeof payload?.product === "string" ? payload.product : null;
+    const result = targetClientId
+      ? await restoreTaskSnapshotToClient(id, targetClientId, environment, product)
+      : await restoreTaskSnapshot(id);
     return NextResponse.json(result);
   } catch (error) {
     return NextResponse.json({ error: routeErrorMessage(error) }, { status: 400 });
