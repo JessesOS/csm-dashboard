@@ -17,7 +17,6 @@ import {
   type OperatingEnvironment,
   type ProductWorkspace,
 } from "../../lib/productWorkspaces";
-import { missionTimelineDays } from "../../lib/respondClients";
 import type {
   Category,
   ClientCreatePayload,
@@ -179,6 +178,27 @@ const clientRiskLabels: Record<ClientRisk, string> = {
 
 const missionToday = Date.parse("2026-06-13T00:00:00Z");
 const missionThirtyDayLimit = Date.parse("2026-07-13T00:00:00Z");
+const respondTimelineDayCount = 14;
+const scaleTimelineDayCount = 30;
+
+function buildMissionTimelineDays(dayCount: number) {
+  return Array.from({ length: dayCount }, (_, index) =>
+    new Intl.DateTimeFormat("en-AU", {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    }).format(new Date(missionToday + index * 24 * 60 * 60 * 1000))
+  );
+}
+
+function formatMissionTimelineDate(dateValue: number) {
+  return new Intl.DateTimeFormat("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(dateValue));
+}
 
 type ActiveClientPipelineOpportunity = {
   id: string;
@@ -2280,6 +2300,15 @@ function MissionControl({
     }))
   );
   const timelineClients = scopedClients;
+  const timelineDayCount = activeProduct === "scale" ? scaleTimelineDayCount : respondTimelineDayCount;
+  const timelineDays = useMemo(() => buildMissionTimelineDays(timelineDayCount), [timelineDayCount]);
+  const timelineHeading = `${timelineDayCount}-day delivery timeline`;
+  const timelineRangeCopy = `Current critical path from ${formatMissionTimelineDate(missionToday)} to ${formatMissionTimelineDate(
+    missionToday + (timelineDayCount - 1) * 24 * 60 * 60 * 1000
+  )}.`;
+  const timelineGridColumns = `190px 116px repeat(${timelineDays.length}, minmax(54px, 1fr)) 132px`;
+  const timelineMinWidth = `${190 + 116 + timelineDays.length * 54 + 132}px`;
+  const timelineGoLiveColumn = timelineDays.length + 3;
   const totalAtRisk = portfolioStats.atRisk + portfolioStats.offTrack;
   const riskPercent = Math.round((totalAtRisk / totalClients) * 100);
   const riskDegrees = emptyPortfolio ? 0 : Math.max(8, Math.round((riskPercent / 100) * 360));
@@ -2564,32 +2593,32 @@ function MissionControl({
         <section className="mission-panel timeline-panel">
           <div className="mission-panel-head">
             <div>
-              <h2>14-day delivery timeline</h2>
-              <p>Current critical path from Jun 13 to Jun 26, 2026.</p>
+              <h2>{timelineHeading}</h2>
+              <p>{timelineRangeCopy}</p>
             </div>
             <button type="button" onClick={() => chooseLens("all")}>View all</button>
           </div>
 
-          <div className="timeline-grid" aria-label="14 day client delivery timeline">
-            <div className="timeline-row timeline-head">
+          <div className="timeline-grid" aria-label={`${timelineDayCount} day client delivery timeline`}>
+            <div className="timeline-row timeline-head" style={{ gridTemplateColumns: timelineGridColumns, minWidth: timelineMinWidth }}>
               <span>Client</span>
               <span>Phase</span>
-              {missionTimelineDays.map((day) => (
+              {timelineDays.map((day) => (
                 <span key={day}>{day}</span>
               ))}
               <span>Go-live</span>
             </div>
             {timelineClients.map((client) => (
-              <div className="timeline-row" key={client.id}>
+              <div className="timeline-row" key={client.id} style={{ gridTemplateColumns: timelineGridColumns, minWidth: timelineMinWidth }}>
                 <div className="timeline-client">
                   <span>{client.code}</span>
                   <strong>{client.name}</strong>
                 </div>
                 <span className={`timeline-phase client-health-${client.health}`}>{client.phase}</span>
                 {client.timeline.map((segment) => {
-                  const start = Math.max(0, Math.min(segment.startDay, missionTimelineDays.length - 1));
-                  const span = Math.max(1, Math.min(segment.span, missionTimelineDays.length - start));
-                  const markerColumn = Math.min(start + span + 2, 16);
+                  const start = Math.max(0, Math.min(segment.startDay, timelineDays.length - 1));
+                  const span = Math.max(1, Math.min(segment.span, timelineDays.length - start));
+                  const markerColumn = Math.min(start + span + 2, timelineDays.length + 2);
 
                   return (
                     <span
@@ -2606,7 +2635,7 @@ function MissionControl({
                     </span>
                   );
                 })}
-                <span className={`timeline-golive risk-${client.risk}`} style={{ gridColumn: "17" }}>
+                <span className={`timeline-golive risk-${client.risk}`} style={{ gridColumn: `${timelineGoLiveColumn}` }}>
                   {client.goLiveLabel}
                 </span>
               </div>
