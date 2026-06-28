@@ -3683,99 +3683,107 @@ export default function RespondDashboard({
           </div>
         </div>
 
-        <ProductSwitcher activeProduct={activeProduct} onProductChange={switchProduct} />
+        <section className="rail-section rail-section-workspace" aria-label="Workspace section">
+          <ProductSwitcher activeProduct={activeProduct} onProductChange={switchProduct} />
+        </section>
 
-        <nav className="view-nav" aria-label="Primary views">
-          <button type="button" onClick={() => setActiveSection("home")}>
-            <Icon name="home" />
-            Mission Control
-          </button>
-          <button type="button" className="active">
-            <Icon name="tasks" />
-            Tasks
-          </button>
-        </nav>
+        <section className="rail-section rail-section-nav" aria-label="Navigation section">
+          <span className="rail-section-label">Navigation</span>
+          <nav className="view-nav" aria-label="Primary views">
+            <button type="button" onClick={() => setActiveSection("home")}>
+              <Icon name="home" />
+              Mission Control
+            </button>
+            <button type="button" className="active">
+              <Icon name="tasks" />
+              Tasks
+            </button>
+          </nav>
+        </section>
 
-        <nav className="phase-nav" aria-label="Task categories">
-          {phaseOrder.map((phase) => {
-            const phaseCategories = categoryStats.filter((category) => category.phase === phase);
-            const isPhaseExpanded = expandedPhases.has(phase);
-            const phaseComplete = phaseCategories.reduce((sum, category) => sum + category.complete, 0);
-            const phaseTotal = phaseCategories.reduce((sum, category) => sum + category.total, 0);
-            return (
-              <div key={phase} className="phase-group">
-                <button
-                  type="button"
-                  className={`phase-label ${phaseAccentClass[phase] ?? ""} ${isPhaseExpanded ? "phase-label-open" : ""}`}
-                  aria-expanded={isPhaseExpanded}
-                  aria-controls={`phase-section-${phase}`}
-                  onClick={() => togglePhase(phase)}
-                >
-                  <span className="phase-label-main">
-                    <span className="phase-label-title">{phase}</span>
-                    <span className="phase-label-meta">{phaseComplete}/{phaseTotal}</span>
-                  </span>
-                  <span className={isPhaseExpanded ? "phase-label-chevron phase-label-chevron-open" : "phase-label-chevron"} aria-hidden="true" />
-                </button>
-                {isPhaseExpanded ? (
-                  <div className="phase-group-body" id={`phase-section-${phase}`}>
-                    {phaseCategories.map((category) => {
-                  const isExpanded = expandedCategories.has(category.name);
-                  const isComplete = category.total > 0 && category.complete === category.total;
-                  const categoryTasks = tasksByCategory.get(category.name) ?? [];
+        <section className="rail-section rail-section-stages" aria-label="Delivery stages section">
+          <span className="rail-section-label">Delivery stages</span>
+          <nav className="phase-nav" aria-label="Task categories">
+            {phaseOrder.map((phase) => {
+              const phaseCategories = categoryStats.filter((category) => category.phase === phase);
+              const isPhaseExpanded = expandedPhases.has(phase);
+              const phaseComplete = phaseCategories.reduce((sum, category) => sum + category.complete, 0);
+              const phaseTotal = phaseCategories.reduce((sum, category) => sum + category.total, 0);
+              return (
+                <div key={phase} className="phase-group">
+                  <button
+                    type="button"
+                    className={`phase-label ${phaseAccentClass[phase] ?? ""} ${isPhaseExpanded ? "phase-label-open" : ""}`}
+                    aria-expanded={isPhaseExpanded}
+                    aria-controls={`phase-section-${phase}`}
+                    onClick={() => togglePhase(phase)}
+                  >
+                    <span className="phase-label-main">
+                      <span className="phase-label-title">{phase}</span>
+                      <span className="phase-label-meta">{phaseComplete}/{phaseTotal}</span>
+                    </span>
+                    <span className={isPhaseExpanded ? "phase-label-chevron phase-label-chevron-open" : "phase-label-chevron"} aria-hidden="true" />
+                  </button>
+                  {isPhaseExpanded ? (
+                    <div className="phase-group-body" id={`phase-section-${phase}`}>
+                      {phaseCategories.map((category) => {
+                        const isExpanded = expandedCategories.has(category.name);
+                        const isComplete = category.total > 0 && category.complete === category.total;
+                        const categoryTasks = tasksByCategory.get(category.name) ?? [];
 
-                  return (
-                    <div key={category.id} className={isExpanded ? "category-nav-group category-nav-group-open" : "category-nav-group"}>
-                      <button
-                        type="button"
-                        className={categoryFilter === category.name ? "category-link active" : "category-link"}
-                        aria-expanded={isExpanded}
-                        aria-controls={`category-tasks-${category.id}`}
-                        onClick={() => toggleCategory(category.name)}
-                      >
-                        <span className={isExpanded ? "category-chevron category-chevron-open" : "category-chevron"} aria-hidden="true" />
-                        <span className="category-dot" style={{ background: category.accent }} />
-                        <span>{category.name}</span>
-                        <span className={isComplete ? "category-state category-state-done" : "category-state"} title={isComplete ? "Complete" : "Not complete"}>
-                          {isComplete ? "✓" : ""}
-                        </span>
-                        <strong>{category.complete}/{category.total}</strong>
-                      </button>
+                        return (
+                          <div key={category.id} className={isExpanded ? "category-nav-group category-nav-group-open" : "category-nav-group"}>
+                            <button
+                              type="button"
+                              className={categoryFilter === category.name ? "category-link active" : "category-link"}
+                              aria-expanded={isExpanded}
+                              aria-controls={`category-tasks-${category.id}`}
+                              onClick={() => toggleCategory(category.name)}
+                            >
+                              <span className={isExpanded ? "category-chevron category-chevron-open" : "category-chevron"} aria-hidden="true" />
+                              <span className="category-dot" style={{ background: category.accent }} />
+                              <span>{category.name}</span>
+                              <span className={isComplete ? "category-state category-state-done" : "category-state"} title={isComplete ? "Complete" : "Not complete"}>
+                                {isComplete ? "✓" : ""}
+                              </span>
+                              <strong>{category.complete}/{category.total}</strong>
+                            </button>
 
-                      {isExpanded ? (
-                        <div className="category-nav-tasks" id={`category-tasks-${category.id}`}>
-                          {categoryTasks.map((task) => {
-                            const isTaskComplete = task.status === "complete";
-                            return (
-                              <button
-                                type="button"
-                                key={task.id}
-                                className={selectedId === task.id ? "category-nav-task active" : "category-nav-task"}
-                                onClick={() => selectTaskFromCategory(task)}
-                                title={task.title}
-                              >
-                                <span
-                                  className={isTaskComplete ? "category-task-state category-task-state-done" : "category-task-state"}
-                                  aria-label={isTaskComplete ? "Complete" : "Not complete"}
-                                >
-                                  {isTaskComplete ? "✓" : ""}
-                                </span>
-                                <span>{task.title}</span>
-                                <em>{statusLabels[task.status]}</em>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
+                            {isExpanded ? (
+                              <div className="category-nav-tasks" id={`category-tasks-${category.id}`}>
+                                {categoryTasks.map((task) => {
+                                  const isTaskComplete = task.status === "complete";
+                                  return (
+                                    <button
+                                      type="button"
+                                      key={task.id}
+                                      className={selectedId === task.id ? "category-nav-task active" : "category-nav-task"}
+                                      onClick={() => selectTaskFromCategory(task)}
+                                      title={task.title}
+                                    >
+                                      <span
+                                        className={isTaskComplete ? "category-task-state category-task-state-done" : "category-task-state"}
+                                        aria-label={isTaskComplete ? "Complete" : "Not complete"}
+                                      >
+                                        {isTaskComplete ? "✓" : ""}
+                                      </span>
+                                      <span>{task.title}</span>
+                                      <em>{statusLabels[task.status]}</em>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </nav>
+                  ) : null}
+                </div>
+              );
+            })}
+          </nav>
+        </section>
 
         <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={switchEnvironment} />
         <AttachmentLensSettings
