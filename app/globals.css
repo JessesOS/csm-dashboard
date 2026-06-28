@@ -258,6 +258,9 @@ button:disabled {
 }
 
 .rail-settings-compact {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
   flex: 0 0 auto;
   margin-top: 0;
   border-top: 0;
@@ -265,9 +268,10 @@ button:disabled {
 }
 
 .rail-settings-compact .rail-settings-menu {
+  left: 0;
   right: 0;
-  left: auto;
-  width: 320px;
+  width: auto;
+  max-width: 100%;
 }
 
 .rail-settings-compact .rail-settings-button {
