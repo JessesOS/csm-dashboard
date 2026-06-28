@@ -2668,6 +2668,7 @@ export default function RespondDashboard({
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [isImportingGhlClient, setIsImportingGhlClient] = useState(false);
+  const [isDeletingClient, setIsDeletingClient] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [tourStepIndex, setTourStepIndex] = useState<number | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -3442,6 +3443,50 @@ export default function RespondDashboard({
     }
   }
 
+  async function deleteSelectedClientWorkspace() {
+    if (!selectedClient || isDeletingClient) {
+      return;
+    }
+
+    const label = selectedClient.companyName ? `${selectedClient.name} - ${selectedClient.companyName}` : selectedClient.name;
+    if (!window.confirm(`Delete ${label}? This will remove the client, task board, backups, and portal data so you can re-import cleanly.`)) {
+      return;
+    }
+
+    setIsDeletingClient(true);
+
+    try {
+      const response = await fetch(
+        `/api/clients/${encodeURIComponent(selectedClient.id)}?environment=${encodeURIComponent(activeEnvironment)}&product=${encodeURIComponent(activeProduct)}`,
+        { method: "DELETE" }
+      );
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "Could not delete client.");
+      }
+
+      const nextClients = clients.filter((client) => client.id !== selectedClient.id);
+      setClients(nextClients);
+      setSelectedClientId("all");
+      setTasks([]);
+      setSelectedId("");
+      setLoadedTaskKey("");
+      setDetailReadyTaskId(null);
+      setDetailTaskId(null);
+      setTaskSnapshots([]);
+      setTaskSnapshotPointers({ legacySnapshotId: null, masterSnapshotId: null });
+      setSnapshotName("");
+      setSnapshotError("");
+      setStorageNotice(`${label} deleted. You can now re-import cleanly.`);
+      setActiveSection(nextClients.length === 0 ? "home" : "tasks");
+    } catch (error) {
+      setStorageNotice(error instanceof Error ? error.message : "Could not delete client.");
+    } finally {
+      setIsDeletingClient(false);
+    }
+  }
+
   const statusTasks = useMemo(
     () =>
       taskStatuses.map((status) => ({
@@ -3727,6 +3772,12 @@ export default function RespondDashboard({
                 <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
                   <Icon name="download" />
                   {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                </button>
+              ) : null}
+              {adminEditing && selectedClient ? (
+                <button type="button" className="walkthrough-button delete-client-button" onClick={deleteSelectedClientWorkspace} disabled={isDeletingClient}>
+                  <Icon name="close" />
+                  {isDeletingClient ? "Deleting" : "Delete client"}
                 </button>
               ) : null}
               {selectedClient?.portalToken ? (

@@ -551,6 +551,17 @@ button:disabled {
   background: rgba(193, 255, 36, 0.16);
 }
 
+.delete-client-button {
+  border-color: rgba(248, 113, 113, 0.36);
+  background: rgba(127, 29, 29, 0.2);
+  color: #fca5a5;
+}
+
+.delete-client-button:hover {
+  border-color: rgba(248, 113, 113, 0.58);
+  background: rgba(127, 29, 29, 0.3);
+}
+
 .walkthrough-panel {
   position: fixed;
   z-index: 90;
@@ -2165,6 +2176,13 @@ button:disabled {
   border-color: #d5e2f2;
   background: #eef5ff;
   color: #174ac9;
+}
+
+.mission-shell-light .delete-client-button,
+.dashboard-shell-light .delete-client-button {
+  border-color: #fecaca;
+  background: #fff1f2;
+  color: #b42318;
 }
 
 .mission-shell-light .theme-toggle button.active {

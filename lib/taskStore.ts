@@ -2737,6 +2737,41 @@ export async function createClient(payload: ClientCreatePayload) {
   };
 }
 
+export async function deleteClient(
+  clientId: string,
+  environmentInput: string | null | undefined = defaultEnvironment,
+  productInput: string | null | undefined = defaultProduct
+) {
+  await ensureTaskStorage();
+  const environment = normalizeEnvironment(environmentInput);
+  const product = normalizeProduct(productInput);
+  const d1 = getD1();
+  const client = await d1
+    .prepare(`SELECT ${clientSelectFields} FROM clients WHERE id = ? AND environment = ? AND product = ?`)
+    .bind(clientId, environment, product)
+    .first<ClientRow>();
+
+  if (!client) {
+    throw new Error("Client not found.");
+  }
+
+  const metaKeys = [
+    taskSnapshotPointerMetaKey(environment, product, clientId, "legacySnapshotId"),
+    taskSnapshotPointerMetaKey(environment, product, clientId, "masterSnapshotId"),
+  ];
+
+  await d1.batch([
+    d1.prepare("DELETE FROM tasks WHERE client_id = ? AND environment = ? AND product = ?").bind(clientId, environment, product),
+    d1.prepare("DELETE FROM portal_form_submissions WHERE client_id = ? AND environment = ? AND product = ?").bind(clientId, environment, product),
+    d1.prepare("DELETE FROM task_snapshots WHERE client_id = ? AND environment = ? AND product = ?").bind(clientId, environment, product),
+    d1.prepare("DELETE FROM task_template_deletions WHERE client_id = ? AND environment = ? AND product = ?").bind(clientId, environment, product),
+    d1.prepare(`DELETE FROM app_meta WHERE key IN (${metaKeys.map(() => "?").join(", ")})`).bind(...metaKeys),
+    d1.prepare("DELETE FROM clients WHERE id = ? AND environment = ? AND product = ?").bind(clientId, environment, product),
+  ]);
+
+  return { clientId, deleted: true };
+}
+
 function normalizePortalToken(token: string) {
   const portalToken = token.trim();
 
