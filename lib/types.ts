@@ -19,6 +19,7 @@ export const statusLabels: Record<TaskStatus, string> = {
 export type Priority = "low" | "normal" | "high" | "critical";
 
 export type ProductKey = "respond" | "scale";
+export type ScaleVariant = "meta" | "google" | "meta_google";
 
 export type EnvironmentKey = "demo" | "live";
 
@@ -194,6 +195,7 @@ export interface RespondClient {
   id: string;
   environment: EnvironmentKey;
   product: ProductKey;
+  scaleVariant?: ScaleVariant;
   portalToken?: string;
   name: string;
   companyName?: string;
@@ -219,6 +221,7 @@ export interface RespondClient {
 export interface ClientCreatePayload {
   environment?: EnvironmentKey;
   product?: ProductKey;
+  scaleVariant?: ScaleVariant;
   name?: string;
   companyName?: string;
   owner?: string;

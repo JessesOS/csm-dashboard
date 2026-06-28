@@ -1,4 +1,4 @@
-import type { Category, Task } from "./types";
+import type { Category, ScaleVariant, Task } from "./types";
 
 export const scaleSourceDocument = {
   "title": "Full List Of Tasks - Scale CSM Comprehensive Operational Workflow Manual",
@@ -6204,3 +6204,29 @@ export const scaleTasks: Task[] = [
     "sortOrder": 307
   }
 ];
+
+const metaOnlyCategoryIds = new Set([
+  "scale-03-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
+  "scale-04-meta-ads-setup-handoff-partner-access",
+]);
+
+const googleOnlyCategoryIds = new Set([
+  "scale-05-google-ads-strategy-landing-page-funnel-creation",
+]);
+
+export function scaleCategoriesForVariant(variant: ScaleVariant = "meta_google") {
+  if (variant === "meta_google") {
+    return scaleCategories;
+  }
+
+  if (variant === "meta") {
+    return scaleCategories.filter((category) => !googleOnlyCategoryIds.has(category.id));
+  }
+
+  return scaleCategories.filter((category) => !metaOnlyCategoryIds.has(category.id));
+}
+
+export function scaleTasksForVariant(variant: ScaleVariant = "meta_google") {
+  const allowedCategories = new Set(scaleCategoriesForVariant(variant).map((category) => category.name));
+  return scaleTasks.filter((task) => allowedCategories.has(task.category));
+}

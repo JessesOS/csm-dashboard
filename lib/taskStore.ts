@@ -11,7 +11,9 @@ import {
   allSeedClients,
   defaultEnvironment,
   defaultProduct,
+  defaultScaleVariant,
   normalizeProduct,
+  normalizeScaleVariant,
   normalizeEnvironment,
   productCategories,
   productConfig,
@@ -32,6 +34,7 @@ import {
   type Priority,
   type ProductKey,
   type RespondClient,
+  type ScaleVariant,
   type Task,
   type TaskSnapshotCollection,
   type TaskSnapshot,
@@ -68,6 +71,7 @@ type TaskRow = Omit<
 type ClientRow = Omit<RespondClient, "environment" | "product" | "timeline" | "attention"> & {
   environment: string;
   product: string;
+  scaleVariant: string;
   timeline: string;
   attention: string;
 };
@@ -114,14 +118,14 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-25-task-snapshots";
+const currentStorageVersion = "2026-06-28-scale-variants";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
-  "id, environment, product, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
+  "id, environment, product, scale_variant AS scaleVariant, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const portalFormSubmissionSelectFields =
   "id, environment, product, client_id AS clientId, form_id AS formId, status, responses, submitted_at AS submittedAt, updated_at AS updatedAt";
 const trainingVideoSelectFields =
@@ -346,11 +350,13 @@ function fromClientRow(row: ClientRow): RespondClient {
   const phase = validClientPhases.has(row.phase) ? row.phase : "Onboarding";
   const health = validClientHealth.has(row.health) ? row.health : "on_track";
   const risk = validClientRisk.has(row.risk) ? row.risk : "low";
+  const product = normalizeProduct(row.product);
 
   return {
     ...row,
     environment: normalizeEnvironment(row.environment),
-    product: normalizeProduct(row.product),
+    product,
+    scaleVariant: product === "scale" ? normalizeScaleVariant(row.scaleVariant) : undefined,
     companyName: row.companyName ?? "",
     phase,
     health,
@@ -476,7 +482,8 @@ function clientCode(name: string) {
 
 function buildNewClient(payload: ClientCreatePayload, id: string, environment: EnvironmentKey, product: ProductKey): RespondClient {
   const config = productConfig(product);
-  const templateTasks = productTasks(product);
+  const scaleVariant = product === "scale" ? normalizeScaleVariant(payload.scaleVariant) : undefined;
+  const templateTasks = productTasks(product, scaleVariant);
   const name = payload.name?.trim() ?? "";
   const companyName = payload.companyName?.trim() ?? "";
   const goLiveDate = payload.goLiveDate?.trim() || defaultGoLiveDate();
@@ -488,6 +495,7 @@ function buildNewClient(payload: ClientCreatePayload, id: string, environment: E
     id,
     environment,
     product,
+    scaleVariant,
     portalToken: makePortalToken(),
     name,
     companyName,
@@ -535,6 +543,7 @@ function clientInsertValues(client: RespondClient) {
     client.id,
     client.environment,
     client.product,
+    client.scaleVariant ?? (client.product === "scale" ? defaultScaleVariant : ""),
     client.portalToken ?? makePortalToken(),
     client.name,
     client.companyName ?? "",
@@ -605,7 +614,7 @@ async function seedWorkspaceShapeReady() {
     "portal_action_label",
     "portal_configured",
   ];
-  const requiredClientColumns = ["portal_token", "environment", "product", "company_name"];
+  const requiredClientColumns = ["portal_token", "environment", "product", "company_name", "scale_variant"];
   const requiredPortalFormColumns = [
     "client_id",
     "environment",
@@ -771,6 +780,10 @@ async function ensureClientColumns() {
   if (!columns.has("company_name")) {
     await d1.prepare("ALTER TABLE clients ADD COLUMN company_name TEXT NOT NULL DEFAULT ''").run();
   }
+
+  if (!columns.has("scale_variant")) {
+    await d1.prepare(`ALTER TABLE clients ADD COLUMN scale_variant TEXT NOT NULL DEFAULT '${defaultScaleVariant}'`).run();
+  }
 }
 
 async function ensureClientPortalTokens() {
@@ -864,6 +877,7 @@ async function migrateGlobalTasksToClient() {
 
 async function seedTemplateTasksForClient(clientId: string, environment: EnvironmentKey, product: ProductKey, useTemplateState: boolean) {
   const d1 = getD1();
+  const scaleVariant = product === "scale" ? await getClientScaleVariant(clientId, environment, product) : undefined;
   const [existing, deletedTemplates] = await Promise.all([
     d1
       .prepare("SELECT template_id AS templateId FROM tasks WHERE client_id = ? AND environment = ? AND product = ?")
@@ -872,7 +886,7 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
     deletedTemplateIdsForClient(d1, environment, product, clientId),
   ]);
   const existingTemplates = new Set((existing.results ?? []).map((item) => item.templateId));
-  const missing = productTasks(product).filter((item) => !existingTemplates.has(item.id) && !deletedTemplates.has(item.id));
+  const missing = productTasks(product, scaleVariant).filter((item) => !existingTemplates.has(item.id) && !deletedTemplates.has(item.id));
 
   if (missing.length === 0) {
     return;
@@ -912,6 +926,68 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
         .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
   );
+}
+
+async function getClientScaleVariant(clientId: string, environment: EnvironmentKey, product: ProductKey) {
+  if (product !== "scale") {
+    return undefined;
+  }
+
+  const row = await getD1()
+    .prepare("SELECT scale_variant AS scaleVariant FROM clients WHERE id = ? AND environment = ? AND product = ?")
+    .bind(clientId, environment, product)
+    .first<{ scaleVariant: string }>();
+
+  return normalizeScaleVariant(row?.scaleVariant);
+}
+
+async function removeTemplateTasksOutsideVariant(clientId: string, environment: EnvironmentKey, product: ProductKey, scaleVariant?: ScaleVariant) {
+  if (product !== "scale") {
+    return;
+  }
+
+  const d1 = getD1();
+  const allowedTemplateIds = new Set(productTasks(product, scaleVariant).map((task) => task.id));
+  const rows = await d1
+    .prepare("SELECT id, template_id AS templateId, dependencies FROM tasks WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(environment, product, clientId)
+    .all<{ id: string; templateId: string; dependencies: string }>();
+  const disallowedTaskIds = new Set(
+    (rows.results ?? [])
+      .filter((row) => row.templateId && !row.templateId.startsWith("custom-") && !allowedTemplateIds.has(row.templateId))
+      .map((row) => row.id)
+  );
+
+  if (disallowedTaskIds.size === 0) {
+    return;
+  }
+
+  const dependencyUpdates = (rows.results ?? [])
+    .map((row) => {
+      const nextDependencies = parseDependencies(row.dependencies).filter((dependencyId) => !disallowedTaskIds.has(dependencyId));
+      return nextDependencies.length === parseDependencies(row.dependencies).length
+        ? null
+        : d1.prepare("UPDATE tasks SET dependencies = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(JSON.stringify(nextDependencies), row.id);
+    })
+    .filter((statement): statement is D1PreparedStatement => Boolean(statement));
+
+  const deleteStatements = [...dependencyUpdates];
+  for (const taskId of disallowedTaskIds) {
+    deleteStatements.push(d1.prepare("DELETE FROM tasks WHERE id = ?").bind(taskId));
+  }
+
+  const staleTemplateDeletions = await d1
+    .prepare("SELECT id, template_id AS templateId FROM task_template_deletions WHERE environment = ? AND product = ? AND client_id = ?")
+    .bind(environment, product, clientId)
+    .all<{ id: string; templateId: string }>();
+
+  for (const row of staleTemplateDeletions.results ?? []) {
+    if (!allowedTemplateIds.has(row.templateId)) {
+      deleteStatements.push(d1.prepare("DELETE FROM task_template_deletions WHERE id = ?").bind(row.id));
+    }
+  }
+
+  await d1.batch(deleteStatements);
 }
 
 async function deletedTemplateIdsForClient(d1: D1Database, environment: EnvironmentKey, product: ProductKey, clientId: string) {
@@ -1106,6 +1182,7 @@ async function prepareTaskStorage() {
         id TEXT PRIMARY KEY,
         environment TEXT NOT NULL DEFAULT 'demo',
         product TEXT NOT NULL DEFAULT 'respond',
+        scale_variant TEXT NOT NULL DEFAULT 'meta_google',
         portal_token TEXT NOT NULL DEFAULT '',
         name TEXT NOT NULL,
         company_name TEXT NOT NULL DEFAULT '',
@@ -1334,14 +1411,15 @@ export async function listClients(environmentInput: string | null | undefined = 
 async function requireClient(environment: EnvironmentKey, product: ProductKey, clientId: string) {
   await ensureTaskStorage();
   const client = await getD1()
-    .prepare("SELECT id FROM clients WHERE id = ? AND environment = ? AND product = ?")
+    .prepare("SELECT id, scale_variant AS scaleVariant FROM clients WHERE id = ? AND environment = ? AND product = ?")
     .bind(clientId, environment, product)
-    .first<{ id: string }>();
+    .first<{ id: string; scaleVariant: string }>();
 
   if (!client) {
     throw new Error("Client not found.");
   }
 
+  await removeTemplateTasksOutsideVariant(clientId, environment, product, normalizeScaleVariant(client.scaleVariant));
   await seedTemplateTasksForClient(clientId, environment, product, false);
   await applyPortalDefaultsToUnconfiguredTasks(clientId, environment, product);
   return client.id;
@@ -1395,9 +1473,10 @@ export async function createTask(
     throw new Error("Task title is required.");
   }
 
-  const categories = productCategories(product);
+  const scaleVariant = await getClientScaleVariant(scopedClientId, environment, product);
+  const categories = productCategories(product, scaleVariant);
   const teamMembers = productTeamMembers(product);
-  const templateTasks = productTasks(product);
+  const templateTasks = productTasks(product, scaleVariant);
   const category = categories.find((item) => item.name === payload.category) ?? categories[0];
   const nextOrder = await d1
     .prepare("SELECT COALESCE(MAX(sort_order), 0) + 1 AS nextOrder FROM tasks WHERE environment = ? AND product = ? AND client_id = ?")
@@ -1492,7 +1571,12 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   }
 
   const product = normalizeProduct(existing.product);
-  const categories = productCategories(product);
+  const taskClient = await d1
+    .prepare("SELECT client_id AS clientId, environment, product FROM tasks WHERE id = ?")
+    .bind(id)
+    .first<{ clientId: string; environment: string; product: string }>();
+  const scaleVariant = taskClient ? await getClientScaleVariant(taskClient.clientId, normalizeEnvironment(taskClient.environment), product) : undefined;
+  const categories = productCategories(product, scaleVariant);
   const teamMembers = productTeamMembers(product);
   const updates: string[] = [];
   const values: unknown[] = [];
@@ -1931,7 +2015,8 @@ function taskRestoreStatement(d1: D1Database, task: Task, environment: Environme
 }
 
 async function syncTemplateDeletionMarkersForTasks(d1: D1Database, environment: EnvironmentKey, product: ProductKey, clientId: string, tasks: Task[]) {
-  const defaultTemplateIds = new Set(productTasks(product).map((task) => task.id));
+  const scaleVariant = await getClientScaleVariant(clientId, environment, product);
+  const defaultTemplateIds = new Set(productTasks(product, scaleVariant).map((task) => task.id));
   const restoredTemplateIds = new Set(
     tasks
       .map((task) => task.templateId ?? "")
@@ -2001,6 +2086,7 @@ export async function restoreTaskSnapshot(id: string) {
     await d1.batch(chunk.map((task) => taskRestoreStatement(d1, task, snapshot.environment, snapshot.product, snapshot.clientId)));
   }
 
+  await removeTemplateTasksOutsideVariant(snapshot.clientId, snapshot.environment, snapshot.product, await getClientScaleVariant(snapshot.clientId, snapshot.environment, snapshot.product));
   await syncTemplateDeletionMarkersForTasks(d1, snapshot.environment, snapshot.product, snapshot.clientId, tasks);
 
   return {
@@ -2530,6 +2616,7 @@ async function updateExistingClientIdentity(client: RespondClient, payload: Clie
   const incomingName = payload.name?.trim() ?? "";
   const incomingCompanyName = payload.companyName?.trim() ?? "";
   const currentCompanyName = client.companyName ?? "";
+  const nextScaleVariant = client.product === "scale" ? normalizeScaleVariant(payload.scaleVariant ?? client.scaleVariant) : undefined;
   const existingLooksCompanyNamed =
     (Boolean(currentCompanyName) && normalizeClientIdentity(client.name) === normalizeClientIdentity(currentCompanyName)) ||
     (Boolean(incomingCompanyName) && normalizeClientIdentity(client.name) === normalizeClientIdentity(incomingCompanyName));
@@ -2552,6 +2639,11 @@ async function updateExistingClientIdentity(client: RespondClient, payload: Clie
   if (payload.industry?.trim() && (!client.industry || client.industry === "New client")) {
     updates.push("industry = ?");
     values.push(payload.industry.trim());
+  }
+
+  if (client.product === "scale" && nextScaleVariant && nextScaleVariant !== client.scaleVariant) {
+    updates.push("scale_variant = ?");
+    values.push(nextScaleVariant);
   }
 
   if (updates.length === 0) {
@@ -2609,6 +2701,7 @@ export async function createClient(payload: ClientCreatePayload) {
         id,
         environment,
         product,
+        scale_variant,
         portal_token,
         name,
         company_name,
@@ -2629,7 +2722,7 @@ export async function createClient(payload: ClientCreatePayload) {
         completed_tasks,
         timeline,
         attention
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(...clientInsertValues(client))
     .run();

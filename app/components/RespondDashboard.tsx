@@ -4,8 +4,10 @@ import { useEffect, useMemo, useRef, useState, useTransition, type FormEvent, ty
 import {
   defaultEnvironment,
   defaultProduct,
+  defaultScaleVariant,
   environmentConfig,
   environmentProductClients,
+  normalizeScaleVariant,
   operatingEnvironments,
   productCategories,
   productConfig,
@@ -24,6 +26,7 @@ import type {
   EnvironmentKey,
   ProductKey,
   RespondClient,
+  ScaleVariant,
   Task,
   TaskSnapshotCollection,
   TaskSnapshot,
@@ -45,6 +48,11 @@ interface DashboardProps {
 }
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
+const scaleVariantOptions: Array<{ key: ScaleVariant; label: string }> = [
+  { key: "meta", label: "Scale with Meta ads" },
+  { key: "google", label: "Scale with Google ads" },
+  { key: "meta_google", label: "Scale with Meta and Google" },
+];
 const statusColumnDetails: Record<TaskStatus, string> = {
   queued: "Ready to start",
   in_progress: "Being worked",
@@ -861,6 +869,33 @@ function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange
       </button>
     </div>
   );
+}
+
+function promptScaleVariant(defaultValue: ScaleVariant = defaultScaleVariant) {
+  const defaultChoice = defaultValue === "meta" ? "1" : defaultValue === "google" ? "2" : "3";
+  const choice = window.prompt(
+    "Choose the Scale checklist:\n1. Meta ads\n2. Google ads\n3. Meta + Google",
+    defaultChoice
+  );
+
+  if (!choice?.trim()) {
+    return null;
+  }
+
+  const normalized = choice.trim().toLowerCase();
+  if (normalized === "1" || normalized === "meta") {
+    return "meta" satisfies ScaleVariant;
+  }
+
+  if (normalized === "2" || normalized === "google") {
+    return "google" satisfies ScaleVariant;
+  }
+
+  if (normalized === "3" || normalized === "meta_google" || normalized === "both" || normalized === "meta and google") {
+    return "meta_google" satisfies ScaleVariant;
+  }
+
+  throw new Error("Choose 1, 2, or 3 for the Scale checklist.");
 }
 
 function RespondMark({ className }: { className: string }) {
@@ -1874,6 +1909,7 @@ function NewClientPanel({
   const [industry, setIndustry] = useState("");
   const [owner, setOwner] = useState(product.ownerFallback);
   const [goLiveDate, setGoLiveDate] = useState("");
+  const [scaleVariant, setScaleVariant] = useState<ScaleVariant>(defaultScaleVariant);
 
   if (!open) {
     return null;
@@ -1886,7 +1922,7 @@ function NewClientPanel({
         aria-label="Create client"
         onSubmit={(event) => {
           event.preventDefault();
-          onSubmit({ name, industry, owner, goLiveDate });
+          onSubmit({ name, industry, owner, goLiveDate, scaleVariant: product.key === "scale" ? scaleVariant : undefined });
         }}
       >
         <div className="new-client-head">
@@ -1910,6 +1946,18 @@ function NewClientPanel({
           Owner
           <input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder={product.ownerFallback} />
         </label>
+        {product.key === "scale" ? (
+          <label>
+            Scale delivery
+            <select value={scaleVariant} onChange={(event) => setScaleVariant(normalizeScaleVariant(event.target.value))}>
+              {scaleVariantOptions.map((option) => (
+                <option key={option.key} value={option.key}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
         <label>
           Target go-live
           <input type="date" value={goLiveDate} onChange={(event) => setGoLiveDate(event.target.value)} />
@@ -2625,19 +2673,6 @@ export default function RespondDashboard({
   const [isPending, startTransition] = useTransition();
   const currentEnvironment = useMemo(() => environmentConfig(activeEnvironment), [activeEnvironment]);
   const currentProduct = useMemo(() => productConfig(activeProduct), [activeProduct]);
-  const categories = useMemo(
-    () => (activeProduct === initialProduct ? initialCategories : productCategories(activeProduct)),
-    [activeProduct, initialProduct, initialCategories]
-  );
-  const teamMembers = useMemo(
-    () => (activeProduct === initialProduct ? initialTeamMembers : productTeamMembers(activeProduct)),
-    [activeProduct, initialProduct, initialTeamMembers]
-  );
-  const templateTasks = useMemo(
-    () => (activeProduct === initialProduct ? initialTasks : productTasks(activeProduct)),
-    [activeProduct, initialProduct, initialTasks]
-  );
-
   const activeTaskClientId = useMemo(() => {
     if (selectedClientId !== "all" && clients.some((client) => client.id === selectedClientId)) {
       return selectedClientId;
@@ -2645,6 +2680,22 @@ export default function RespondDashboard({
 
     return clients[0]?.id ?? "";
   }, [clients, selectedClientId]);
+  const activeScaleVariant = useMemo(
+    () => (activeProduct === "scale" ? clients.find((client) => client.id === activeTaskClientId)?.scaleVariant ?? defaultScaleVariant : undefined),
+    [activeProduct, activeTaskClientId, clients]
+  );
+  const categories = useMemo(
+    () => (activeProduct === initialProduct ? initialCategories : productCategories(activeProduct, activeScaleVariant)),
+    [activeProduct, activeScaleVariant, initialProduct, initialCategories]
+  );
+  const teamMembers = useMemo(
+    () => (activeProduct === initialProduct ? initialTeamMembers : productTeamMembers(activeProduct)),
+    [activeProduct, initialProduct, initialTeamMembers]
+  );
+  const templateTasks = useMemo(
+    () => (activeProduct === initialProduct ? initialTasks : productTasks(activeProduct, activeScaleVariant)),
+    [activeProduct, activeScaleVariant, initialProduct, initialTasks]
+  );
   const activeTaskKey = taskWorkspaceKey(activeEnvironment, activeProduct, activeTaskClientId);
   const tasksMatchActiveWorkspace = useMemo(
     () =>
@@ -2659,8 +2710,9 @@ export default function RespondDashboard({
   function resetWorkspace(environment: EnvironmentKey, product: ProductKey) {
     const nextClients = environmentProductClients(environment, product);
     const shouldUseSeededPreview = environment === defaultEnvironment && nextClients.length > 0;
-    const nextTasks = shouldUseSeededPreview ? productTasks(product) : [];
-    const nextCategories = productCategories(product);
+    const previewScaleVariant = product === "scale" ? nextClients[0]?.scaleVariant ?? defaultScaleVariant : undefined;
+    const nextTasks = shouldUseSeededPreview ? productTasks(product, previewScaleVariant) : [];
+    const nextCategories = productCategories(product, previewScaleVariant);
 
     setActiveEnvironment(environment);
     setActiveProduct(product);
@@ -2829,6 +2881,11 @@ export default function RespondDashboard({
       active = false;
     };
   }, [activeEnvironment, activeProduct, activeTaskClientId]);
+
+  useEffect(() => {
+    setCategoryFilter((current) => (current === "all" || categories.some((category) => category.name === current) ? current : "all"));
+    setNewTaskCategory((current) => (categories.some((category) => category.name === current) ? current : (categories[0]?.name ?? "")));
+  }, [categories]);
 
   useEffect(() => {
     if (!detailTaskId) {
@@ -3339,13 +3396,27 @@ export default function RespondDashboard({
       return;
     }
 
+    let scaleVariant: ScaleVariant | undefined;
+    if (activeProduct === "scale") {
+      try {
+        scaleVariant = promptScaleVariant();
+      } catch (error) {
+        setStorageNotice(error instanceof Error ? error.message : "Could not choose the Scale checklist.");
+        return;
+      }
+
+      if (!scaleVariant) {
+        return;
+      }
+    }
+
     setIsImportingGhlClient(true);
 
     try {
       const response = await fetch("/api/clients/import-ghl", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ selector: selector.trim(), product: activeProduct }),
+        body: JSON.stringify({ selector: selector.trim(), product: activeProduct, scaleVariant }),
       });
       const data = await response.json();
       if (!response.ok) {

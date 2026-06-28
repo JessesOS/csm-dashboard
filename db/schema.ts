@@ -34,6 +34,7 @@ export const clients = sqliteTable("clients", {
   id: text("id").primaryKey(),
   environment: text("environment").notNull().default("demo"),
   product: text("product").notNull().default("respond"),
+  scaleVariant: text("scale_variant").notNull().default("meta_google"),
   portalToken: text("portal_token").notNull().default(""),
   name: text("name").notNull(),
   companyName: text("company_name").notNull().default(""),

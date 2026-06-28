@@ -1,8 +1,8 @@
 import { liveRespondClients, respondClients } from "./respondClients";
 import { categories, seedTasks, sourceDocument, teamMembers } from "./respondTasks";
 import { scaleClients } from "./scaleClients";
-import { scaleCategories, scaleSourceDocument, scaleTasks, scaleTeamMembers } from "./scaleTasks";
-import type { Category, EnvironmentKey, ProductKey, RespondClient, Task } from "./types";
+import { scaleCategoriesForVariant, scaleSourceDocument, scaleTasksForVariant, scaleTeamMembers } from "./scaleTasks";
+import type { Category, EnvironmentKey, ProductKey, RespondClient, ScaleVariant, Task } from "./types";
 
 export interface ProductWorkspace {
   key: ProductKey;
@@ -74,6 +74,11 @@ export const productWorkspaces: ProductWorkspace[] = [
 
 export const defaultProduct: ProductKey = "respond";
 export const defaultEnvironment: EnvironmentKey = "demo";
+export const defaultScaleVariant: ScaleVariant = "meta_google";
+
+export function normalizeScaleVariant(value: string | null | undefined): ScaleVariant {
+  return value === "meta" || value === "google" ? value : "meta_google";
+}
 
 export function normalizeProduct(value: string | null | undefined): ProductKey {
   return value === "scale" ? "scale" : "respond";
@@ -91,16 +96,16 @@ export function environmentConfig(environment: EnvironmentKey) {
   return operatingEnvironments.find((workspace) => workspace.key === environment) ?? operatingEnvironments[0];
 }
 
-export function productCategories(product: ProductKey): Category[] {
-  return product === "scale" ? scaleCategories : categories;
+export function productCategories(product: ProductKey, scaleVariant: ScaleVariant = defaultScaleVariant): Category[] {
+  return product === "scale" ? scaleCategoriesForVariant(scaleVariant) : categories;
 }
 
 export function productTeamMembers(product: ProductKey): string[] {
   return product === "scale" ? scaleTeamMembers : teamMembers;
 }
 
-export function productTasks(product: ProductKey): Task[] {
-  return product === "scale" ? scaleTasks : seedTasks;
+export function productTasks(product: ProductKey, scaleVariant: ScaleVariant = defaultScaleVariant): Task[] {
+  return product === "scale" ? scaleTasksForVariant(scaleVariant) : seedTasks;
 }
 
 export function productClients(product: ProductKey): RespondClient[] {

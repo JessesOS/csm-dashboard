@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { specifiedGhlClientImport } from "../../../../lib/ghlImport";
-import { normalizeProduct } from "../../../../lib/productWorkspaces";
+import { normalizeProduct, normalizeScaleVariant } from "../../../../lib/productWorkspaces";
 import { createClient, routeErrorMessage } from "../../../../lib/taskStore";
 
 export const dynamic = "force-dynamic";
@@ -12,11 +12,13 @@ export async function POST(request: Request) {
     const payload = await request.json().catch(() => ({}));
     const selector = typeof payload.selector === "string" ? payload.selector.trim() : "";
     const importProduct = normalizeProduct(typeof payload.product === "string" ? payload.product : "respond");
+    const scaleVariant = importProduct === "scale" ? normalizeScaleVariant(typeof payload.scaleVariant === "string" ? payload.scaleVariant : undefined) : undefined;
     const ghlImport = await specifiedGhlClientImport(selector, importProduct);
     const result = await createClient({
       ...ghlImport.payload,
       environment: importEnvironment,
       product: importProduct,
+      scaleVariant,
     });
 
     return NextResponse.json({
