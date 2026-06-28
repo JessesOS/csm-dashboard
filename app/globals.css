@@ -2546,15 +2546,24 @@ button:disabled {
 
 .phase-group {
   display: grid;
-  gap: 5px;
-  margin-bottom: 20px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .phase-label {
-  color: #8791a2;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  border: 1px solid #d9e1ea;
+  border-radius: 8px;
+  background: #f4f7fb;
+  color: #475569;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 860;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  padding: 0 12px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
 }
 
 .category-nav-group {
@@ -4792,6 +4801,13 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .category-link strong,
 .dashboard-shell-dark .category-nav-task em {
   color: #71849a;
+}
+
+.dashboard-shell-dark .phase-label {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: rgba(10, 31, 51, 0.95);
+  color: #9cb0c6;
+  box-shadow: none;
 }
 
 .dashboard-shell-dark .category-nav-tasks {
