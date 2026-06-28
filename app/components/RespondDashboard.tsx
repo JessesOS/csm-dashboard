@@ -48,6 +48,14 @@ interface DashboardProps {
 }
 
 const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
+const phaseAccentClass: Record<string, string> = {
+  Onboarding: "phase-accent-onboarding",
+  Build: "phase-accent-build",
+  Testing: "phase-accent-testing",
+  "Go-Live": "phase-accent-golive",
+  "Post-Launch": "phase-accent-postlaunch",
+  Support: "phase-accent-support",
+};
 const scaleVariantOptions: Array<{ key: ScaleVariant; label: string }> = [
   { key: "meta", label: "Scale with Meta ads" },
   { key: "google", label: "Scale with Google ads" },
@@ -2666,6 +2674,7 @@ export default function RespondDashboard({
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set());
+  const [expandedPhases, setExpandedPhases] = useState<Set<string>>(() => new Set(phaseOrder));
   const [isTaskOverviewOpen, setIsTaskOverviewOpen] = useState(false);
   const [storageNotice, setStorageNotice] = useState("");
   const [taskActionNotice, setTaskActionNotice] = useState<TaskActionNotice | null>(null);
@@ -2737,6 +2746,7 @@ export default function RespondDashboard({
     setNewTaskTitle("");
     setNewTaskCategory(nextCategories[0]?.name ?? "");
     setExpandedCategories(new Set());
+    setExpandedPhases(new Set(phaseOrder));
     setIsTaskOverviewOpen(false);
     setShowNewClientPanel(false);
     setStorageNotice("");
@@ -3267,6 +3277,20 @@ export default function RespondDashboard({
     });
   }
 
+  function togglePhase(phase: string) {
+    setExpandedPhases((current) => {
+      const next = new Set(current);
+
+      if (next.has(phase)) {
+        next.delete(phase);
+      } else {
+        next.add(phase);
+      }
+
+      return next;
+    });
+  }
+
   function selectTaskFromCategory(task: Task) {
     setSelectedId(task.id);
     setDetailReadyTaskId(task.id);
@@ -3675,10 +3699,27 @@ export default function RespondDashboard({
         <nav className="phase-nav" aria-label="Task categories">
           {phaseOrder.map((phase) => {
             const phaseCategories = categoryStats.filter((category) => category.phase === phase);
+            const isPhaseExpanded = expandedPhases.has(phase);
+            const phaseComplete = phaseCategories.reduce((sum, category) => sum + category.complete, 0);
+            const phaseTotal = phaseCategories.reduce((sum, category) => sum + category.total, 0);
             return (
               <div key={phase} className="phase-group">
-                <span className="phase-label">{phase}</span>
-                {phaseCategories.map((category) => {
+                <button
+                  type="button"
+                  className={`phase-label ${phaseAccentClass[phase] ?? ""} ${isPhaseExpanded ? "phase-label-open" : ""}`}
+                  aria-expanded={isPhaseExpanded}
+                  aria-controls={`phase-section-${phase}`}
+                  onClick={() => togglePhase(phase)}
+                >
+                  <span className="phase-label-main">
+                    <span className="phase-label-title">{phase}</span>
+                    <span className="phase-label-meta">{phaseComplete}/{phaseTotal}</span>
+                  </span>
+                  <span className={isPhaseExpanded ? "phase-label-chevron phase-label-chevron-open" : "phase-label-chevron"} aria-hidden="true" />
+                </button>
+                {isPhaseExpanded ? (
+                  <div className="phase-group-body" id={`phase-section-${phase}`}>
+                    {phaseCategories.map((category) => {
                   const isExpanded = expandedCategories.has(category.name);
                   const isComplete = category.total > 0 && category.complete === category.total;
                   const categoryTasks = tasksByCategory.get(category.name) ?? [];
@@ -3728,7 +3769,9 @@ export default function RespondDashboard({
                       ) : null}
                     </div>
                   );
-                })}
+                    })}
+                  </div>
+                ) : null}
               </div>
             );
           })}
