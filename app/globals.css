@@ -1245,14 +1245,14 @@ button:disabled {
 .mission-client-card-main {
   display: grid;
   flex: 1;
-  grid-template-columns: 38px minmax(0, 1fr) auto;
+  grid-template-columns: 38px minmax(0, 1fr);
   align-items: center;
-  gap: 8px 10px;
+  gap: 6px 10px;
   width: 100%;
   border: 0;
   background: transparent;
   color: inherit;
-  padding: 13px 13px 8px;
+  padding: 13px 13px 10px;
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -1283,9 +1283,7 @@ button:disabled {
   color: #f8fbff;
   font-size: 15px;
   font-weight: 820;
-  line-height: 1.25;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .mission-client-name small {
@@ -1303,7 +1301,6 @@ button:disabled {
   display: flex;
   align-items: center;
   gap: 6px;
-  justify-content: flex-end;
 }
 
 .mission-client-portal-icon {
@@ -1337,7 +1334,7 @@ button:disabled {
 }
 
 .mission-client-meta {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
 }
 
 .mission-progress-track {
@@ -1361,6 +1358,11 @@ button:disabled {
   justify-content: space-between;
   gap: 8px;
   font-size: 12px;
+}
+
+.mission-client-foot strong {
+  color: #c9f82b;
+  font-weight: 760;
 }
 
 

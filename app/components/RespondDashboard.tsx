@@ -2555,7 +2555,7 @@ function MissionControl({
                   <span style={{ width: `${client.progress}%` }} />
                 </span>
                 <span className="mission-client-foot">
-                  <span>{client.progress}% ready</span>
+                  <span><strong>{client.progress}%</strong> ready</span>
                   <span>{client.goLiveLabel}</span>
                 </span>
               </button>
