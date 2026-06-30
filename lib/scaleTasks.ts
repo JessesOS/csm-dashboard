@@ -270,7 +270,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-010",
     "title": "Verify \"Setup Fee Invoices Created and Sent\" is marked completed in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -290,7 +290,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-011",
     "title": "Verify \"Setup Fee Paid and Reconciled\" is marked completed in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -310,7 +310,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-012",
     "title": "Check that \"SaaS Fees Are Activated\" in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -330,7 +330,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-013",
     "title": "Verify \"Recurring Invoices Setup/Auto/Reconciled\" is marked completed in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -350,7 +350,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-014",
     "title": "Verify \"Client Payments\" in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -370,7 +370,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-015",
     "title": "Verify the automated Zapier trigger deployed the correct LaunchBay project template upon the deal closing.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -390,7 +390,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-016",
     "title": "Verify the automated Zapier trigger sent the welcome email with the LaunchBay form to the client.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -410,7 +410,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-017",
     "title": "Set up a Zapier automation connecting the client's LaunchBay project with their Slack channel to sync task notifications in real-time.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
