@@ -46,8 +46,9 @@ interface DashboardProps {
   initialClients: RespondClient[];
 }
 
-const phaseOrder = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
+const phaseOrder = ["Pre-Onboarding and Welcome Call", "Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
 const phaseAccentClass: Record<string, string> = {
+  "Pre-Onboarding and Welcome Call": "phase-accent-preonboarding",
   Onboarding: "phase-accent-onboarding",
   Build: "phase-accent-build",
   Testing: "phase-accent-testing",

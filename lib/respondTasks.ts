@@ -19,6 +19,7 @@ export const teamMembers = [
 ];
 
 export const categories: Category[] = [
+  { id: "pre-onboarding", name: "Pre-Onboarding and Welcome Call", phase: "Pre-Onboarding and Welcome Call", accent: "#14b8a6" },
   { id: "accounts", name: "LaunchBay Accounts Stage Verification", phase: "Onboarding", accent: "#2563eb" },
   { id: "admin", name: "Admin & Account Setup", phase: "Onboarding", accent: "#0891b2" },
   { id: "welcome", name: "Welcome Onboarding Call", phase: "Onboarding", accent: "#0f766e" },
@@ -71,40 +72,40 @@ function task(
 }
 
 export const seedTasks: Task[] = [
-  task(1, "accounts", "Monitor the Accounts stage in LaunchBay to ensure the finance baseline is complete.", {
+  task(1, "pre-onboarding", "Monitor the Accounts stage in LaunchBay to ensure the finance baseline is complete.", {
     status: "complete",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",
     priority: "high",
   }),
-  task(2, "accounts", "Verify that Setup Fee Invoices Created and Sent is marked complete.", {
+  task(2, "pre-onboarding", "Verify that Setup Fee Invoices Created and Sent is marked complete.", {
     status: "complete",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",
     priority: "high",
   }),
-  task(3, "accounts", "Verify that Setup Fee Paid and Reconciled is marked complete.", {
+  task(3, "pre-onboarding", "Verify that Setup Fee Paid and Reconciled is marked complete.", {
     status: "complete",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",
     priority: "critical",
     dependencies: ["rsp-002"],
   }),
-  task(4, "accounts", "Check that SaaS Fees Are Activated.", {
+  task(4, "pre-onboarding", "Check that SaaS Fees Are Activated.", {
     status: "complete",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",
     priority: "high",
     dependencies: ["rsp-003"],
   }),
-  task(5, "accounts", "Verify that Recurring Invoices Setup/Auto/Reconciled is completed.", {
+  task(5, "pre-onboarding", "Verify that Recurring Invoices Setup/Auto/Reconciled is completed.", {
     status: "review",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",
     priority: "high",
     dependencies: ["rsp-004"],
   }),
-  task(6, "accounts", "Confirm Client Payments is marked as Active.", {
+  task(6, "pre-onboarding", "Confirm Client Payments is marked as Active.", {
     status: "review",
     assignee: "Accounts - Sandy",
     dueWindow: "Pre-build",

@@ -24,6 +24,7 @@ export type ScaleVariant = "meta" | "google" | "meta_google";
 export type EnvironmentKey = "demo" | "live";
 
 export type Phase =
+  | "Pre-Onboarding and Welcome Call"
   | "Onboarding"
   | "Build"
   | "Testing"

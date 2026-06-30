@@ -2719,6 +2719,12 @@ button:disabled {
   color: #166534;
 }
 
+.phase-accent-preonboarding {
+  background: linear-gradient(180deg, #ecfeff 0%, #dff7f8 100%);
+  border-color: #9ee6e6;
+  color: #0f766e;
+}
+
 .phase-accent-build {
   background: linear-gradient(180deg, #eef4ff 0%, #e4edff 100%);
   border-color: #c8d8ff;
@@ -5030,6 +5036,12 @@ progress::-webkit-progress-value {
   background: linear-gradient(180deg, rgba(22, 101, 52, 0.34) 0%, rgba(12, 74, 36, 0.36) 100%);
   border-color: rgba(74, 222, 128, 0.28);
   color: #9df7b4;
+}
+
+.dashboard-shell-dark .phase-accent-preonboarding {
+  background: linear-gradient(180deg, rgba(15, 118, 110, 0.34) 0%, rgba(13, 148, 136, 0.28) 100%);
+  border-color: rgba(45, 212, 191, 0.28);
+  color: #9df7ec;
 }
 
 .dashboard-shell-dark .phase-accent-build {
