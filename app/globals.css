@@ -1126,6 +1126,21 @@ button:disabled {
   color: #ff6961 !important;
 }
 
+.portfolio-kpi:has(.tone-amber) strong,
+.portfolio-kpi:has(.tone-red) strong {
+  font-size: 32px;
+}
+
+.portfolio-kpi:has(.tone-amber) {
+  background: rgba(245, 178, 44, 0.06);
+  border-top: 2px solid rgba(245, 178, 44, 0.4);
+}
+
+.portfolio-kpi:has(.tone-red) {
+  background: rgba(255, 105, 97, 0.06);
+  border-top: 2px solid rgba(255, 105, 97, 0.4);
+}
+
 .portfolio-health {
   display: flex;
   align-items: center;
