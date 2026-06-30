@@ -3604,6 +3604,79 @@ button:disabled {
   background: #ffe4e6;
 }
 
+.client-task-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  border-radius: 999px;
+  border: 1px solid rgba(36, 94, 232, 0.18);
+  background: #f8fbff;
+  color: #245ee8;
+  padding: 4px 10px 4px 6px;
+}
+
+.client-task-toggle-knob {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: rgba(100, 116, 139, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+
+.client-task-toggle-copy {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+}
+
+.client-task-toggle-copy strong,
+.client-task-toggle-copy em {
+  display: block;
+  font-style: normal;
+  line-height: 1.1;
+}
+
+.client-task-toggle-copy strong {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.client-task-toggle-copy em {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.client-task-toggle-on {
+  border-color: rgba(22, 163, 74, 0.24);
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.client-task-toggle-on .client-task-toggle-knob {
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
+}
+
+.client-task-toggle-on .client-task-toggle-copy em {
+  color: #15803d;
+}
+
+.client-task-toggle-compact {
+  min-height: 28px;
+  padding-right: 9px;
+}
+
+.client-task-toggle-compact .client-task-toggle-copy strong {
+  font-size: 10px;
+}
+
+.client-task-toggle-compact .client-task-toggle-copy em {
+  font-size: 9px;
+}
+
 .task-actions .admin-delete-task:disabled {
   cursor: wait;
   opacity: 0.6;
@@ -3940,6 +4013,11 @@ progress::-webkit-progress-value {
   color: var(--ink);
   font-size: 12px;
   font-weight: 780;
+}
+
+.category-task-row-controls {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .dependency-list button {
@@ -5376,6 +5454,36 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-actions .admin-delete-task:hover {
   border-color: rgba(248, 113, 113, 0.42);
   background: rgba(248, 113, 113, 0.18);
+}
+
+.dashboard-shell-dark .client-task-toggle {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(15, 42, 67, 0.9);
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .client-task-toggle-knob {
+  background: rgba(148, 163, 184, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(220, 232, 246, 0.08);
+}
+
+.dashboard-shell-dark .client-task-toggle-copy em {
+  color: #8fa2b7;
+}
+
+.dashboard-shell-dark .client-task-toggle-on {
+  border-color: rgba(193, 255, 36, 0.34);
+  background: rgba(193, 255, 36, 0.12);
+  color: #c9f82b;
+}
+
+.dashboard-shell-dark .client-task-toggle-on .client-task-toggle-knob {
+  background: #c9f82b;
+  box-shadow: 0 0 0 3px rgba(193, 255, 36, 0.16);
+}
+
+.dashboard-shell-dark .client-task-toggle-on .client-task-toggle-copy em {
+  color: #dffb73;
 }
 
 .dashboard-shell-dark .admin-editing-notice {

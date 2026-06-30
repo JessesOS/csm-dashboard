@@ -1203,6 +1203,35 @@ function canAdminReassignScaleCategory(product: ProductKey, categoryName: string
   return product === "scale" && scaleAdminEditableCategories.includes(categoryName as (typeof scaleAdminEditableCategories)[number]);
 }
 
+function ClientTaskToggle({
+  checked,
+  onToggle,
+  compact = false,
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      className={`client-task-toggle ${checked ? "client-task-toggle-on" : "client-task-toggle-off"} ${compact ? "client-task-toggle-compact" : ""}`}
+      onClick={(event) => {
+        event.stopPropagation();
+        onToggle();
+      }}
+      aria-pressed={checked}
+      title={checked ? "Marked as a client task" : "Marked as an internal task"}
+    >
+      <span className="client-task-toggle-knob" aria-hidden="true" />
+      <span className="client-task-toggle-copy">
+        <strong>Client task</strong>
+        <em>{checked ? "On" : "Off"}</em>
+      </span>
+    </button>
+  );
+}
+
 function TaskCard({
   task,
   taskMap,
@@ -1213,6 +1242,7 @@ function TaskCard({
   onQuickMove,
   onTitleChange,
   onDelete,
+  onClientTaskToggle,
   onDragStart,
 }: {
   task: Task;
@@ -1224,6 +1254,7 @@ function TaskCard({
   onQuickMove: (task: Task, status: TaskStatus) => void;
   onTitleChange: (task: Task, title: string) => void;
   onDelete: (task: Task) => void;
+  onClientTaskToggle: (task: Task, checked: boolean) => void;
   onDragStart: (task: Task) => void;
 }) {
   const [draftState, setDraftState] = useState(() => ({
@@ -1330,10 +1361,13 @@ function TaskCard({
           </span>
           <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
             {adminEditing ? (
-              <button type="button" className="admin-delete-task" onClick={() => onDelete(task)} disabled={isDeleting} title="Delete task">
-                <Icon name="trash" />
-                {isDeleting ? "Deleting" : "Delete"}
-              </button>
+              <>
+                <ClientTaskToggle checked={task.portalVisible} onToggle={() => onClientTaskToggle(task, !task.portalVisible)} compact />
+                <button type="button" className="admin-delete-task" onClick={() => onDelete(task)} disabled={isDeleting} title="Delete task">
+                  <Icon name="trash" />
+                  {isDeleting ? "Deleting" : "Delete"}
+                </button>
+              </>
             ) : null}
             {isDone ? (
               <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
@@ -1366,6 +1400,7 @@ function CategoryTaskRow({
   isDragEnabled,
   onSelect,
   onTitleChange,
+  onClientTaskToggle,
   onDragStart,
   onDragEnd,
 }: {
@@ -1374,6 +1409,7 @@ function CategoryTaskRow({
   isDragEnabled: boolean;
   onSelect: (task: Task) => void;
   onTitleChange: (task: Task, title: string) => void;
+  onClientTaskToggle: (task: Task, checked: boolean) => void;
   onDragStart: (task: Task) => void;
   onDragEnd: () => void;
 }) {
@@ -1456,6 +1492,9 @@ function CategoryTaskRow({
           <div className="category-task-row-meta">
             <span>{task.category}</span>
             <em>{statusLabels[task.status]}</em>
+          </div>
+          <div className="category-task-row-controls">
+            <ClientTaskToggle checked={task.portalVisible} onToggle={() => onClientTaskToggle(task, !task.portalVisible)} compact />
           </div>
         </div>
       ) : (
@@ -4208,6 +4247,7 @@ export default function RespondDashboard({
                       onQuickMove={moveTask}
                       onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
                       onDelete={removeTask}
+                      onClientTaskToggle={(targetTask, checked) => updateTask(targetTask.id, { portalVisible: checked })}
                       onDragStart={setDraggedTask}
                     />
                   ))}
@@ -4264,6 +4304,7 @@ export default function RespondDashboard({
                         isDragEnabled={isEditableDropZone}
                         onSelect={selectOrOpenTask}
                         onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
+                        onClientTaskToggle={(targetTask, checked) => updateTask(targetTask.id, { portalVisible: checked })}
                         onDragStart={(targetTask) => setDraggedCategoryTaskId(targetTask.id)}
                         onDragEnd={() => setDraggedCategoryTaskId(null)}
                       />
