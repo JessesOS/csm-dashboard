@@ -1305,62 +1305,51 @@ function TaskCard({
           {initials(task.assignee)}
         </span>
       </div>
-      <dl className="task-card-details">
-        <div>
-          <dt>Category:</dt>
-          <dd>{task.category}</dd>
-        </div>
-        <div>
-          <dt>Owner:</dt>
-          <dd>{task.assignee}</dd>
-        </div>
-        <div>
-          <dt>Due:</dt>
-          <dd>{task.dueWindow || "-"}</dd>
-        </div>
-        <div>
-          <dt>Dependencies:</dt>
-          <dd>{dependencySummary}</dd>
-        </div>
-      </dl>
+      <p className="task-meta-line">
+        {task.category}{task.assignee ? ` · ${task.assignee}` : ""}{task.dueWindow ? ` · ${task.dueWindow}` : ""}
+      </p>
       <div className="task-card-footer">
-        <span className={`priority priority-${task.priority}`}>{task.priority}</span>
-        {loomUrl ? (
-          <span className="loom-card-indicator" title={task.loomTitle || "Loom instructions attached"}>
-            <Icon name="video" />
-          </span>
-        ) : null}
-        <span className={`dependency-chip ${dependencyState.isBlockedByDependencies ? "dependency-open" : ""}`}>
-          <Icon name="link" />
-          {dependencyState.dependencies.length}
-        </span>
-        {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
-        <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
-          {adminEditing ? (
-            <button type="button" className="admin-delete-task" onClick={() => onDelete(task)} disabled={isDeleting} title="Delete task">
-              <Icon name="trash" />
-              {isDeleting ? "Deleting" : "Delete"}
-            </button>
+        <div className="task-card-chips">
+          <span className={`priority priority-${task.priority}`}>{task.priority}</span>
+          {loomUrl ? (
+            <span className="loom-card-indicator" title={task.loomTitle || "Loom instructions attached"}>
+              <Icon name="video" />
+            </span>
           ) : null}
-          {isDone ? (
-            <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
-              Review
-            </button>
-          ) : (
-            <button type="button" onClick={() => onQuickMove(task, "complete")} title="Mark complete">
-              <Icon name="check" />
-              Done
-            </button>
-          )}
-          {dependencyState.isBlockedByDependencies && task.status !== "blocked" ? (
-            <button type="button" onClick={() => onQuickMove(task, "blocked")} title="Mark blocked">
-              Block
-            </button>
-          ) : null}
+          {task.portalVisible ? <span className="portal-chip">Portal</span> : null}
         </div>
-        <span className="drag-handle" title="Drag to move status">
-          <Icon name="move" />
-        </span>
+        <div className="task-card-actions-group">
+          <span className={`dependency-chip ${dependencyState.isBlockedByDependencies ? "dependency-open" : ""}`}>
+            <Icon name="link" />
+            {dependencyState.dependencies.length}
+          </span>
+          <div className="task-actions" onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+            {adminEditing ? (
+              <button type="button" className="admin-delete-task" onClick={() => onDelete(task)} disabled={isDeleting} title="Delete task">
+                <Icon name="trash" />
+                {isDeleting ? "Deleting" : "Delete"}
+              </button>
+            ) : null}
+            {isDone ? (
+              <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
+                Review
+              </button>
+            ) : (
+              <button type="button" onClick={() => onQuickMove(task, "complete")} title="Mark complete">
+                <Icon name="check" />
+                Done
+              </button>
+            )}
+            {dependencyState.isBlockedByDependencies && task.status !== "blocked" ? (
+              <button type="button" onClick={() => onQuickMove(task, "blocked")} title="Mark blocked">
+                Block
+              </button>
+            ) : null}
+          </div>
+          <span className="drag-handle" title="Drag to move status">
+            <Icon name="move" />
+          </span>
+        </div>
       </div>
     </article>
   );
