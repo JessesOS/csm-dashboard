@@ -3106,3 +3106,22 @@ export async function getPortalWorkspace(token: string) {
     formSubmission: await getPortalFormSubmissionForClient(client),
   };
 }
+
+export async function listPortalTasks(token: string) {
+  const client = await getClientByPortalToken(token);
+
+  await ensureTaskStorage();
+
+  const result = await getD1()
+    .prepare(
+      `SELECT ${taskSelectFields} FROM tasks WHERE environment = ? AND product = ? AND client_id = ? AND portal_visible = 1 ORDER BY sort_order ASC`
+    )
+    .bind(client.environment, client.product, client.id)
+    .all<TaskRow>();
+
+  return {
+    clientId: client.id,
+    clientName: client.name,
+    tasks: (result.results ?? []).map(fromRow),
+  };
+}
