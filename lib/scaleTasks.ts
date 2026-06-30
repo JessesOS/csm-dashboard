@@ -6272,12 +6272,12 @@ export const scaleTasks: Task[] = [
 ];
 
 const metaOnlyCategoryIds = new Set([
-  "scale-03-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
-  "scale-04-meta-ads-setup-handoff-partner-access",
+  "scale-04-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
+  "scale-05-meta-ads-setup-handoff-partner-access",
 ]);
 
 const googleOnlyCategoryIds = new Set([
-  "scale-05-google-ads-strategy-landing-page-funnel-creation",
+  "scale-06-google-ads-strategy-landing-page-funnel-creation",
 ]);
 
 export function scaleCategoriesForVariant(variant: ScaleVariant = "meta_google") {

@@ -2178,7 +2178,7 @@ function cloneSnapshotTasksForClient(
   targetClientId: string,
   targetEnvironment: EnvironmentKey,
   targetProduct: ProductKey,
-  options?: { resetWorkflowState?: boolean }
+  options?: { resetWorkflowState?: boolean; existingTasksByTemplateId?: Map<string, Task> }
 ) {
   const idMap = new Map<string, string>();
 
@@ -2191,6 +2191,7 @@ function cloneSnapshotTasksForClient(
     const templateId = task.templateId || task.id.split("__").pop() || task.id;
     const nextId = idMap.get(task.id) ?? scopedTaskId(targetClientId, templateId);
     const nextDependencies = (task.dependencies ?? []).map((dependencyId) => idMap.get(dependencyId) ?? unscopedDependencyId(targetClientId, dependencyId));
+    const existingTask = options?.existingTasksByTemplateId?.get(templateId);
 
     return {
       ...task,
@@ -2201,6 +2202,13 @@ function cloneSnapshotTasksForClient(
       templateId,
       status: options?.resetWorkflowState ? "queued" : task.status,
       dependencies: nextDependencies,
+      portalVisible: existingTask?.portalVisible ?? task.portalVisible,
+      portalTitle: existingTask?.portalTitle ?? task.portalTitle,
+      portalNote: existingTask?.portalNote ?? task.portalNote,
+      portalActionRequired: existingTask?.portalActionRequired ?? task.portalActionRequired,
+      portalActionUrl: existingTask?.portalActionUrl ?? task.portalActionUrl,
+      portalActionLabel: existingTask?.portalActionLabel ?? task.portalActionLabel,
+      portalConfigured: existingTask?.portalConfigured ?? task.portalConfigured,
     };
   });
 }
@@ -2217,13 +2225,18 @@ export async function restoreTaskSnapshotToClient(
   const targetEnvironment = normalizeEnvironment(environmentInput);
   const targetProduct = normalizeProduct(productInput);
   const targetClientId = await requireClient(targetEnvironment, targetProduct, targetClientIdInput);
+  const existingTargetTasks = options?.resetWorkflowState ? await listTasks(targetEnvironment, targetProduct, targetClientId) : [];
+  const existingTasksByTemplateId = new Map(existingTargetTasks.map((task) => [task.templateId || task.id, task]));
 
   const tasks = cloneSnapshotTasksForClient(
     [...snapshot.tasks].sort((a, b) => a.sortOrder - b.sortOrder),
     targetClientId,
     targetEnvironment,
     targetProduct,
-    options
+    {
+      ...options,
+      existingTasksByTemplateId,
+    }
   );
 
   await d1
