@@ -348,11 +348,52 @@ function isAttentionItem(item: unknown): item is ClientAttentionItem {
   );
 }
 
+function normalizeTaskCategoryName(product: ProductKey, category: string) {
+  if (product !== "scale") {
+    return category;
+  }
+
+  if (category === "Comms, Admin & Communication Routines") {
+    return "Accounts Stage Verification";
+  }
+
+  if (category === "Pre-Onboarding & Welcome Call") {
+    return "Welcome Onboarding Call";
+  }
+
+  return category;
+}
+
+function normalizeTaskTitle(task: Pick<TaskRow, "product" | "title">) {
+  const product = normalizeProduct(task.product);
+
+  if (product !== "scale") {
+    return task.title;
+  }
+
+  const replacements: Record<string, string> = {
+    "Have the client log into LaunchBay live while sharing their screen on the call.":
+      "Have the client log into CSM live while sharing their screen on the call.",
+    'Copy the "Magic Link" from the Users tab in LaunchBay and provide it to the client.':
+      'Copy the "Magic Link" from the Users tab in CSM platform and provide it to the client.',
+    "Instruct the client to bookmark their LaunchBay Magic Link.":
+      "Instruct the client to bookmark their Magic Link.",
+    "Walk the client through LaunchBay project milestones, tasks, and the messaging center.":
+      "Walk the client through CSM project milestones, tasks, and the messaging center.",
+  };
+
+  return replacements[task.title] ?? task.title;
+}
+
 function fromRow(row: TaskRow): Task {
+  const product = normalizeProduct(row.product);
+
   return {
     ...row,
     environment: normalizeEnvironment(row.environment),
-    product: normalizeProduct(row.product),
+    product,
+    title: normalizeTaskTitle(row),
+    category: normalizeTaskCategoryName(product, row.category),
     dependencies: parseDependencies(row.dependencies),
     loomUrl: row.loomUrl ?? "",
     loomTitle: row.loomTitle ?? "",

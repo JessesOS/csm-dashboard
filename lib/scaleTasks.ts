@@ -607,7 +607,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-024",
-    "title": "Have the client log into LaunchBay live while sharing their screen on the call.",
+    "title": "Have the client log into CSM live while sharing their screen on the call.",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -627,7 +627,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-025",
-    "title": "Copy the \"Magic Link\" from the Users tab in LaunchBay and provide it to the client.",
+    "title": "Copy the \"Magic Link\" from the Users tab in CSM platform and provide it to the client.",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -647,7 +647,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-026",
-    "title": "Instruct the client to bookmark their LaunchBay Magic Link.",
+    "title": "Instruct the client to bookmark their Magic Link.",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -667,7 +667,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-027",
-    "title": "Walk the client through LaunchBay project milestones, tasks, and the messaging center.",
+    "title": "Walk the client through CSM project milestones, tasks, and the messaging center.",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
