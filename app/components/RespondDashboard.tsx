@@ -2405,37 +2405,24 @@ function MissionControl({
 
       <section className="mission-main">
         <header className="mission-header">
-          <div>
-            <h1>Mission Control</h1>
-            <p>Portfolio health across {product.clientLabel}.</p>
-          </div>
-          <div className="mission-header-actions">
-            <span className="system-pill">
-              <span />
-              {environment.statusLabel}
-            </span>
-            <span className="mission-date">Jun 13, 2026</span>
-            <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
-            <button type="button" className="walkthrough-button" onClick={onStartTour}>
-              <Icon name="play" />
-              Start walkthrough
-            </button>
-            {selectedClient?.portalToken ? (
-              <a className="mission-secondary portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
-                <Icon name="link" />
-                Client portal
-              </a>
-            ) : null}
-            {canImportGhlClient ? (
-              <button type="button" className="mission-secondary" onClick={onImportGhlClient} disabled={isImportingGhlClient}>
-                <Icon name="download" />
-                {isImportingGhlClient ? "Importing" : "Import from GHL"}
+          <div className="mission-header-title">
+            <div>
+              <h1>Mission Control</h1>
+              <p>Portfolio health across {product.clientLabel}.</p>
+            </div>
+            <div className="mission-header-meta">
+              <span className="system-pill">
+                <span />
+                {environment.statusLabel}
+              </span>
+              <span className="mission-date">Jun 13, 2026</span>
+              <ThemeToggle theme={theme} onThemeChange={onThemeChange} />
+              <button type="button" className="walkthrough-icon-button" onClick={onStartTour} aria-label="Start walkthrough">
+                <Icon name="play" />
               </button>
-            ) : null}
-            <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
-              <Icon name="plus" />
-              New client
-            </button>
+            </div>
+          </div>
+          <div className="mission-header-toolbar">
             <select
               aria-label="Select client"
               value={selectedClientId}
@@ -2451,10 +2438,28 @@ function MissionControl({
                 </option>
               ))}
             </select>
-            <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
-              <Icon name="tasks" />
-              Open tasks
-            </button>
+            <div className="mission-header-actions">
+              {selectedClient?.portalToken ? (
+                <a className="mission-secondary portal-link" href={`/portal/${selectedClient.portalToken}`} target="_blank" rel="noreferrer">
+                  <Icon name="link" />
+                  Client portal
+                </a>
+              ) : null}
+              {canImportGhlClient ? (
+                <button type="button" className="mission-secondary" onClick={onImportGhlClient} disabled={isImportingGhlClient}>
+                  <Icon name="download" />
+                  {isImportingGhlClient ? "Importing" : "Import from GHL"}
+                </button>
+              ) : null}
+              <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
+                <Icon name="plus" />
+                New client
+              </button>
+              <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
+                <Icon name="tasks" />
+                Open tasks
+              </button>
+            </div>
           </div>
         </header>
 

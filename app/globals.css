@@ -845,14 +845,47 @@ button:disabled {
 
 .mission-header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
+  flex-direction: column;
+  gap: 12px;
   margin-bottom: 18px;
 }
 
-.mission-header > div:first-child {
-  min-width: 260px;
+.mission-header-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.mission-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mission-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.mission-header-toolbar select {
+  height: 36px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: #0a1f33;
+  color: #eaf2fb;
+  padding: 0 12px;
+  outline: 0;
+  font-size: 13px;
+}
+
+.mission-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .mission-header h1 {
@@ -870,21 +903,22 @@ button:disabled {
   overflow-wrap: anywhere;
 }
 
-.mission-header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.mission-header-actions select {
-  height: 40px;
+.walkthrough-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 8px;
-  background: #0a1f33;
-  color: #eaf2fb;
-  padding: 0 12px;
-  outline: 0;
+  background: transparent;
+  color: #8fa2b7;
+  flex-shrink: 0;
+}
+
+.walkthrough-icon-button:hover {
+  border-color: rgba(148, 163, 184, 0.5);
+  color: #c9f82b;
 }
 
 .system-pill {
@@ -953,7 +987,8 @@ button:disabled {
 }
 
 .mission-secondary:disabled,
-.walkthrough-button:disabled {
+.walkthrough-button:disabled,
+.walkthrough-icon-button:disabled {
   border-color: rgba(148, 163, 184, 0.2);
   background: rgba(148, 163, 184, 0.08);
   color: #71849a;
@@ -1970,7 +2005,7 @@ button:disabled {
   color: #174ac9;
 }
 
-.mission-shell-light .mission-header-actions select,
+.mission-shell-light .mission-header-toolbar select,
 .mission-shell-light .theme-toggle {
   border-color: #d6dee8;
   background: #ffffff;
@@ -6523,8 +6558,9 @@ progress::-webkit-progress-value {
     min-width: 0;
   }
 
+  .mission-header-toolbar,
   .mission-header-actions,
-  .mission-header-actions select,
+  .mission-header-toolbar select,
   .mission-primary,
   .mission-secondary,
   .portal-link,
