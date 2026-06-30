@@ -6623,17 +6623,40 @@ progress::-webkit-progress-value {
     padding: 16px;
   }
 
+  /* header: stack title row so meta wraps below h1 */
+  .mission-header-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .mission-header-meta {
+    flex-wrap: wrap;
+  }
+
+  .mission-header h1 {
+    font-size: 22px;
+  }
+
+  /* toolbar + actions: stack vertically, each full-width */
+  .mission-header-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mission-header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
   .mission-header > div:first-child {
     min-width: 0;
   }
 
-  .mission-header-toolbar,
-  .mission-header-actions,
   .mission-header-toolbar select,
   .mission-primary,
   .mission-secondary,
-  .portal-link,
-  .system-pill {
+  .portal-link {
     width: 100%;
   }
 
@@ -6641,6 +6664,11 @@ progress::-webkit-progress-value {
     width: 100%;
     border-left: 0;
     padding-left: 0;
+  }
+
+  /* rail: hide saved lenses at mobile to reduce stacking height */
+  .mission-side .mission-side-section {
+    display: none;
   }
 
   .portfolio-strip,
