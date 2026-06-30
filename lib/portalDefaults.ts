@@ -8,7 +8,7 @@ const clientFacingCategories = new Set([
   "Internal Testing Phase",
   "Go-Live Call",
   "Post Go-Live Reporting & Support",
-  "Pre-Onboarding & Welcome Call",
+  "Welcome Onboarding Call",
   "Meta Ads Setup, Handoff & Partner Access",
   "Google Ads Strategy & Landing Page Funnel Creation",
   "AI Test Call & Final Checks (Day 14)",

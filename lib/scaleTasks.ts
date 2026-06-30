@@ -8,60 +8,66 @@ export const scaleSourceDocument = {
 export const scaleCategories: Category[] = [
   {
     "id": "scale-01-comms-admin-communication-routines",
-    "name": "Comms, Admin & Communication Routines",
+    "name": "Accounts Stage Verification",
     "phase": "Onboarding",
     "accent": "#0891b2"
   },
   {
-    "id": "scale-02-pre-onboarding-welcome-call",
-    "name": "Pre-Onboarding & Welcome Call",
+    "id": "scale-02-admin-account-setup",
+    "name": "Admin & Account Setup",
+    "phase": "Onboarding",
+    "accent": "#2563eb"
+  },
+  {
+    "id": "scale-03-pre-onboarding-welcome-call",
+    "name": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "accent": "#0f766e"
   },
   {
-    "id": "scale-03-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
+    "id": "scale-04-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
     "name": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "accent": "#7c3aed"
   },
   {
-    "id": "scale-04-meta-ads-setup-handoff-partner-access",
+    "id": "scale-05-meta-ads-setup-handoff-partner-access",
     "name": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "accent": "#2563eb"
   },
   {
-    "id": "scale-05-google-ads-strategy-landing-page-funnel-creation",
+    "id": "scale-06-google-ads-strategy-landing-page-funnel-creation",
     "name": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "accent": "#0284c7"
   },
   {
-    "id": "scale-06-ai-bot-build-ghl-configuration",
+    "id": "scale-07-ai-bot-build-ghl-configuration",
     "name": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "accent": "#4f46e5"
   },
   {
-    "id": "scale-07-ai-test-call-final-checks-day-14",
+    "id": "scale-08-ai-test-call-final-checks-day-14",
     "name": "AI Test Call & Final Checks (Day 14)",
     "phase": "Testing",
     "accent": "#ca8a04"
   },
   {
-    "id": "scale-08-go-live-call-day-30",
+    "id": "scale-09-go-live-call-day-30",
     "name": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "accent": "#059669"
   },
   {
-    "id": "scale-09-post-go-live-check-ins-reporting-admin",
+    "id": "scale-10-post-go-live-check-ins-reporting-admin",
     "name": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "accent": "#0d9488"
   },
   {
-    "id": "scale-10-exit-pause-cancellation-protocol",
+    "id": "scale-11-exit-pause-cancellation-protocol",
     "name": "Exit, Pause, & Cancellation Protocol",
     "phase": "Support",
     "accent": "#64748b"
@@ -86,7 +92,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-001",
     "title": "Log into the Gmail, check emails.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "complete",
     "assignee": "Scale CSM",
@@ -104,7 +110,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-002",
     "title": "Log into the RTDigital Agency Slack to check Slack comms, multiple channels and DM's daily.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "complete",
     "assignee": "Scale CSM",
@@ -124,7 +130,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-003",
     "title": "Log into the GoHighLevel (GHL) Agency View -> RT Digital sub-account. Contacts, Scott Lambert Check comms with client. Message replies etc. Also, check clients sub account comms.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "complete",
     "assignee": "Scale CSM",
@@ -144,7 +150,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-004",
     "title": "Use GHL as the mandatory primary platform for all client communication.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "complete",
     "assignee": "Scale CSM",
@@ -164,7 +170,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-005",
     "title": "Leave an 'internal comment' on the GHL contact record for every single client interaction.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "review",
     "assignee": "Scale CSM",
@@ -184,7 +190,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-006",
     "title": "Format every GHL note strictly as: Date - Reason for follow-up or communication - Team member name (e.g., \"May 19, 2026 - Followed up regarding website revisions - John\").",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "review",
     "assignee": "Scale CSM",
@@ -204,7 +210,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-007",
     "title": "Create a task inside GHL attached to the client's contact record for any new project build or support request.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "in_progress",
     "assignee": "Scale CSM",
@@ -224,7 +230,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-008",
     "title": "Name every GHL task strictly using the convention: Client Business Name | Task Description.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "in_progress",
     "assignee": "Scale CSM",
@@ -244,7 +250,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-009",
     "title": "Monitor the backend \"Accounts\" progress in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Scale CSM",
@@ -424,7 +430,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-018",
     "title": "Check that the client has submitted the onboarding form in LaunchBay.",
-    "category": "Comms, Admin & Communication Routines",
+    "category": "Admin & Account Setup",
     "phase": "Onboarding",
     "status": "blocked",
     "assignee": "Scale CSM",
@@ -442,9 +448,69 @@ export const scaleTasks: Task[] = [
     "sortOrder": 18
   },
   {
+    "id": "scl-019a",
+    "title": "Verify client project template is deployed in Scale CSM platform using import from GHL.",
+    "category": "Admin & Account Setup",
+    "phase": "Onboarding",
+    "status": "complete",
+    "assignee": "Scale CSM",
+    "dueWindow": "Days 1-2",
+    "priority": "high",
+    "dependencies": [
+      "scl-018"
+    ],
+    "notes": "",
+    "portalVisible": false,
+    "portalTitle": "",
+    "portalNote": "",
+    "portalActionRequired": false,
+    "portalConfigured": false,
+    "sortOrder": 19
+  },
+  {
+    "id": "scl-019b",
+    "title": "Verify welcome email sent.",
+    "category": "Admin & Account Setup",
+    "phase": "Onboarding",
+    "status": "complete",
+    "assignee": "Scale CSM",
+    "dueWindow": "Days 1-2",
+    "priority": "high",
+    "dependencies": [
+      "scl-019a"
+    ],
+    "notes": "",
+    "portalVisible": false,
+    "portalTitle": "",
+    "portalNote": "",
+    "portalActionRequired": false,
+    "portalConfigured": false,
+    "sortOrder": 20
+  },
+  {
+    "id": "scl-019c",
+    "title": "Check that the client has submitted the onboarding form in CSM platform.",
+    "category": "Admin & Account Setup",
+    "phase": "Onboarding",
+    "status": "blocked",
+    "assignee": "Scale CSM",
+    "dueWindow": "Days 1-2",
+    "priority": "high",
+    "dependencies": [
+      "scl-019b"
+    ],
+    "notes": "",
+    "portalVisible": false,
+    "portalTitle": "",
+    "portalNote": "",
+    "portalActionRequired": false,
+    "portalConfigured": false,
+    "sortOrder": 21
+  },
+  {
     "id": "scl-019",
     "title": "Verify the Sales Team closed the deal, left the opportunity in the Sales Person Pipeline, and booked the Welcome Onboard Call.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -457,12 +523,12 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 19
+    "sortOrder": 22
   },
   {
     "id": "scl-020",
     "title": "Update the automation that sends the welcome email to ensure the messaging is accurate.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -477,12 +543,12 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 20
+    "sortOrder": 23
   },
   {
     "id": "scl-021",
     "title": "Follow up with the new client via GHL SMS or Email to introduce yourself before the Welcome Call.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -497,12 +563,12 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 21
+    "sortOrder": 24
   },
   {
     "id": "scl-022",
     "title": "Create a copy of the \"AISS Client Artifact Template\" and save it under the client's name for note-taking.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -522,7 +588,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-023",
     "title": "Start the Welcome Onboard call and present the Scale Onboarding Slide Deck (Gamma TAI-Scale-Onboard).",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -542,7 +608,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-024",
     "title": "Have the client log into LaunchBay live while sharing their screen on the call.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -562,7 +628,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-025",
     "title": "Copy the \"Magic Link\" from the Users tab in LaunchBay and provide it to the client.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -582,7 +648,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-026",
     "title": "Instruct the client to bookmark their LaunchBay Magic Link.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -602,7 +668,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-027",
     "title": "Walk the client through LaunchBay project milestones, tasks, and the messaging center.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -622,7 +688,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-028",
     "title": "Ask the client to send a test message on the onboarding form task in LaunchBay to confirm they understand the system.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -642,7 +708,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-029",
     "title": "Review the submitted onboard form with the client: Business Info, Proof of Address, Phone Options, Appointment Options, Domain Access, Website Access, ICP, and Branding/Logos.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -662,7 +728,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-030",
     "title": "Ask the client: \"If your agent was a human, how would you train her to talk with leads?\"",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -682,7 +748,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-031",
     "title": "Determine their exact pre-qualification questions (e.g., Service type, emergency status, name/email/phone, address, budget).",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "blocked",
     "assignee": "Account Manager",
@@ -702,7 +768,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-032",
     "title": "Document these exact questions in the Client Artifact document.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -722,7 +788,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-033",
     "title": "Get verbal approval from the client on the AI questions.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -742,7 +808,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-034",
     "title": "Change the approved AI question text to GREEN BOLD in the Client Artifact document.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -762,7 +828,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-035",
     "title": "Add a comment \"approved by Client\" to the GREEN BOLD text.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -782,7 +848,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-036",
     "title": "Explain the project timeline: Days 2-13 Build, Day 14 AI Test, Day 30 Go Live.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -802,7 +868,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-037",
     "title": "Warn the client that SaaS fees start ticking 14-30 days from the point of sale.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -822,7 +888,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-038",
     "title": "Instruct the client to download the LeadConnector Mobile App.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -842,7 +908,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-039",
     "title": "Client Review of SMS/Email Copy",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -862,7 +928,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-040",
     "title": "Have client connect their Calendar, Social Media DMs, and set up a Payment Mechanism in their CRM settings.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -882,7 +948,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-041",
     "title": "Instruct the client to prepare and upload a CSV database of their past leads and lost quotes.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -902,7 +968,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-042",
     "title": "Schedule the \"AI Test Call\" for Day 14 in the GHL calendar.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -922,7 +988,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-043",
     "title": "Post a recap message in LaunchBay tagging the client and Dev Team.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -942,7 +1008,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-044",
     "title": "Paste the LaunchBay Magic Link into the recap message.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -962,7 +1028,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-045",
     "title": "Paste the Read.ai call recording link into the recap message.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -982,7 +1048,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-046",
     "title": "Write a bulleted list of any missing Action Items in the recap message.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -1002,7 +1068,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-047",
     "title": "Chase the client to provide admin access to Google Ads Manager, Google Analytics, and Google My Business Profile.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
@@ -1022,7 +1088,7 @@ export const scaleTasks: Task[] = [
   {
     "id": "scl-048",
     "title": "Chase the client to provide Domain Provider Access and Website Builder Access.",
-    "category": "Pre-Onboarding & Welcome Call",
+    "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
     "assignee": "Account Manager",
