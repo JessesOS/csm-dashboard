@@ -1259,7 +1259,7 @@ button:disabled {
 }
 
 .mission-client-card-main:focus-visible,
-.mission-client-portal-link:focus-visible {
+.mission-client-portal-icon:focus-visible {
   outline: 2px solid #c9f82b;
   outline-offset: -2px;
 }
@@ -1281,9 +1281,11 @@ button:disabled {
 .mission-client-name {
   overflow: hidden;
   color: #f8fbff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 820;
   line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .mission-client-name small {
@@ -1295,6 +1297,37 @@ button:disabled {
   font-weight: 760;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mission-client-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.mission-client-portal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(201, 248, 43, 0.28);
+  border-radius: 6px;
+  background: rgba(201, 248, 43, 0.07);
+  color: #c9f82b;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.mission-client-portal-icon:hover {
+  border-color: rgba(201, 248, 43, 0.6);
+  background: rgba(201, 248, 43, 0.14);
+}
+
+.mission-client-portal-icon svg {
+  width: 12px;
+  height: 12px;
 }
 
 .mission-client-meta,
@@ -1327,35 +1360,9 @@ button:disabled {
   grid-column: 1 / -1;
   justify-content: space-between;
   gap: 8px;
+  font-size: 12px;
 }
 
-.mission-client-portal-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  margin: 0 13px 13px;
-  border: 1px solid rgba(201, 248, 43, 0.34);
-  border-radius: 8px;
-  background: rgba(201, 248, 43, 0.1);
-  color: #c9f82b;
-  padding: 8px 10px;
-  font-size: 11px;
-  font-weight: 850;
-  line-height: 1;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.mission-client-portal-link:hover {
-  border-color: rgba(201, 248, 43, 0.72);
-  background: rgba(201, 248, 43, 0.16);
-}
-
-.mission-client-portal-link svg {
-  width: 14px;
-  height: 14px;
-}
 
 .client-health,
 .status-pill,
@@ -2336,13 +2343,13 @@ button:disabled {
   background: #dbe4ee;
 }
 
-.mission-shell-light .mission-client-portal-link {
+.mission-shell-light .mission-client-portal-icon {
   border-color: #bed3fb;
   background: #eef5ff;
   color: #174ac9;
 }
 
-.mission-shell-light .mission-client-portal-link:hover {
+.mission-shell-light .mission-client-portal-icon:hover {
   border-color: #8fb3f8;
   background: #e0edff;
 }

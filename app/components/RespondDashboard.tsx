@@ -2535,8 +2535,22 @@ function MissionControl({
                   {client.name}
                   {client.companyName ? <small>{client.companyName}</small> : null}
                 </span>
-                <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
-                <span className="mission-client-meta">{client.phase} - {client.owner}</span>
+                <span className="mission-client-card-badges">
+                  <span className={`client-health client-health-${client.health}`}>{clientHealthLabels[client.health]}</span>
+                  {client.portalToken ? (
+                    <a
+                      className="mission-client-portal-icon"
+                      href={`/portal/${client.portalToken}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Open client portal"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Icon name="link" />
+                    </a>
+                  ) : null}
+                </span>
+                <span className="mission-client-meta">{client.phase} · {client.owner}</span>
                 <span className="mission-progress-track">
                   <span style={{ width: `${client.progress}%` }} />
                 </span>
@@ -2545,12 +2559,6 @@ function MissionControl({
                   <span>{client.goLiveLabel}</span>
                 </span>
               </button>
-              {client.portalToken ? (
-                <a className="mission-client-portal-link" href={`/portal/${client.portalToken}`} target="_blank" rel="noreferrer">
-                  <Icon name="link" />
-                  Portal link
-                </a>
-              ) : null}
             </article>
           ))}
         </section>
