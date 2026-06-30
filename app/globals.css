@@ -3659,8 +3659,32 @@ button:disabled {
   padding-bottom: 24px;
 }
 
+.category-admin-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  grid-column: 1 / -1;
+  border: 1px dashed #bfd2e6;
+  border-radius: 8px;
+  background: #f7fbff;
+  color: #37516f;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 12px;
+}
+
 .category-panel {
   padding: 14px;
+}
+
+.category-panel-editable {
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.category-panel-drop-target {
+  border-color: #8fb3f8;
+  box-shadow: 0 0 0 2px rgba(143, 179, 248, 0.18);
+  background: #f8fbff;
 }
 
 .category-panel-head {
@@ -3725,6 +3749,70 @@ progress::-webkit-progress-value {
   color: #263445;
   padding: 7px 9px;
   text-align: left;
+}
+
+.category-task-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  border: 1px solid #e0e7ef;
+  border-radius: 8px;
+  background: #fbfdff;
+  color: #263445;
+  padding: 7px 9px;
+  text-align: left;
+}
+
+.category-task-row-admin {
+  cursor: pointer;
+}
+
+.category-task-row-draggable {
+  cursor: grab;
+}
+
+.category-task-row-draggable:active {
+  cursor: grabbing;
+}
+
+.category-task-row-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.category-task-row-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.category-task-row-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.category-task-row-meta span {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.category-drag-handle {
+  flex: 0 0 auto;
+}
+
+.category-task-title-edit {
+  padding: 6px 8px;
 }
 
 .category-task-list span {
@@ -5361,12 +5449,34 @@ progress::-webkit-progress-value {
   color: #c9f82b;
 }
 
+.dashboard-shell-dark .category-admin-banner {
+  border-color: rgba(148, 163, 184, 0.24);
+  background: rgba(15, 42, 67, 0.92);
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .category-panel-drop-target {
+  border-color: rgba(157, 247, 180, 0.32);
+  box-shadow: 0 0 0 2px rgba(157, 247, 180, 0.12);
+  background: rgba(13, 38, 60, 0.95);
+}
+
 .dashboard-shell-dark .category-task-list button,
 .dashboard-shell-dark .dependency-list button,
 .dashboard-shell-dark .status-grid button {
   border-color: rgba(148, 163, 184, 0.18);
   background: #0f2a43;
   color: #dce8f6;
+}
+
+.dashboard-shell-dark .category-task-row {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: #0f2a43;
+  color: #dce8f6;
+}
+
+.dashboard-shell-dark .category-task-row-meta span {
+  color: #8fa2b7;
 }
 
 .dashboard-shell-dark .category-task-list em {

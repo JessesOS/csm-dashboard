@@ -72,6 +72,7 @@ const statusColumnDetails: Record<TaskStatus, string> = {
   review: "Awaiting review",
   complete: "Done",
 };
+const scaleAdminEditableCategories = ["Accounts Stage Verification", "Admin & Account Setup", "Welcome Onboarding Call"] as const;
 
 type ThemeMode = "dark" | "light";
 type AppSection = "home" | "tasks";
@@ -1198,6 +1199,10 @@ function taskWorkspaceKey(environment: EnvironmentKey, product: ProductKey, clie
   return clientId ? `${environment}:${product}:${clientId}` : "";
 }
 
+function canAdminReassignScaleCategory(product: ProductKey, categoryName: string) {
+  return product === "scale" && scaleAdminEditableCategories.includes(categoryName as (typeof scaleAdminEditableCategories)[number]);
+}
+
 function TaskCard({
   task,
   taskMap,
@@ -1351,6 +1356,114 @@ function TaskCard({
           </span>
         </div>
       </div>
+    </article>
+  );
+}
+
+function CategoryTaskRow({
+  task,
+  adminEditing,
+  isDragEnabled,
+  onSelect,
+  onTitleChange,
+  onDragStart,
+  onDragEnd,
+}: {
+  task: Task;
+  adminEditing: boolean;
+  isDragEnabled: boolean;
+  onSelect: (task: Task) => void;
+  onTitleChange: (task: Task, title: string) => void;
+  onDragStart: (task: Task) => void;
+  onDragEnd: () => void;
+}) {
+  const [draftState, setDraftState] = useState(() => ({
+    sourceTitle: task.title,
+    taskId: task.id,
+    title: task.title,
+  }));
+  const draftTitle = draftState.taskId === task.id && draftState.sourceTitle === task.title ? draftState.title : task.title;
+
+  function updateDraftTitle(title: string) {
+    setDraftState({
+      sourceTitle: task.title,
+      taskId: task.id,
+      title,
+    });
+  }
+
+  function commitTitle() {
+    const cleanTitle = draftTitle.trim();
+
+    if (!cleanTitle) {
+      updateDraftTitle(task.title);
+      return;
+    }
+
+    if (cleanTitle !== task.title) {
+      onTitleChange(task, cleanTitle);
+    }
+  }
+
+  return (
+    <article
+      className={`category-task-row ${adminEditing ? "category-task-row-admin" : ""} ${isDragEnabled ? "category-task-row-draggable" : ""}`}
+      draggable={isDragEnabled}
+      onDragStart={() => onDragStart(task)}
+      onDragEnd={onDragEnd}
+      onClick={() => onSelect(task)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect(task);
+        }
+      }}
+      role="button"
+      tabIndex={0}
+    >
+      {adminEditing ? (
+        <div className="category-task-row-main">
+          <div className="category-task-row-topline">
+            {isDragEnabled ? (
+              <span className="drag-handle category-drag-handle" title="Drag to move between onboarding categories">
+                <Icon name="move" />
+                Move
+              </span>
+            ) : null}
+            <input
+              className="task-title-edit category-task-title-edit"
+              aria-label="Task title"
+              value={draftTitle}
+              onChange={(event) => updateDraftTitle(event.target.value)}
+              onBlur={commitTitle}
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => {
+                event.stopPropagation();
+
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  commitTitle();
+                  event.currentTarget.blur();
+                }
+
+                if (event.key === "Escape") {
+                  updateDraftTitle(task.title);
+                  event.currentTarget.blur();
+                }
+              }}
+            />
+          </div>
+          <div className="category-task-row-meta">
+            <span>{task.category}</span>
+            <em>{statusLabels[task.status]}</em>
+          </div>
+        </div>
+      ) : (
+        <>
+          <span>{task.title}</span>
+          <em>{statusLabels[task.status]}</em>
+        </>
+      )}
     </article>
   );
 }
@@ -2720,6 +2833,7 @@ export default function RespondDashboard({
   const [storageNotice, setStorageNotice] = useState("");
   const [taskActionNotice, setTaskActionNotice] = useState<TaskActionNotice | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+  const [draggedCategoryTaskId, setDraggedCategoryTaskId] = useState<string | null>(null);
   const [showNewClientPanel, setShowNewClientPanel] = useState(false);
   const [isCreatingClient, setIsCreatingClient] = useState(false);
   const [isImportingGhlClient, setIsImportingGhlClient] = useState(false);
@@ -3086,6 +3200,11 @@ export default function RespondDashboard({
       }),
     [categoryStats]
   );
+  const editableCategoryNames = useMemo(
+    () => categories.filter((category) => canAdminReassignScaleCategory(activeProduct, category.name)).map((category) => category.name),
+    [activeProduct, categories]
+  );
+  const draggedCategoryTask = draggedCategoryTaskId ? taskMap.get(draggedCategoryTaskId) ?? null : null;
 
   async function persistTask(id: string, payload: TaskUpdatePayload) {
     const response = await fetch(`/api/tasks/${id}`, {
@@ -3287,6 +3406,14 @@ export default function RespondDashboard({
             : `Task moved to ${statusLabels[status]}: ${task.title}`;
 
     updateTask(task.id, { status }, successMessage);
+  }
+
+  function moveTaskToCategory(task: Task, categoryName: string) {
+    if (task.category === categoryName) {
+      return;
+    }
+
+    updateTask(task.id, { category: categoryName }, `Task moved to ${categoryName}: ${task.title}`);
   }
 
   function selectTaskClient(clientId: string) {
@@ -4090,10 +4217,35 @@ export default function RespondDashboard({
           </section>
         ) : (
           <section className="category-view" aria-label="Task categories">
+            {adminEditing && editableCategoryNames.length > 0 ? (
+              <div className="category-admin-banner">
+                <Icon name="move" />
+                Drag tasks between `Accounts Stage Verification`, `Admin & Account Setup`, and `Welcome Onboarding Call`. Edit titles inline here.
+              </div>
+            ) : null}
             {categoryStats.map((category) => {
               const rows = orderedFilteredTasks.filter((task) => task.category === category.name);
+              const isEditableDropZone = adminEditing && editableCategoryNames.includes(category.name);
               return (
-                <article key={category.id} className="category-panel">
+                <article
+                  key={category.id}
+                  className={`category-panel ${isEditableDropZone ? "category-panel-editable" : ""} ${draggedCategoryTask && draggedCategoryTask.category !== category.name && isEditableDropZone ? "category-panel-drop-target" : ""}`}
+                  onDragOver={(event) => {
+                    if (!isEditableDropZone || !draggedCategoryTask || !editableCategoryNames.includes(draggedCategoryTask.category)) {
+                      return;
+                    }
+
+                    event.preventDefault();
+                  }}
+                  onDrop={() => {
+                    if (!isEditableDropZone || !draggedCategoryTask || !editableCategoryNames.includes(draggedCategoryTask.category)) {
+                      return;
+                    }
+
+                    moveTaskToCategory(draggedCategoryTask, category.name);
+                    setDraggedCategoryTaskId(null);
+                  }}
+                >
                   <div className="category-panel-head">
                     <span className="category-dot" style={{ background: category.accent }} />
                     <div>
@@ -4104,11 +4256,17 @@ export default function RespondDashboard({
                     <b>{category.percent}%</b>
                   </div>
                   <div className="category-task-list">
-                    {rows.slice(0, 10).map((task) => (
-                      <button type="button" key={task.id} onClick={() => selectOrOpenTask(task)}>
-                        <span>{task.title}</span>
-                        <em>{statusLabels[task.status]}</em>
-                      </button>
+                    {rows.map((task) => (
+                      <CategoryTaskRow
+                        key={task.id}
+                        task={task}
+                        adminEditing={adminEditing}
+                        isDragEnabled={isEditableDropZone}
+                        onSelect={selectOrOpenTask}
+                        onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
+                        onDragStart={(targetTask) => setDraggedCategoryTaskId(targetTask.id)}
+                        onDragEnd={() => setDraggedCategoryTaskId(null)}
+                      />
                     ))}
                   </div>
                 </article>
