@@ -7,6 +7,7 @@ import {
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
 import { portalDefaultsForTask } from "./portalDefaults";
+import { scaleTasksForVariant } from "./scaleTasks";
 import {
   allSeedClients,
   defaultEnvironment,
@@ -118,7 +119,7 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-06-28-scale-variants";
+const currentStorageVersion = "2026-07-01-portal-defaults-v2";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
@@ -1078,10 +1079,12 @@ function taskInsertValues(clientId: string, environment: EnvironmentKey, product
     useTemplateState ? item.notes : "",
     item.loomUrl ?? "",
     item.loomTitle ?? "",
-    item.portalVisible ? 1 : portalDefaults.portalVisible ? 1 : 0,
-    item.portalTitle || portalDefaults.portalTitle,
-    item.portalNote || portalDefaults.portalNote,
-    item.portalActionRequired ? 1 : portalDefaults.portalActionRequired ? 1 : 0,
+    // If template explicitly configured portal (portalConfigured: true), use its values exactly.
+    // Otherwise merge with keyword-detected defaults so unconfigured tasks still get suggestions.
+    item.portalConfigured ? (item.portalVisible ? 1 : 0) : (item.portalVisible ? 1 : portalDefaults.portalVisible ? 1 : 0),
+    item.portalConfigured ? item.portalTitle : (item.portalTitle || portalDefaults.portalTitle),
+    item.portalConfigured ? item.portalNote : (item.portalNote || portalDefaults.portalNote),
+    item.portalConfigured ? (item.portalActionRequired ? 1 : 0) : (item.portalActionRequired ? 1 : portalDefaults.portalActionRequired ? 1 : 0),
     item.portalActionUrl ?? "",
     item.portalActionLabel ?? "",
     1,
@@ -1218,6 +1221,41 @@ async function seedTrainingCategoryOrders() {
 
   for (const row of rows.results ?? []) {
     await ensureTrainingCategory(normalizeProduct(row.product), row.category);
+  }
+}
+
+async function migrateScalePortalDefaults() {
+  const d1 = getD1();
+  const configuredTemplateTasks = scaleTasksForVariant("meta_google").filter((t) => t.portalConfigured);
+
+  if (configuredTemplateTasks.length === 0) {
+    return;
+  }
+
+  const clients = await d1
+    .prepare("SELECT id, environment FROM clients WHERE product = 'scale'")
+    .all<{ id: string; environment: string }>();
+
+  for (const client of clients.results ?? []) {
+    const updates = configuredTemplateTasks.map((template) =>
+      d1
+        .prepare(
+          "UPDATE tasks SET portal_visible = ?, portal_title = ?, portal_note = ?, portal_action_required = ?, portal_configured = 1, updated_at = CURRENT_TIMESTAMP WHERE environment = ? AND product = 'scale' AND client_id = ? AND template_id = ?"
+        )
+        .bind(
+          template.portalVisible ? 1 : 0,
+          template.portalTitle,
+          template.portalNote,
+          template.portalActionRequired ? 1 : 0,
+          client.environment,
+          client.id,
+          template.id
+        )
+    );
+
+    for (let i = 0; i < updates.length; i += 50) {
+      await d1.batch(updates.slice(i, i + 50));
+    }
   }
 }
 
@@ -1407,6 +1445,7 @@ async function prepareTaskStorage() {
 
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
+  await migrateScalePortalDefaults();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
   await seedTrainingCategoryOrders();

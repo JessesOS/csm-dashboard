@@ -440,11 +440,11 @@ export const scaleTasks: Task[] = [
       "scl-017"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Complete your onboarding form",
+    "portalNote": "Log in to your portal and submit the onboarding form before your Welcome Call.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 18
   },
   {
@@ -504,7 +504,7 @@ export const scaleTasks: Task[] = [
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 21
   },
   {
@@ -642,7 +642,7 @@ export const scaleTasks: Task[] = [
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 25
   },
   {
@@ -658,11 +658,11 @@ export const scaleTasks: Task[] = [
       "scl-025"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Bookmark your portal link",
+    "portalNote": "Save your portal link so you can access it anytime.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 26
   },
   {
@@ -698,11 +698,11 @@ export const scaleTasks: Task[] = [
       "scl-027"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Send a test message in your portal",
+    "portalNote": "Open your portal onboarding task and send us a test message to confirm everything is working.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 28
   },
   {
@@ -798,11 +798,11 @@ export const scaleTasks: Task[] = [
       "scl-032"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Review & approve your AI qualification questions",
+    "portalNote": "We'll go through your AI's qualification questions together on your Welcome Call.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 33
   },
   {
@@ -822,7 +822,7 @@ export const scaleTasks: Task[] = [
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 34
   },
   {
@@ -842,7 +842,7 @@ export const scaleTasks: Task[] = [
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 35
   },
   {
@@ -898,11 +898,11 @@ export const scaleTasks: Task[] = [
       "scl-037"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Download the LeadConnector Mobile App",
+    "portalNote": "Search 'LeadConnector' in the App Store or Google Play and install it before your next call.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 38
   },
   {
@@ -918,11 +918,11 @@ export const scaleTasks: Task[] = [
       "scl-038"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Review your SMS & email message copy",
+    "portalNote": "We'll walk through your messaging templates together on the call.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 39
   },
   {
@@ -938,11 +938,11 @@ export const scaleTasks: Task[] = [
       "scl-039"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Connect your calendar, social accounts & payment method",
+    "portalNote": "We'll help you set these up during your Welcome Call.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 40
   },
   {
@@ -958,11 +958,11 @@ export const scaleTasks: Task[] = [
       "scl-040"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Upload your past leads (CSV)",
+    "portalNote": "Prepare a CSV of your past leads and lost quotes — we'll walk you through the upload.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 41
   },
   {
@@ -1067,7 +1067,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-047",
-    "title": "Chase the client to provide admin access to Google Ads Manager, Google Analytics, and Google My Business Profile.",
+    "title": "Chase the client to provide access to Google My Business Profile.",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -1078,11 +1078,11 @@ export const scaleTasks: Task[] = [
       "scl-046"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Grant access to your Google My Business Profile",
+    "portalNote": "We'll need this to connect your local business listing. We'll send instructions during your Welcome Call.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 47
   },
   {
@@ -1098,11 +1098,11 @@ export const scaleTasks: Task[] = [
       "scl-047"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Grant domain & website builder access",
+    "portalNote": "We'll need access to your domain provider and website builder to set up your funnel.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 48
   },
   {
@@ -1336,11 +1336,11 @@ export const scaleTasks: Task[] = [
       "scl-059"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Review & approve your eBook lead magnet content",
+    "portalNote": "We'll share a Google Doc link in your portal — please review and send us your feedback.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 60
   },
   {
@@ -2194,11 +2194,11 @@ export const scaleTasks: Task[] = [
       "scl-102"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Approve your Meta ad campaigns & creative assets",
+    "portalNote": "We'll share your strategy doc and ad creatives in your portal for your final sign-off.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 103
   },
   {
@@ -2214,11 +2214,11 @@ export const scaleTasks: Task[] = [
       "scl-103"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Add RT Digital as a Partner in your Meta Business Suite",
+    "portalNote": "We'll send you our Business ID and a step-by-step guide to complete this in your portal.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 104
   },
   {
@@ -2754,11 +2754,11 @@ export const scaleTasks: Task[] = [
       "scl-130"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Watch your ad campaign walkthrough video",
+    "portalNote": "We've recorded a Loom walkthrough of your live campaigns — check your portal messages for the link.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 131
   },
   {
@@ -4608,11 +4608,11 @@ export const scaleTasks: Task[] = [
       "scl-223"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalVisible": true,
+    "portalTitle": "Test your AI receptionist live",
+    "portalNote": "Use the link we send you to chat and speak with your AI — try different personas to put it through its paces.",
+    "portalActionRequired": true,
+    "portalConfigured": true,
     "sortOrder": 224
   },
   {
@@ -4748,11 +4748,11 @@ export const scaleTasks: Task[] = [
       "scl-230"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Your Go-Live Call is scheduled",
+    "portalNote": "We'll confirm the exact date and time via your portal messages.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 231
   },
   {
@@ -4966,11 +4966,11 @@ export const scaleTasks: Task[] = [
       "scl-241"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Your live system walkthrough",
+    "portalNote": "On the Go-Live Call we'll show you how to handle calls, manage contacts, and use notifications.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 242
   },
   {
@@ -5326,11 +5326,11 @@ export const scaleTasks: Task[] = [
       "scl-259"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "You're live! Access your recording & support links",
+    "portalNote": "Your system is now live. Check your portal messages for your call recording and support resources.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 260
   },
   {
@@ -5668,7 +5668,7 @@ export const scaleTasks: Task[] = [
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 277
   },
   {
@@ -5684,11 +5684,11 @@ export const scaleTasks: Task[] = [
       "scl-277"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Your Week 1 check-in call",
+    "portalNote": "A 30-minute Zoom to review your first week — we'll be in touch to confirm the time.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 278
   },
   {
@@ -5704,12 +5704,32 @@ export const scaleTasks: Task[] = [
       "scl-278"
     ],
     "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
+    "portalVisible": true,
+    "portalTitle": "Your Week 2 check-in call",
+    "portalNote": "A 30-minute Zoom to review your progress and answer any questions.",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 279
+  },
+  {
+    "id": "scl-308",
+    "title": "Ask the client to share a testimonial about their experience.",
+    "category": "Post Go-Live Check-ins, Reporting & Admin",
+    "phase": "Post-Launch",
+    "status": "queued",
+    "assignee": "Scale CSM",
+    "dueWindow": "Week 2–4",
+    "priority": "normal",
+    "dependencies": [
+      "scl-279"
+    ],
+    "notes": "",
+    "portalVisible": true,
+    "portalTitle": "Share your experience — send us a testimonial",
+    "portalNote": "We'd love to hear how your journey has gone. A short video or written testimonial means the world to us!",
+    "portalActionRequired": true,
+    "portalConfigured": true,
+    "sortOrder": 308
   },
   {
     "id": "scl-280",
@@ -6271,6 +6291,9 @@ export const scaleTasks: Task[] = [
   }
 ];
 
+// scl-309 lives in the google-only category so it is automatically excluded for Meta-only clients
+export const googleAdsAccessTaskId = "scl-309";
+
 const metaOnlyCategoryIds = new Set([
   "scale-04-meta-ads-strategy-ebook-creation-gamma-chatgpt-switc",
   "scale-05-meta-ads-setup-handoff-partner-access",
@@ -6294,5 +6317,30 @@ export function scaleCategoriesForVariant(variant: ScaleVariant = "meta_google")
 
 export function scaleTasksForVariant(variant: ScaleVariant = "meta_google") {
   const allowedCategories = new Set(scaleCategoriesForVariant(variant).map((category) => category.name));
-  return scaleTasks.filter((task) => allowedCategories.has(task.category));
+  const tasks = scaleTasks.filter((task) => allowedCategories.has(task.category));
+  // Inject the Google Ads access task (scl-309) for google/meta_google variants only
+  if (variant === "google" || variant === "meta_google") {
+    const googleAdsAccessTask: Task = {
+      id: "scl-309",
+      title: "Chase the client to provide admin access to Google Ads Manager and Google Analytics.",
+      category: "Google Ads Strategy & Landing Page Funnel Creation",
+      phase: "Build",
+      status: "queued",
+      assignee: "Account Manager",
+      dueWindow: "Days 1-5",
+      priority: "high",
+      dependencies: [],
+      notes: "",
+      portalVisible: true,
+      portalTitle: "Grant access to Google Ads Manager & Google Analytics",
+      portalNote: "We'll need admin access to your Google Ads account and Google Analytics to set up tracking and campaigns.",
+      portalActionRequired: true,
+      portalConfigured: true,
+      sortOrder: 309,
+    };
+    if (!tasks.find((t) => t.id === googleAdsAccessTask.id)) {
+      tasks.push(googleAdsAccessTask);
+    }
+  }
+  return tasks;
 }

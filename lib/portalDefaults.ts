@@ -69,12 +69,33 @@ const actionKeywords = [
   "payment mechanism",
 ];
 
+// Phrases that indicate an internal staff instruction, even when other keywords match.
+const staffInstructionPhrases = [
+  "instruct the client to",
+  "chase the client to",
+  "ask the client to",
+  "tell the client to",
+  "inform the client",
+  "remind the client",
+  "document these",
+  "add a comment",
+  "change the approved",
+  "mark launchbay",
+  "post in launchbay",
+  "post to the dev team",
+  "copy the \"magic link\"",
+  "paste the launchbay",
+  "add the client as a user",
+  "log into the",
+];
+
 function lowerTitle(task: PortalTaskInput) {
   return task.title.toLowerCase();
 }
 
 export function shouldSuggestPortalVisible(task: PortalTaskInput) {
   const title = lowerTitle(task);
+  if (staffInstructionPhrases.some((phrase) => title.includes(phrase))) return false;
   const clientTouchpoint =
     clientFacingCategories.has(task.category) &&
     ["client", "call", "demo", "download", "permission", "phone", "csv", "abn/acn"].some((keyword) => title.includes(keyword));
