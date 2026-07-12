@@ -119,7 +119,7 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-07-12-scale-consolidation-v1";
+const currentStorageVersion = "2026-07-12-respond-consolidation-v1";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
@@ -1003,7 +1003,7 @@ async function getClientScaleVariant(clientId: string, environment: EnvironmentK
 }
 
 async function removeTemplateTasksOutsideVariant(clientId: string, environment: EnvironmentKey, product: ProductKey, scaleVariant?: ScaleVariant) {
-  if (product !== "scale") {
+  if (product !== "scale" && product !== "respond") {
     return;
   }
 
@@ -1263,6 +1263,45 @@ async function migrateScalePortalDefaults() {
 // Propagate the Scale task consolidation (many micro-steps merged into fewer milestones)
 // to existing client workspaces: delete tasks whose template is gone, and refresh the
 // surviving tasks' title / dependencies / order / merged-step notes from the template.
+// Build UPDATE statements that refresh a client's surviving template tasks from the (consolidated)
+// template. Dependencies are re-scoped to the client's task ids to match how they were seeded; title,
+// order and (when the template carries merged-step content) notes are synced. Pass withPortal to also
+// push the template's portal config (used where there is no separate portal migration).
+function templateRefreshStatements(
+  d1: D1Database,
+  environment: EnvironmentKey,
+  product: ProductKey,
+  clientId: string,
+  templateTasks: Task[],
+  withPortal: boolean
+) {
+  return templateTasks.map((template) => {
+    const scopedDeps = JSON.stringify(template.dependencies.map((dependencyId) => scopedTaskId(clientId, dependencyId)));
+    const columns = ["title = ?"];
+    const values: (string | number)[] = [template.title];
+    if (template.notes && template.notes.trim()) {
+      columns.push("notes = ?");
+      values.push(template.notes);
+    }
+    columns.push("dependencies = ?", "sort_order = ?");
+    values.push(scopedDeps, template.sortOrder);
+    if (withPortal) {
+      columns.push("portal_visible = ?", "portal_title = ?", "portal_note = ?", "portal_action_required = ?", "portal_configured = ?");
+      values.push(
+        template.portalVisible ? 1 : 0,
+        template.portalTitle,
+        template.portalNote,
+        template.portalActionRequired ? 1 : 0,
+        template.portalConfigured ? 1 : 0
+      );
+    }
+    columns.push("updated_at = CURRENT_TIMESTAMP");
+    return d1
+      .prepare(`UPDATE tasks SET ${columns.join(", ")} WHERE environment = ? AND product = ? AND client_id = ? AND template_id = ?`)
+      .bind(...values, environment, product, clientId, template.id);
+  });
+}
+
 async function migrateScaleTaskConsolidation() {
   const d1 = getD1();
   const clients = await d1
@@ -1276,24 +1315,29 @@ async function migrateScaleTaskConsolidation() {
     // 1. Remove tasks whose template_id no longer exists in the consolidated template (repoints deps).
     await removeTemplateTasksOutsideVariant(client.id, environment, "scale", variant);
 
-    // 2. Refresh surviving tasks from the template. Title / dependencies / sort order are always
-    //    synced (idempotent for unchanged tasks); notes are only overwritten when the template has
-    //    merged-step content, so any hand-written notes on untouched tasks are preserved.
-    const templateTasks = scaleTasksForVariant(variant);
-    const updates = templateTasks.map((template) =>
-      template.notes && template.notes.trim()
-        ? d1
-            .prepare(
-              "UPDATE tasks SET title = ?, notes = ?, dependencies = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE environment = ? AND product = 'scale' AND client_id = ? AND template_id = ?"
-            )
-            .bind(template.title, template.notes, JSON.stringify(template.dependencies), template.sortOrder, environment, client.id, template.id)
-        : d1
-            .prepare(
-              "UPDATE tasks SET title = ?, dependencies = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE environment = ? AND product = 'scale' AND client_id = ? AND template_id = ?"
-            )
-            .bind(template.title, JSON.stringify(template.dependencies), template.sortOrder, environment, client.id, template.id)
-    );
+    // 2. Refresh surviving tasks from the template (portal handled by migrateScalePortalDefaults).
+    const updates = templateRefreshStatements(d1, environment, "scale", client.id, scaleTasksForVariant(variant), false);
+    for (let i = 0; i < updates.length; i += 50) {
+      await d1.batch(updates.slice(i, i + 50));
+    }
+  }
+}
 
+// Same pass for Respond: consolidated internal tasks + newly added client-facing portal milestones.
+async function migrateRespondTaskConsolidation() {
+  const d1 = getD1();
+  const clients = await d1
+    .prepare("SELECT id, environment FROM clients WHERE product = 'respond'")
+    .all<{ id: string; environment: string }>();
+
+  for (const client of clients.results ?? []) {
+    const environment = normalizeEnvironment(client.environment);
+
+    // 1. Remove tasks merged away in the consolidation (repoints deps).
+    await removeTemplateTasksOutsideVariant(client.id, environment, "respond");
+
+    // 2. Refresh surviving tasks + push portal config (Respond has no separate portal migration).
+    const updates = templateRefreshStatements(d1, environment, "respond", client.id, productTasks("respond"), true);
     for (let i = 0; i < updates.length; i += 50) {
       await d1.batch(updates.slice(i, i + 50));
     }
@@ -1487,6 +1531,7 @@ async function prepareTaskStorage() {
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
   await migrateScaleTaskConsolidation();
+  await migrateRespondTaskConsolidation();
   await migrateScalePortalDefaults();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
