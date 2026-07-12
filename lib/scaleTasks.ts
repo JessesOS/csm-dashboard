@@ -1107,7 +1107,7 @@ export const scaleTasks: Task[] = [
   },
   {
     "id": "scl-049",
-    "title": "Review the client's onboard form to identify their key customer pain points.",
+    "title": "Draft the eBook lead-magnet content with ChatGPT",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1115,7 +1115,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 2-8",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Review the client's onboard form to identify their key customer pain points.\n- Open ChatGPT in a new tab and prompt it to create an eBook lead magnet outline for the client's business.\n- Review the generated outline to ensure it covers the specific pain points; prompt for revisions until it meets standards.\n- Prompt ChatGPT for the full eBook content draft that you can review and copy-paste.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
@@ -1124,8 +1124,8 @@ export const scaleTasks: Task[] = [
     "sortOrder": 49
   },
   {
-    "id": "scl-050",
-    "title": "Start the eBook process, utilising ChatGPT and other tools. Open ChatGPT in a new tab.",
+    "id": "scl-055",
+    "title": "Add client testimonials to the eBook draft",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1135,7 +1135,7 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-049"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Open a new tab, go to Google, and search the client's company name.\n- Open their Google Reviews and locate the most relevant, recent 5-star reviews.\n- Copy 3 to 5 testimonials into the final section of the Google Doc draft.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
@@ -1144,108 +1144,8 @@ export const scaleTasks: Task[] = [
     "sortOrder": 50
   },
   {
-    "id": "scl-051",
-    "title": "Provide ChatGPT with the prompt: \"There's two parts to our business... We want to create an eBook lead magnet titled... Can you help us?\"",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-050"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 51
-  },
-  {
-    "id": "scl-052",
-    "title": "Review the ChatGPT generated outline to ensure it covers the specific pain points requested by the client.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-051"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 52
-  },
-  {
-    "id": "scl-053",
-    "title": "Prompt ChatGPT to generate revisions until the outline meets standards.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-052"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 53
-  },
-  {
-    "id": "scl-054",
-    "title": "Prompt ChatGPT: \"eBook content draft that I can review and copy-paste.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-053"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 54
-  },
-  {
-    "id": "scl-055",
-    "title": "Open a new tab, navigate to Google.com, and search for the client's company name.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-054"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 55
-  },
-  {
-    "id": "scl-056",
-    "title": "Click on their Google Reviews.",
+    "id": "scl-060",
+    "title": "Send the eBook draft for client review & approval",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1255,137 +1155,37 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-055"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 56
-  },
-  {
-    "id": "scl-057",
-    "title": "Locate the most relevant and recent 5-star client reviews.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-056"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 57
-  },
-  {
-    "id": "scl-058",
-    "title": "Copy and paste 3 to 5 of these client testimonials into the final section of the Google Doc draft.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-057"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 58
-  },
-  {
-    "id": "scl-059",
-    "title": "Upload or create the Google Doc in the client's assigned Google Drive folder.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-058"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 59
-  },
-  {
-    "id": "scl-060",
-    "title": "Send the Google Doc link to the client via LaunchBay for their review and approval.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-059"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Upload or create the Google Doc in the client's assigned Google Drive folder.\n- Send the Google Doc link to the client via LaunchBay for review and approval.\n- Wait for client approval on the text before building the page.",
     "portalVisible": true,
     "portalTitle": "Review & approve your eBook lead magnet content",
     "portalNote": "We'll share a Google Doc link in your portal — please review and send us your feedback.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 60
+    "sortOrder": 51
   },
   {
-    "id": "scl-061",
-    "title": "Wait for client approval on the text.",
+    "id": "scl-062",
+    "title": "Import the approved doc into Gamma",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
     "assignee": "Creative Strategist",
     "dueWindow": "Days 2-8",
-    "priority": "high",
+    "priority": "normal",
     "dependencies": [
       "scl-060"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- In Google Docs: File > Download > Microsoft Word (.docx).\n- Log into Gamma.app and open the \"Client eBooks\" folder.\n- Create new AI > Import file > upload the Word document.\n- Select \"Webpage\" as the output format, then Continue.\n- Choose \"Card-by-card\" and confirm \"Yes, split for me\".",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 61
+    "sortOrder": 52
   },
   {
-    "id": "scl-062",
-    "title": "Once approved, click \"File\" > \"Download\" > \"Microsoft Word (.docx)\" in Google Docs.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "blocked",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-061"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 62
-  },
-  {
-    "id": "scl-063",
-    "title": "Log into Gamma.app.",
+    "id": "scl-072",
+    "title": "Refine the Gamma cards & generate the page",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1395,197 +1195,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-062"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Go through each generated card to check how the text is segmented; make manual adjustments as needed.\n- Click Continue, select a visual theme suited to the client's brand, then Generate.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 63
+    "sortOrder": 53
   },
   {
-    "id": "scl-064",
-    "title": "Navigate to the \"Client eBooks\" folder in Gamma.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-063"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 64
-  },
-  {
-    "id": "scl-065",
-    "title": "Click \"Create new AI\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-064"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 65
-  },
-  {
-    "id": "scl-066",
-    "title": "Click \"Import file\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-065"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 66
-  },
-  {
-    "id": "scl-067",
-    "title": "Upload the downloaded Word document.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-066"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 67
-  },
-  {
-    "id": "scl-068",
-    "title": "Select \"Webpage\" as the output format.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-067"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 68
-  },
-  {
-    "id": "scl-069",
-    "title": "Click \"Continue\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-068"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 69
-  },
-  {
-    "id": "scl-070",
-    "title": "Select \"Card-by-card\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-069"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 70
-  },
-  {
-    "id": "scl-071",
-    "title": "Click \"Yes, split for me\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-070"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 71
-  },
-  {
-    "id": "scl-072",
-    "title": "Go through each generated card to manually double-check how the text is segmented.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-071"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 72
-  },
-  {
-    "id": "scl-073",
-    "title": "Make manual adjustments to the text segmentation as needed.",
+    "id": "scl-077",
+    "title": "Apply the client's branding in Gamma",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1595,177 +1215,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-072"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Theme > Customize in the Gamma editor.\n- Open the client's website; use the Color Picker for Chrome extension to grab their primary brand hex, and apply it in Gamma.\n- Use the What The Font extension to identify their font and match it in Gamma's typography settings.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 73
-  },
-  {
-    "id": "scl-074",
-    "title": "Click \"Continue\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-073"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 74
-  },
-  {
-    "id": "scl-075",
-    "title": "Select a visual theme suited for the client's brand.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-074"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 75
-  },
-  {
-    "id": "scl-076",
-    "title": "Click \"Generate\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-075"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 76
-  },
-  {
-    "id": "scl-077",
-    "title": "Click \"Theme\" then \"Customize\" in the Gamma editor.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-076"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 77
-  },
-  {
-    "id": "scl-078",
-    "title": "Open the client's actual website in a new tab.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-077"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 78
-  },
-  {
-    "id": "scl-079",
-    "title": "Use the \"Color Picker for Chrome\" extension to extract their exact primary brand hex color.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-078"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 79
-  },
-  {
-    "id": "scl-080",
-    "title": "Paste the extracted hex color into Gamma to apply it to the page elements.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-079"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 80
-  },
-  {
-    "id": "scl-081",
-    "title": "Use the \"What The Font\" extension on the client's site to identify their font, and match it in Gamma's typography settings.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-080"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 81
+    "sortOrder": 54
   },
   {
     "id": "scl-082",
-    "title": "Click the CTA buttons in Gamma.",
+    "title": "Set up CTAs & images in Gamma",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1773,19 +1233,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 2-8",
     "priority": "normal",
     "dependencies": [
-      "scl-081"
+      "scl-077"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Select the CTA buttons, set the link display to \"Button\", and paste the client's contact URL.\n- Use Edit Image > Ask AI to generate or replace images to suit the client's services.\n- Review the whole page and make any final layout changes.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 82
+    "sortOrder": 55
   },
   {
-    "id": "scl-083",
-    "title": "Change the link display setting to \"Button\".",
+    "id": "scl-087",
+    "title": "Publish the eBook & copy the live URL",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1795,97 +1255,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-082"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Click Publish.\n- Click View site and copy the live URL.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 83
+    "sortOrder": 56
   },
   {
-    "id": "scl-084",
-    "title": "Paste the client's contact URL into the button link.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-083"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 84
-  },
-  {
-    "id": "scl-085",
-    "title": "Click \"Edit Image\" and use the \"Ask AI\" tool to generate or replace images (e.g., prompt: \"Modern home with solar panels on roof... bright sunny day\").",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-084"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 85
-  },
-  {
-    "id": "scl-086",
-    "title": "Review the entire Gamma page and make any final layout changes.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-085"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 86
-  },
-  {
-    "id": "scl-087",
-    "title": "Click \"Publish\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-086"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 87
-  },
-  {
-    "id": "scl-088",
-    "title": "Click \"View site\" and copy the live URL.",
+    "id": "scl-089",
+    "title": "Create the Switchy short link for the eBook",
     "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
     "phase": "Build",
     "status": "queued",
@@ -1895,133 +1275,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-087"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Go to Switchy.io and create a New folder named after the client, then Confirm.\n- Paste the Gamma URL into the link field.\n- Customize the short link to the format [clientname]-ebook.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 88
-  },
-  {
-    "id": "scl-089",
-    "title": "Navigate to Switchy.io (https://www.switchy.io/6047/list) in a new tab.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-088"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 89
-  },
-  {
-    "id": "scl-090",
-    "title": "Click \"New folder\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-089"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 90
-  },
-  {
-    "id": "scl-091",
-    "title": "Create a new folder named after the client.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-090"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 91
-  },
-  {
-    "id": "scl-092",
-    "title": "Click \"Confirm\".",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-091"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 92
-  },
-  {
-    "id": "scl-093",
-    "title": "Click the https://yourlink.com field and paste the Gamma URL.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "normal",
-    "dependencies": [
-      "scl-092"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 93
-  },
-  {
-    "id": "scl-094",
-    "title": "Customize the short link to the format [clientname]-ebook.",
-    "category": "Meta Ads Strategy & eBook Creation (Gamma/ChatGPT/Switchy)",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Creative Strategist",
-    "dueWindow": "Days 2-8",
-    "priority": "high",
-    "dependencies": [
-      "scl-093"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 94
+    "sortOrder": 57
   },
   {
     "id": "scl-095",

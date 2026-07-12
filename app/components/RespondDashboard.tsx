@@ -4302,7 +4302,7 @@ export default function RespondDashboard({
                         task={task}
                         adminEditing={adminEditing}
                         isDragEnabled={isEditableDropZone}
-                        onSelect={selectOrOpenTask}
+                        onSelect={openTaskInModal}
                         onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
                         onClientTaskToggle={(targetTask, checked) => updateTask(targetTask.id, { portalVisible: checked })}
                         onDragStart={(targetTask) => setDraggedCategoryTaskId(targetTask.id)}
