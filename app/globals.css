@@ -2027,7 +2027,26 @@ button:disabled {
 }
 
 .mission-shell-light .mission-side-section span {
-  color: #8791a2;
+  color: #4b5563;
+}
+
+/* Light-theme status badges: the base colors are tuned for the dark shell and
+   fail contrast on a light background, so give each a readable fg + soft fill. */
+.mission-shell-light .client-health-on_track {
+  color: #1a7f37 !important;
+  background: #e7f6ec;
+}
+.mission-shell-light .client-health-at_risk {
+  color: #8a5a00 !important;
+  background: #fbf1de;
+}
+.mission-shell-light .client-health-off_track {
+  color: #b42318 !important;
+  background: #fdeceb;
+}
+.mission-shell-light .client-health-on_hold {
+  color: #475467 !important;
+  background: #eef1f5;
 }
 
 .mission-shell-light .mission-side-section button {

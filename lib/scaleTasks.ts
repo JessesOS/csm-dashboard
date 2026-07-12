@@ -91,7 +91,7 @@ export const scaleTeamMembers = [
 export const scaleTasks: Task[] = [
   {
     "id": "scl-001",
-    "title": "Log into the Gmail, check emails.",
+    "title": "Daily comms routine — Gmail, Slack & GHL",
     "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "complete",
@@ -99,157 +99,37 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Pre-build / Ongoing",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into the Gmail, check emails.\n- Log into the RTDigital Agency Slack to check Slack comms, multiple channels and DM's daily.\n- Log into the GoHighLevel (GHL) Agency View -> RT Digital sub-account. Contacts, Scott Lambert Check comms with client. Message replies etc. Also, check clients sub account comms.\n- Use GHL as the mandatory primary platform for all client communication.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 1
   },
   {
-    "id": "scl-002",
-    "title": "Log into the RTDigital Agency Slack to check Slack comms, multiple channels and DM's daily.",
+    "id": "scl-005",
+    "title": "GHL logging & task-naming conventions",
     "category": "Accounts Stage Verification",
     "phase": "Onboarding",
-    "status": "complete",
+    "status": "review",
     "assignee": "Scale CSM",
     "dueWindow": "Pre-build / Ongoing",
     "priority": "high",
     "dependencies": [
       "scl-001"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Leave an 'internal comment' on the GHL contact record for every single client interaction.\n- Format every GHL note strictly as: Date - Reason for follow-up or communication - Team member name (e.g., \"May 19, 2026 - Followed up regarding website revisions - John\").\n- Create a task inside GHL attached to the client's contact record for any new project build or support request.\n- Name every GHL task strictly using the convention: Client Business Name | Task Description.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
+    "portalConfigured": true,
     "sortOrder": 2
   },
   {
-    "id": "scl-003",
-    "title": "Log into the GoHighLevel (GHL) Agency View -> RT Digital sub-account. Contacts, Scott Lambert Check comms with client. Message replies etc. Also, check clients sub account comms.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "complete",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-002"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 3
-  },
-  {
-    "id": "scl-004",
-    "title": "Use GHL as the mandatory primary platform for all client communication.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "complete",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-003"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 4
-  },
-  {
-    "id": "scl-005",
-    "title": "Leave an 'internal comment' on the GHL contact record for every single client interaction.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "review",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-004"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 5
-  },
-  {
-    "id": "scl-006",
-    "title": "Format every GHL note strictly as: Date - Reason for follow-up or communication - Team member name (e.g., \"May 19, 2026 - Followed up regarding website revisions - John\").",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "review",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-005"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 6
-  },
-  {
-    "id": "scl-007",
-    "title": "Create a task inside GHL attached to the client's contact record for any new project build or support request.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "in_progress",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-006"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 7
-  },
-  {
-    "id": "scl-008",
-    "title": "Name every GHL task strictly using the convention: Client Business Name | Task Description.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "in_progress",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-007"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 8
-  },
-  {
     "id": "scl-009",
-    "title": "Monitor the backend \"Accounts\" progress in LaunchBay.",
+    "title": "Verify billing & Accounts stage in LaunchBay",
     "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
@@ -257,19 +137,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Pre-build / Ongoing",
     "priority": "high",
     "dependencies": [
-      "scl-008"
+      "scl-005"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Monitor the backend \"Accounts\" progress in LaunchBay.\n- Verify \"Setup Fee Invoices Created and Sent\" is marked completed in LaunchBay.\n- Verify \"Setup Fee Paid and Reconciled\" is marked completed in LaunchBay.\n- Check that \"SaaS Fees Are Activated\" in LaunchBay.\n- Verify \"Recurring Invoices Setup/Auto/Reconciled\" is marked completed in LaunchBay.\n- Verify \"Client Payments\" in LaunchBay.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 9
+    "portalConfigured": true,
+    "sortOrder": 3
   },
   {
-    "id": "scl-010",
-    "title": "Verify \"Setup Fee Invoices Created and Sent\" is marked completed in LaunchBay.",
+    "id": "scl-015",
+    "title": "Confirm Zapier deploy automations (template, welcome email, Slack sync)",
     "category": "Accounts Stage Verification",
     "phase": "Onboarding",
     "status": "queued",
@@ -279,153 +159,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-009"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Verify the automated Zapier trigger deployed the correct LaunchBay project template upon the deal closing.\n- Verify the automated Zapier trigger sent the welcome email with the LaunchBay form to the client.\n- Set up a Zapier automation connecting the client's LaunchBay project with their Slack channel to sync task notifications in real-time.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 10
-  },
-  {
-    "id": "scl-011",
-    "title": "Verify \"Setup Fee Paid and Reconciled\" is marked completed in LaunchBay.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-010"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 11
-  },
-  {
-    "id": "scl-012",
-    "title": "Check that \"SaaS Fees Are Activated\" in LaunchBay.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-011"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 12
-  },
-  {
-    "id": "scl-013",
-    "title": "Verify \"Recurring Invoices Setup/Auto/Reconciled\" is marked completed in LaunchBay.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-012"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 13
-  },
-  {
-    "id": "scl-014",
-    "title": "Verify \"Client Payments\" in LaunchBay.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-013"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 14
-  },
-  {
-    "id": "scl-015",
-    "title": "Verify the automated Zapier trigger deployed the correct LaunchBay project template upon the deal closing.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-014"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 15
-  },
-  {
-    "id": "scl-016",
-    "title": "Verify the automated Zapier trigger sent the welcome email with the LaunchBay form to the client.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-015"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 16
-  },
-  {
-    "id": "scl-017",
-    "title": "Set up a Zapier automation connecting the client's LaunchBay project with their Slack channel to sync task notifications in real-time.",
-    "category": "Accounts Stage Verification",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Scale CSM",
-    "dueWindow": "Pre-build / Ongoing",
-    "priority": "high",
-    "dependencies": [
-      "scl-016"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 17
+    "portalConfigured": true,
+    "sortOrder": 4
   },
   {
     "id": "scl-018",
@@ -437,7 +177,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Pre-build / Ongoing",
     "priority": "high",
     "dependencies": [
-      "scl-017"
+      "scl-015"
     ],
     "notes": "",
     "portalVisible": true,
@@ -445,11 +185,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "Log in to your portal and submit the onboarding form before your Welcome Call.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 18
+    "sortOrder": 5
   },
   {
     "id": "scl-019a",
-    "title": "Verify client project template is deployed in Scale CSM platform using import from GHL.",
+    "title": "Verify project template, welcome email & onboarding form (CSM)",
     "category": "Admin & Account Setup",
     "phase": "Onboarding",
     "status": "complete",
@@ -459,57 +199,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-018"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 19
-  },
-  {
-    "id": "scl-019b",
-    "title": "Verify welcome email sent.",
-    "category": "Admin & Account Setup",
-    "phase": "Onboarding",
-    "status": "complete",
-    "assignee": "Scale CSM",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-019a"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 20
-  },
-  {
-    "id": "scl-019c",
-    "title": "Check that the client has submitted the onboarding form in CSM platform.",
-    "category": "Admin & Account Setup",
-    "phase": "Onboarding",
-    "status": "blocked",
-    "assignee": "Scale CSM",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-019b"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Verify client project template is deployed in Scale CSM platform using import from GHL.\n- Verify welcome email sent.\n- Check that the client has submitted the onboarding form in CSM platform.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 21
+    "sortOrder": 6
   },
   {
     "id": "scl-019",
-    "title": "Verify the Sales Team closed the deal, left the opportunity in the Sales Person Pipeline, and booked the Welcome Onboard Call.",
+    "title": "Pre-call setup (handoff, welcome email, client intro, artifact doc)",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -517,17 +217,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Verify the Sales Team closed the deal, left the opportunity in the Sales Person Pipeline, and booked the Welcome Onboard Call.\n- Update the automation that sends the welcome email to ensure the messaging is accurate.\n- Follow up with the new client via GHL SMS or Email to introduce yourself before the Welcome Call.\n- Create a copy of the \"AISS Client Artifact Template\" and save it under the client's name for note-taking.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 22
+    "portalConfigured": true,
+    "sortOrder": 7
   },
   {
-    "id": "scl-020",
-    "title": "Update the automation that sends the welcome email to ensure the messaging is accurate.",
+    "id": "scl-023",
+    "title": "Run the Welcome Call & portal walkthrough",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -537,113 +237,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-019"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 23
-  },
-  {
-    "id": "scl-021",
-    "title": "Follow up with the new client via GHL SMS or Email to introduce yourself before the Welcome Call.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-020"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 24
-  },
-  {
-    "id": "scl-022",
-    "title": "Create a copy of the \"AISS Client Artifact Template\" and save it under the client's name for note-taking.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-021"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 22
-  },
-  {
-    "id": "scl-023",
-    "title": "Start the Welcome Onboard call and present the Scale Onboarding Slide Deck (Gamma TAI-Scale-Onboard).",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-022"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 23
-  },
-  {
-    "id": "scl-024",
-    "title": "Have the client log into CSM live while sharing their screen on the call.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-023"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 24
-  },
-  {
-    "id": "scl-025",
-    "title": "Copy the \"Magic Link\" from the Users tab in CSM platform and provide it to the client.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-024"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Start the Welcome Onboard call and present the Scale Onboarding Slide Deck (Gamma TAI-Scale-Onboard).\n- Have the client log into CSM live while sharing their screen on the call.\n- Copy the \"Magic Link\" from the Users tab in CSM platform and provide it to the client.\n- Walk the client through CSM project milestones, tasks, and the messaging center.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 25
+    "sortOrder": 8
   },
   {
     "id": "scl-026",
@@ -655,7 +255,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [
-      "scl-025"
+      "scl-023"
     ],
     "notes": "",
     "portalVisible": true,
@@ -663,27 +263,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "Save your portal link so you can access it anytime.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 26
-  },
-  {
-    "id": "scl-027",
-    "title": "Walk the client through CSM project milestones, tasks, and the messaging center.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-026"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 27
+    "sortOrder": 9
   },
   {
     "id": "scl-028",
@@ -695,7 +275,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [
-      "scl-027"
+      "scl-023"
     ],
     "notes": "",
     "portalVisible": true,
@@ -703,11 +283,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "Open your portal onboarding task and send us a test message to confirm everything is working.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 28
+    "sortOrder": 10
   },
   {
     "id": "scl-029",
-    "title": "Review the submitted onboard form with the client: Business Info, Proof of Address, Phone Options, Appointment Options, Domain Access, Website Access, ICP, and Branding/Logos.",
+    "title": "Review onboarding form & define AI qualification questions",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -717,17 +297,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-028"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Review the submitted onboard form with the client: Business Info, Proof of Address, Phone Options, Appointment Options, Domain Access, Website Access, ICP, and Branding/Logos.\n- Ask the client: \"If your agent was a human, how would you train her to talk with leads?\"\n- Determine their exact pre-qualification questions (e.g., Service type, emergency status, name/email/phone, address, budget).\n- Document these exact questions in the Client Artifact document.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 29
+    "portalConfigured": true,
+    "sortOrder": 11
   },
   {
-    "id": "scl-030",
-    "title": "Ask the client: \"If your agent was a human, how would you train her to talk with leads?\"",
+    "id": "scl-033",
+    "title": "Review & approve the AI qualification questions",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -737,117 +317,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-029"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 30
-  },
-  {
-    "id": "scl-031",
-    "title": "Determine their exact pre-qualification questions (e.g., Service type, emergency status, name/email/phone, address, budget).",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "blocked",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-030"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 31
-  },
-  {
-    "id": "scl-032",
-    "title": "Document these exact questions in the Client Artifact document.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-031"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 32
-  },
-  {
-    "id": "scl-033",
-    "title": "Get verbal approval from the client on the AI questions.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-032"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Get verbal approval from the client on the AI questions.\n- Change the approved AI question text to GREEN BOLD in the Client Artifact document.\n- Add a comment \"approved by Client\" to the GREEN BOLD text.",
     "portalVisible": true,
     "portalTitle": "Review & approve your AI qualification questions",
     "portalNote": "We'll go through your AI's qualification questions together on your Welcome Call.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 33
-  },
-  {
-    "id": "scl-034",
-    "title": "Change the approved AI question text to GREEN BOLD in the Client Artifact document.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-033"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": true,
-    "sortOrder": 34
-  },
-  {
-    "id": "scl-035",
-    "title": "Add a comment \"approved by Client\" to the GREEN BOLD text.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-034"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": true,
-    "sortOrder": 35
+    "sortOrder": 12
   },
   {
     "id": "scl-036",
-    "title": "Explain the project timeline: Days 2-13 Build, Day 14 AI Test, Day 30 Go Live.",
+    "title": "Explain timeline & fees, schedule the AI Test Call",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -855,35 +335,15 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "critical",
     "dependencies": [
-      "scl-035"
+      "scl-033"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Explain the project timeline: Days 2-13 Build, Day 14 AI Test, Day 30 Go Live.\n- Warn the client that SaaS fees start ticking 14-30 days from the point of sale.\n- Schedule the \"AI Test Call\" for Day 14 in the GHL calendar.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 36
-  },
-  {
-    "id": "scl-037",
-    "title": "Warn the client that SaaS fees start ticking 14-30 days from the point of sale.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-036"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 37
+    "portalConfigured": true,
+    "sortOrder": 13
   },
   {
     "id": "scl-038",
@@ -895,7 +355,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [
-      "scl-037"
+      "scl-036"
     ],
     "notes": "",
     "portalVisible": true,
@@ -903,7 +363,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "Search 'LeadConnector' in the App Store or Google Play and install it before your next call.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 38
+    "sortOrder": 14
   },
   {
     "id": "scl-039",
@@ -923,7 +383,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll walk through your messaging templates together on the call.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 39
+    "sortOrder": 15
   },
   {
     "id": "scl-040",
@@ -943,7 +403,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll help you set these up during your Welcome Call.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 40
+    "sortOrder": 16
   },
   {
     "id": "scl-041",
@@ -963,31 +423,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "Prepare a CSV of your past leads and lost quotes — we'll walk you through the upload.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 41
-  },
-  {
-    "id": "scl-042",
-    "title": "Schedule the \"AI Test Call\" for Day 14 in the GHL calendar.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-041"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 42
+    "sortOrder": 17
   },
   {
     "id": "scl-043",
-    "title": "Post a recap message in LaunchBay tagging the client and Dev Team.",
+    "title": "Post the recap message in LaunchBay",
     "category": "Welcome Onboarding Call",
     "phase": "Onboarding",
     "status": "queued",
@@ -995,75 +435,15 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [
-      "scl-042"
+      "scl-036"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Post a recap message in LaunchBay tagging the client and Dev Team.\n- Paste the LaunchBay Magic Link into the recap message.\n- Paste the Read.ai call recording link into the recap message.\n- Write a bulleted list of any missing Action Items in the recap message.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 43
-  },
-  {
-    "id": "scl-044",
-    "title": "Paste the LaunchBay Magic Link into the recap message.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-043"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 44
-  },
-  {
-    "id": "scl-045",
-    "title": "Paste the Read.ai call recording link into the recap message.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "high",
-    "dependencies": [
-      "scl-044"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 45
-  },
-  {
-    "id": "scl-046",
-    "title": "Write a bulleted list of any missing Action Items in the recap message.",
-    "category": "Welcome Onboarding Call",
-    "phase": "Onboarding",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Days 1-2",
-    "priority": "normal",
-    "dependencies": [
-      "scl-045"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 46
+    "portalConfigured": true,
+    "sortOrder": 18
   },
   {
     "id": "scl-047",
@@ -1075,7 +455,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 1-2",
     "priority": "high",
     "dependencies": [
-      "scl-046"
+      "scl-043"
     ],
     "notes": "",
     "portalVisible": true,
@@ -1083,7 +463,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll need this to connect your local business listing. We'll send instructions during your Welcome Call.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 47
+    "sortOrder": 19
   },
   {
     "id": "scl-048",
@@ -1103,7 +483,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll need access to your domain provider and website builder to set up your funnel.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 48
+    "sortOrder": 20
   },
   {
     "id": "scl-049",
@@ -1121,7 +501,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 49
+    "sortOrder": 21
   },
   {
     "id": "scl-055",
@@ -1141,7 +521,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 50
+    "sortOrder": 22
   },
   {
     "id": "scl-060",
@@ -1161,7 +541,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll share a Google Doc link in your portal — please review and send us your feedback.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 51
+    "sortOrder": 23
   },
   {
     "id": "scl-062",
@@ -1181,7 +561,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 52
+    "sortOrder": 24
   },
   {
     "id": "scl-072",
@@ -1201,7 +581,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 53
+    "sortOrder": 25
   },
   {
     "id": "scl-077",
@@ -1221,7 +601,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 54
+    "sortOrder": 26
   },
   {
     "id": "scl-082",
@@ -1241,7 +621,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 55
+    "sortOrder": 27
   },
   {
     "id": "scl-087",
@@ -1261,7 +641,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 56
+    "sortOrder": 28
   },
   {
     "id": "scl-089",
@@ -1281,11 +661,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 57
+    "sortOrder": 29
   },
   {
     "id": "scl-095",
-    "title": "Fill out the Meta Ad Campaign Strategy Doc using the template.",
+    "title": "Build the Meta ad campaign strategy & creatives",
     "category": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "status": "blocked",
@@ -1293,153 +673,13 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-12",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Fill out the Meta Ad Campaign Strategy Doc using the template.\n- Outline the eBook Lead Magnet campaign (broad audience targeting).\n- Outline the Consult Offer campaign (warm retargeting audience).\n- Specify audience targeting details (e.g., ages 35-55+, lookalike audiences, engaged followers).\n- Draft the ad copy, including the Headline and Primary Text.\n- Design the Meta native lead form for the eBook to request Name, Email, Phone, Postcode, and T&Cs agreement.\n- Design the Meta native lead form for the Consult to include one pre-qualifying question (e.g., \"What electrical work do you need help with?\").\n- Create 1 static image and 1 Reel per campaign using Canva, AdCreative.ai, or Mirage.app.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 95
-  },
-  {
-    "id": "scl-096",
-    "title": "Outline the eBook Lead Magnet campaign (broad audience targeting).",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-095"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 96
-  },
-  {
-    "id": "scl-097",
-    "title": "Outline the Consult Offer campaign (warm retargeting audience).",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-096"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 97
-  },
-  {
-    "id": "scl-098",
-    "title": "Specify audience targeting details (e.g., ages 35-55+, lookalike audiences, engaged followers).",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-097"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 98
-  },
-  {
-    "id": "scl-099",
-    "title": "Draft the ad copy, including the Headline and Primary Text.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-098"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 99
-  },
-  {
-    "id": "scl-100",
-    "title": "Design the Meta native lead form for the eBook to request Name, Email, Phone, Postcode, and T&Cs agreement.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-099"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 100
-  },
-  {
-    "id": "scl-101",
-    "title": "Design the Meta native lead form for the Consult to include one pre-qualifying question (e.g., \"What electrical work do you need help with?\").",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-100"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 101
-  },
-  {
-    "id": "scl-102",
-    "title": "Create 1 static image and 1 Reel per campaign using Canva, AdCreative.ai, or Mirage.app.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-101"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 102
+    "portalConfigured": true,
+    "sortOrder": 30
   },
   {
     "id": "scl-103",
@@ -1451,7 +691,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-12",
     "priority": "high",
     "dependencies": [
-      "scl-102"
+      "scl-095"
     ],
     "notes": "",
     "portalVisible": true,
@@ -1459,11 +699,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll share your strategy doc and ad creatives in your portal for your final sign-off.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 103
+    "sortOrder": 31
   },
   {
     "id": "scl-104",
-    "title": "Instruct the client to add RT Digital as a \"Partner\" in their Meta Business Suite.",
+    "title": "Get RT Digital partner access to Meta Business Suite",
     "category": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "status": "queued",
@@ -1473,17 +713,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-103"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Instruct the client to add RT Digital as a \"Partner\" in their Meta Business Suite.\n- Send the client the Scribe guide: \"How to Add RT Digital as a Partner on Meta Business Suite\".\n- Provide the client with the RT Digital Business ID to enter.",
     "portalVisible": true,
     "portalTitle": "Add RT Digital as a Partner in your Meta Business Suite",
     "portalNote": "We'll send you our Business ID and a step-by-step guide to complete this in your portal.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 104
+    "sortOrder": 32
   },
   {
-    "id": "scl-105",
-    "title": "Send the client the Scribe guide: \"How to Add RT Digital as a Partner on Meta Business Suite\".",
+    "id": "scl-107",
+    "title": "Assign client's FB Page, Ad Account & Instagram to RT Digital",
     "category": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "status": "queued",
@@ -1493,357 +733,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-104"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Once Partner access is granted, log into the RT Digital Meta Business Portfolio.\n- Under \"Users\", click on \"System Users\".\n- Look for mktg@webindiainc.com or jayking6505@gmail.com.\n- Click \"Assign assets\".\n- Select \"Facebook Pages\" from the asset type list.\n- Use the \"Search\" field to look for the client's Facebook Page.\n- Click the checkbox next to the client's Facebook Page.\n- Under \"Partial access\", toggle ON the \"Content, Messages, Community activity, Ads, Insights\" switch.\n- Click \"Ad accounts\" from the asset type list.\n- Use the \"Search\" field to look for the client's Ad Account.\n- Click the checkbox next to the client's Ad Account.\n- Under \"Full control\", toggle ON the \"Manage ad accounts\" switch.\n- Click \"Instagram accounts\" from the asset type list.\n- Use the \"Search\" field and select the client's Instagram account.\n- Assign all permissions for Instagram.\n- Click \"Assign assets\" and then \"Done\".",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 105
-  },
-  {
-    "id": "scl-106",
-    "title": "Provide the client with the RT Digital Business ID to enter.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-105"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 106
-  },
-  {
-    "id": "scl-107",
-    "title": "Once Partner access is granted, log into the RT Digital Meta Business Portfolio.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-106"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 107
-  },
-  {
-    "id": "scl-108",
-    "title": "Under \"Users\", click on \"System Users\".",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-107"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 108
-  },
-  {
-    "id": "scl-109",
-    "title": "Look for mktg@webindiainc.com or jayking6505@gmail.com.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-108"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 109
-  },
-  {
-    "id": "scl-110",
-    "title": "Click \"Assign assets\".",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-109"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 110
-  },
-  {
-    "id": "scl-111",
-    "title": "Select \"Facebook Pages\" from the asset type list.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-110"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 111
-  },
-  {
-    "id": "scl-112",
-    "title": "Use the \"Search\" field to look for the client's Facebook Page.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-111"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 112
-  },
-  {
-    "id": "scl-113",
-    "title": "Click the checkbox next to the client's Facebook Page.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-112"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 113
-  },
-  {
-    "id": "scl-114",
-    "title": "Under \"Partial access\", toggle ON the \"Content, Messages, Community activity, Ads, Insights\" switch.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-113"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 114
-  },
-  {
-    "id": "scl-115",
-    "title": "Click \"Ad accounts\" from the asset type list.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-114"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 115
-  },
-  {
-    "id": "scl-116",
-    "title": "Use the \"Search\" field to look for the client's Ad Account.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-115"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 116
-  },
-  {
-    "id": "scl-117",
-    "title": "Click the checkbox next to the client's Ad Account.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-116"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 117
-  },
-  {
-    "id": "scl-118",
-    "title": "Under \"Full control\", toggle ON the \"Manage ad accounts\" switch.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-117"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 118
-  },
-  {
-    "id": "scl-119",
-    "title": "Click \"Instagram accounts\" from the asset type list.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-118"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 119
-  },
-  {
-    "id": "scl-120",
-    "title": "Use the \"Search\" field and select the client's Instagram account.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-119"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 120
-  },
-  {
-    "id": "scl-121",
-    "title": "Assign all permissions for Instagram.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-120"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 121
-  },
-  {
-    "id": "scl-122",
-    "title": "Click \"Assign assets\" and then \"Done\".",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-121"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 122
+    "portalConfigured": true,
+    "sortOrder": 33
   },
   {
     "id": "scl-123",
-    "title": "Log into Upwork using credentials in LastPass.",
+    "title": "Set up & fund the Ads Team milestone in Upwork",
     "category": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "status": "queued",
@@ -1851,119 +751,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-12",
     "priority": "high",
     "dependencies": [
-      "scl-122"
+      "scl-107"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into Upwork using credentials in LastPass.\n- Navigate to the Ads Team contracts.\n- Activate the \"Facebook\" setup milestone.\n- Set the hours to 4 hours (at $12/hr = $72).\n- Attach the approved Meta strategy document to the milestone.\n- Fund the milestone so the Ads team can load the campaign.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 123
-  },
-  {
-    "id": "scl-124",
-    "title": "Navigate to the Ads Team contracts.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "critical",
-    "dependencies": [
-      "scl-123"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 124
-  },
-  {
-    "id": "scl-125",
-    "title": "Activate the \"Facebook\" setup milestone.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-124"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 125
-  },
-  {
-    "id": "scl-126",
-    "title": "Set the hours to 4 hours (at $12/hr = $72).",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "normal",
-    "dependencies": [
-      "scl-125"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 126
-  },
-  {
-    "id": "scl-127",
-    "title": "Attach the approved Meta strategy document to the milestone.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-126"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 127
-  },
-  {
-    "id": "scl-128",
-    "title": "Fund the milestone so the Ads team can load the campaign.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-127"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 128
+    "portalConfigured": true,
+    "sortOrder": 34
   },
   {
     "id": "scl-129",
-    "title": "Record a Loom video walking the client through their new live ad campaigns.",
+    "title": "Record the ad campaign walkthrough Loom",
     "category": "Meta Ads Setup, Handoff & Partner Access",
     "phase": "Build",
     "status": "queued",
@@ -1971,35 +771,15 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-12",
     "priority": "high",
     "dependencies": [
-      "scl-128"
+      "scl-123"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Record a Loom video walking the client through their new live ad campaigns.\n- Explain in the Loom video how the AI will handle incoming leads from the ads via the native lead forms.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 129
-  },
-  {
-    "id": "scl-130",
-    "title": "Explain in the Loom video how the AI will handle incoming leads from the ads via the native lead forms.",
-    "category": "Meta Ads Setup, Handoff & Partner Access",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-12",
-    "priority": "high",
-    "dependencies": [
-      "scl-129"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 130
+    "portalConfigured": true,
+    "sortOrder": 35
   },
   {
     "id": "scl-131",
@@ -2011,7 +791,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-12",
     "priority": "high",
     "dependencies": [
-      "scl-130"
+      "scl-129"
     ],
     "notes": "",
     "portalVisible": true,
@@ -2019,11 +799,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "We've recorded a Loom walkthrough of your live campaigns — check your portal messages for the link.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 131
+    "sortOrder": 36
   },
   {
     "id": "scl-132",
-    "title": "Log into the RT Digital Google Ads Manager (MCC) account via the Projects Chrome profile.",
+    "title": "Link the client's Google Ads account to the MCC",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2031,177 +811,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-18",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into the RT Digital Google Ads Manager (MCC) account via the Projects Chrome profile.\n- Go to Sub-account settings.\n- Click the \"+\" (Add) button.\n- Select \"Link existing accounts\".\n- Paste the client's Customer ID into the field.\n- Click \"Send Request\".\n- Message the client instructing them to approve the link request on their end.\n- If the client does not have an ad account, click \"Create a new account\" from the MCC.\n- Grant the client admin access to the newly created ad account.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 132
-  },
-  {
-    "id": "scl-133",
-    "title": "Go to Sub-account settings.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-132"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 133
-  },
-  {
-    "id": "scl-134",
-    "title": "Click the \"+\" (Add) button.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-133"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 134
-  },
-  {
-    "id": "scl-135",
-    "title": "Select \"Link existing accounts\".",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-134"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 135
-  },
-  {
-    "id": "scl-136",
-    "title": "Paste the client's Customer ID into the field.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-135"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 136
-  },
-  {
-    "id": "scl-137",
-    "title": "Click \"Send Request\".",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-136"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 137
-  },
-  {
-    "id": "scl-138",
-    "title": "Message the client instructing them to approve the link request on their end.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-137"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 138
-  },
-  {
-    "id": "scl-139",
-    "title": "If the client does not have an ad account, click \"Create a new account\" from the MCC.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-138"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 139
-  },
-  {
-    "id": "scl-140",
-    "title": "Grant the client admin access to the newly created ad account.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-139"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 140
+    "portalConfigured": true,
+    "sortOrder": 37
   },
   {
     "id": "scl-141",
-    "title": "Check Google Business Profile manager under projects@richtraining.com.au to ensure RT Digital is invited to manage it.",
+    "title": "Confirm GMB & Google Analytics access",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2209,19 +829,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-18",
     "priority": "high",
     "dependencies": [
-      "scl-140"
+      "scl-132"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Check Google Business Profile manager under projects@richtraining.com.au to ensure RT Digital is invited to manage it.\n- If the GMB profile is new and unverified, instruct the client to log in and manage verification (e.g., submit a video of their business to Google).\n- Ensure the client sets up and links Google Analytics.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 141
+    "portalConfigured": true,
+    "sortOrder": 38
   },
   {
-    "id": "scl-142",
-    "title": "If the GMB profile is new and unverified, instruct the client to log in and manage verification (e.g., submit a video of their business to Google).",
+    "id": "scl-144",
+    "title": "Fill out the Google Ads Strategy Doc",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2231,57 +851,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-141"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Fill out the Google Ads Strategy Doc template.\n- Select 3 to 5 focus services to highlight.\n- Define target service areas (exact suburbs or postcodes).\n- Define the campaign objective (e.g., calls, form inquiries).\n- Detail the daily budget.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 142
+    "portalConfigured": true,
+    "sortOrder": 39
   },
   {
-    "id": "scl-143",
-    "title": "Ensure the client sets up and links Google Analytics.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "blocked",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-142"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 143
-  },
-  {
-    "id": "scl-144",
-    "title": "Fill out the Google Ads Strategy Doc template.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-143"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 144
-  },
-  {
-    "id": "scl-145",
-    "title": "Select 3 to 5 focus services to highlight.",
+    "id": "scl-149",
+    "title": "Activate the Ads Team keyword-research milestone (Upwork)",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2291,137 +871,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-144"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Go to Upwork and activate the \"Google ads standard setup\" milestone.\n- Set the milestone for 6 hours.\n- Wait for the Ads Team to return the Keyword Planner spreadsheet.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 145
-  },
-  {
-    "id": "scl-146",
-    "title": "Define target service areas (exact suburbs or postcodes).",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-145"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 146
-  },
-  {
-    "id": "scl-147",
-    "title": "Define the campaign objective (e.g., calls, form inquiries).",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-146"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 147
-  },
-  {
-    "id": "scl-148",
-    "title": "Detail the daily budget.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-147"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 148
-  },
-  {
-    "id": "scl-149",
-    "title": "Go to Upwork and activate the \"Google ads standard setup\" milestone.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-148"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 149
-  },
-  {
-    "id": "scl-150",
-    "title": "Set the milestone for 6 hours.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-149"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 150
-  },
-  {
-    "id": "scl-151",
-    "title": "Wait for the Ads Team to return the Keyword Planner spreadsheet.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-150"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 151
+    "portalConfigured": true,
+    "sortOrder": 40
   },
   {
     "id": "scl-152",
-    "title": "Log into GHL Agency View.",
+    "title": "Clone the Ads Funnel into the client sub-account",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2429,19 +889,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-18",
     "priority": "high",
     "dependencies": [
-      "scl-151"
+      "scl-149"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into GHL Agency View.\n- Navigate to a live client's sub-account (e.g., Fusion).\n- Go to Sites > Funnels.\n- Find the \"Ads Funnel\".\n- Clone the \"Ads Funnel\" to your new client's sub-account.\n- Open the cloned 2-step funnel (Homepage and Thank You page) in the GHL builder.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 152
+    "portalConfigured": true,
+    "sortOrder": 41
   },
   {
-    "id": "scl-153",
-    "title": "Navigate to a live client's sub-account (e.g., Fusion).",
+    "id": "scl-158",
+    "title": "Build the landing page hero, offer & CTAs",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2451,117 +911,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-152"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Update the Hero Section background image to depict the client's specific services.\n- Upload the client's logo.\n- Update the location text in the Hero Section.\n- Write a clear header offering their service.\n- Write a sub-headline listing the exact areas they serve.\n- Configure the \"Request an Appointment\" CTA button.\n- Configure the \"Click to Call\" CTA button.\n- Link the \"Click to Call\" button to the client's new TradeAI GHL phone number.\n- Edit the text in the Services Section to perfectly match the specific keywords the Ads Team provided for the campaign.\n- Insert simple Call-to-Action buttons between sections so users don't have to scroll to the bottom.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 153
+    "portalConfigured": true,
+    "sortOrder": 42
   },
   {
-    "id": "scl-154",
-    "title": "Go to Sites > Funnels.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-153"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 154
-  },
-  {
-    "id": "scl-155",
-    "title": "Find the \"Ads Funnel\".",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-154"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 155
-  },
-  {
-    "id": "scl-156",
-    "title": "Clone the \"Ads Funnel\" to your new client's sub-account.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-155"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 156
-  },
-  {
-    "id": "scl-157",
-    "title": "Open the cloned 2-step funnel (Homepage and Thank You page) in the GHL builder.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-156"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 157
-  },
-  {
-    "id": "scl-158",
-    "title": "Update the Hero Section background image to depict the client's specific services.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-157"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 158
-  },
-  {
-    "id": "scl-159",
-    "title": "Upload the client's logo.",
+    "id": "scl-168",
+    "title": "Create & wire the Google Ads lead form",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2571,337 +931,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-158"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Navigate away from the funnel builder to Sites > Forms > Builder.\n- Create a new form and name it \"Google Ads Funnel\".\n- Add standard fields to the form: Name, Phone, Email.\n- Add any pre-qualifying questions requested by the client (e.g., \"When is the best time to call?\") using custom fields.\n- Click Save on the form.\n- Go back to the Funnel builder.\n- Replace the placeholder form with your newly created \"Google Ads Funnel\" form to ensure leads are tagged specifically as Google Ad Leads.\n- Set the form action to \"Go to next step\" (Thank You page).",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 159
-  },
-  {
-    "id": "scl-160",
-    "title": "Update the location text in the Hero Section.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-159"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 160
-  },
-  {
-    "id": "scl-161",
-    "title": "Write a clear header offering their service.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-160"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 161
-  },
-  {
-    "id": "scl-162",
-    "title": "Write a sub-headline listing the exact areas they serve.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-161"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 162
-  },
-  {
-    "id": "scl-163",
-    "title": "Configure the \"Request an Appointment\" CTA button.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-162"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 163
-  },
-  {
-    "id": "scl-164",
-    "title": "Configure the \"Click to Call\" CTA button.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-163"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 164
-  },
-  {
-    "id": "scl-165",
-    "title": "Link the \"Click to Call\" button to the client's new TradeAI GHL phone number.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-164"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 165
-  },
-  {
-    "id": "scl-166",
-    "title": "Edit the text in the Services Section to perfectly match the specific keywords the Ads Team provided for the campaign.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-165"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 166
-  },
-  {
-    "id": "scl-167",
-    "title": "Insert simple Call-to-Action buttons between sections so users don't have to scroll to the bottom.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-166"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 167
-  },
-  {
-    "id": "scl-168",
-    "title": "Navigate away from the funnel builder to Sites > Forms > Builder.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-167"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 168
-  },
-  {
-    "id": "scl-169",
-    "title": "Create a new form and name it \"Google Ads Funnel\".",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-168"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 169
-  },
-  {
-    "id": "scl-170",
-    "title": "Add standard fields to the form: Name, Phone, Email.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-169"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 170
-  },
-  {
-    "id": "scl-171",
-    "title": "Add any pre-qualifying questions requested by the client (e.g., \"When is the best time to call?\") using custom fields.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-170"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 171
-  },
-  {
-    "id": "scl-172",
-    "title": "Click Save on the form.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-171"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 172
-  },
-  {
-    "id": "scl-173",
-    "title": "Go back to the Funnel builder.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-172"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 173
-  },
-  {
-    "id": "scl-174",
-    "title": "Replace the placeholder form with your newly created \"Google Ads Funnel\" form to ensure leads are tagged specifically as Google Ad Leads.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-173"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 174
-  },
-  {
-    "id": "scl-175",
-    "title": "Set the form action to \"Go to next step\" (Thank You page).",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "normal",
-    "dependencies": [
-      "scl-174"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 175
+    "portalConfigured": true,
+    "sortOrder": 43
   },
   {
     "id": "scl-176",
-    "title": "Update the \"Why Choose Us\" section with their experience, certifications, and brand values.",
+    "title": "Add reviews widget & 'Why Choose Us' section",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2909,19 +949,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-18",
     "priority": "normal",
     "dependencies": [
-      "scl-175"
+      "scl-168"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Update the \"Why Choose Us\" section with their experience, certifications, and brand values.\n- Log into SociableKit.com using projects@richtraining.com.au.\n- Connect their Google Business Profile in SociableKit to generate a live review widget.\n- Embed the SociableKit HTML code on the GHL landing page.\n- If the client lacks project photos, embed their Instagram feed using SociableKit.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 176
+    "portalConfigured": true,
+    "sortOrder": 44
   },
   {
-    "id": "scl-177",
-    "title": "Log into SociableKit.com using projects@richtraining.com.au.",
+    "id": "scl-181",
+    "title": "Edit the Thank You page",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -2931,117 +971,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-176"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Edit the Thank You page (second funnel step).\n- Add links to their main website and list any secondary services not covered on the homepage.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 177
-  },
-  {
-    "id": "scl-178",
-    "title": "Connect their Google Business Profile in SociableKit to generate a live review widget.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-177"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 178
-  },
-  {
-    "id": "scl-179",
-    "title": "Embed the SociableKit HTML code on the GHL landing page.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-178"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 179
-  },
-  {
-    "id": "scl-180",
-    "title": "If the client lacks project photos, embed their Instagram feed using SociableKit.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-179"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 180
-  },
-  {
-    "id": "scl-181",
-    "title": "Edit the Thank You page (second funnel step).",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-180"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 181
-  },
-  {
-    "id": "scl-182",
-    "title": "Add links to their main website and list any secondary services not covered on the homepage.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-181"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 182
+    "portalConfigured": true,
+    "sortOrder": 45
   },
   {
     "id": "scl-183",
-    "title": "Click Save and Publish.",
+    "title": "Publish, connect domain & send preview for approval",
     "category": "Google Ads Strategy & Landing Page Funnel Creation",
     "phase": "Build",
     "status": "queued",
@@ -3049,119 +989,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 5-18",
     "priority": "normal",
     "dependencies": [
-      "scl-182"
+      "scl-181"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Click Save and Publish.\n- Go to funnel settings and connect their domain.\n- Use the DNS settings provided in their onboarding form to connect the domain.\n- Double-check that all URL paths are correct.\n- Generate a preview link of the funnel via \"Share Funnel\".\n- Send the Ads Team's keyword plan and the GHL landing page preview link to the client for final approval.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 183
-  },
-  {
-    "id": "scl-184",
-    "title": "Go to funnel settings and connect their domain.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-183"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 184
-  },
-  {
-    "id": "scl-185",
-    "title": "Use the DNS settings provided in their onboarding form to connect the domain.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-184"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 185
-  },
-  {
-    "id": "scl-186",
-    "title": "Double-check that all URL paths are correct.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-185"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 186
-  },
-  {
-    "id": "scl-187",
-    "title": "Generate a preview link of the funnel via \"Share Funnel\".",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-186"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 187
-  },
-  {
-    "id": "scl-188",
-    "title": "Send the Ads Team's keyword plan and the GHL landing page preview link to the client for final approval.",
-    "category": "Google Ads Strategy & Landing Page Funnel Creation",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Ads Team",
-    "dueWindow": "Days 5-18",
-    "priority": "high",
-    "dependencies": [
-      "scl-187"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 188
+    "portalConfigured": true,
+    "sortOrder": 46
   },
   {
     "id": "scl-189",
-    "title": "Log into GHL Agency View > Settings > Team > Edit Ads Team, and grant the Ads Team access to the client's new GHL sub-account.",
+    "title": "Set up the client's GHL sub-account & access",
     "category": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "status": "queued",
@@ -3169,17 +1009,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 8-13",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into GHL Agency View > Settings > Team > Edit Ads Team, and grant the Ads Team access to the client's new GHL sub-account.\n- Set up the GHL sub-account and update the Business Profile.\n- Add the client as a user in GHL with strictly limited permissions: Contacts, Conversations, Dashboard, Opportunities, Tags, Account Settings.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 189
+    "portalConfigured": true,
+    "sortOrder": 47
   },
   {
-    "id": "scl-190",
-    "title": "Set up the GHL sub-account and update the Business Profile.",
+    "id": "scl-192",
+    "title": "Generate bot objectives & knowledgebase via CloseBot GPT",
     "category": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "status": "queued",
@@ -3189,57 +1029,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-189"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Use the CloseBot Objective Builder GPT link (https://chatgpt.com/g/g-67ae76f80150819187fbb5fa67ddcec4-closebot-objective-builder) in a new chat.\n- Change the yellow highlighted sections in the prompt template to reflect the client details (Bot Name, Client Website, Industry Insight, Pain Points, Objections, ICP).\n- Run Task 1 (Generate Bot Details & Objectives Prompt) and Task 2 (Generate Knowledgebase Prompt) together in ChatGPT.\n- Review the output for the 7 standard CloseBot Objectives: Pain Point, Motivation, Service Type, Email, Phone, Timezone, and Book Call.\n- Ensure Max Attempts is set to 2 and Sensitivity is set to 50 for all objectives.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 190
+    "portalConfigured": true,
+    "sortOrder": 48
   },
   {
-    "id": "scl-191",
-    "title": "Add the client as a user in GHL with strictly limited permissions: Contacts, Conversations, Dashboard, Opportunities, Tags, Account Settings.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-190"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 191
-  },
-  {
-    "id": "scl-192",
-    "title": "Use the CloseBot Objective Builder GPT link (https://chatgpt.com/g/g-67ae76f80150819187fbb5fa67ddcec4-closebot-objective-builder) in a new chat.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-191"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 192
-  },
-  {
-    "id": "scl-193",
-    "title": "Change the yellow highlighted sections in the prompt template to reflect the client details (Bot Name, Client Website, Industry Insight, Pain Points, Objections, ICP).",
+    "id": "scl-197",
+    "title": "Clone & configure the CloseBot bot",
     "category": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "status": "queued",
@@ -3249,257 +1049,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-192"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Log into CloseBot (app.closebot.com) using the stored team credentials.\n- Clone the V2 bot (e.g., 'Susan' Agent and 'CONVERT' workflow or 'LenderlyAIv2' bot).\n- Rename the bot to match the client details.\n- Set Persona Name, 'How to Respond' section, and Tone according to the GPT prompt results.\n- Select Provider as RTD OpenAi.\n- Connect to RTDigital Agency and the appropriate client GHL subaccount.\n- Turn ON \"Bot Shutoff Manual Message\".\n- Turn ON \"Graceful Goodbye\".\n- Turn OFF \"Followup Availability\" by default.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 193
-  },
-  {
-    "id": "scl-194",
-    "title": "Run Task 1 (Generate Bot Details & Objectives Prompt) and Task 2 (Generate Knowledgebase Prompt) together in ChatGPT.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-193"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 194
-  },
-  {
-    "id": "scl-195",
-    "title": "Review the output for the 7 standard CloseBot Objectives: Pain Point, Motivation, Service Type, Email, Phone, Timezone, and Book Call.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-194"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 195
-  },
-  {
-    "id": "scl-196",
-    "title": "Ensure Max Attempts is set to 2 and Sensitivity is set to 50 for all objectives.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "normal",
-    "dependencies": [
-      "scl-195"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 196
-  },
-  {
-    "id": "scl-197",
-    "title": "Log into CloseBot (app.closebot.com) using the stored team credentials.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-196"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 197
-  },
-  {
-    "id": "scl-198",
-    "title": "Clone the V2 bot (e.g., 'Susan' Agent and 'CONVERT' workflow or 'LenderlyAIv2' bot).",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-197"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 198
-  },
-  {
-    "id": "scl-199",
-    "title": "Rename the bot to match the client details.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-198"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 199
-  },
-  {
-    "id": "scl-200",
-    "title": "Set Persona Name, 'How to Respond' section, and Tone according to the GPT prompt results.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "normal",
-    "dependencies": [
-      "scl-199"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 200
-  },
-  {
-    "id": "scl-201",
-    "title": "Select Provider as RTD OpenAi.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-200"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 201
-  },
-  {
-    "id": "scl-202",
-    "title": "Connect to RTDigital Agency and the appropriate client GHL subaccount.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-201"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 202
-  },
-  {
-    "id": "scl-203",
-    "title": "Turn ON \"Bot Shutoff Manual Message\".",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "normal",
-    "dependencies": [
-      "scl-202"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 203
-  },
-  {
-    "id": "scl-204",
-    "title": "Turn ON \"Graceful Goodbye\".",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "blocked",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "normal",
-    "dependencies": [
-      "scl-203"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 204
-  },
-  {
-    "id": "scl-205",
-    "title": "Turn OFF \"Followup Availability\" by default.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-204"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 205
+    "portalConfigured": true,
+    "sortOrder": 49
   },
   {
     "id": "scl-206",
-    "title": "Paste the GPT-generated Knowledgebase into the \"Knowledge\" section (Knowledge library > Create text file).",
+    "title": "Load knowledgebase & connect calendar booking",
     "category": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "status": "queued",
@@ -3507,19 +1067,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Days 8-13",
     "priority": "normal",
     "dependencies": [
-      "scl-205"
+      "scl-197"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Paste the GPT-generated Knowledgebase into the \"Knowledge\" section (Knowledge library > Create text file).\n- Click \"website scrape\", enter the client's website URL, and select website.\n- Edit sources for both Knowledge entries and link them to the appropriate client subaccount.\n- Ensure conversational booking logic routes to the GHL AI Calendar using the GET method.\n- Log into GHL -> Account -> Calendar -> Calendar Settings, and copy the AI Calendar ID to paste into CloseBot.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 206
+    "portalConfigured": true,
+    "sortOrder": 50
   },
   {
-    "id": "scl-207",
-    "title": "Click \"website scrape\", enter the client's website URL, and select website.",
+    "id": "scl-211",
+    "title": "Provide weekly updates to the client via LaunchBay task comments or phone calls during the build phase.",
     "category": "AI Bot Build & GHL Configuration",
     "phase": "Build",
     "status": "queued",
@@ -3535,91 +1095,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 207
-  },
-  {
-    "id": "scl-208",
-    "title": "Edit sources for both Knowledge entries and link them to the appropriate client subaccount.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-207"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 208
-  },
-  {
-    "id": "scl-209",
-    "title": "Ensure conversational booking logic routes to the GHL AI Calendar using the GET method.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-208"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 209
-  },
-  {
-    "id": "scl-210",
-    "title": "Log into GHL -> Account -> Calendar -> Calendar Settings, and copy the AI Calendar ID to paste into CloseBot.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-209"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 210
-  },
-  {
-    "id": "scl-211",
-    "title": "Provide weekly updates to the client via LaunchBay task comments or phone calls during the build phase.",
-    "category": "AI Bot Build & GHL Configuration",
-    "phase": "Build",
-    "status": "queued",
-    "assignee": "Automation Specialist",
-    "dueWindow": "Days 8-13",
-    "priority": "high",
-    "dependencies": [
-      "scl-210"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 211
+    "sortOrder": 51
   },
   {
     "id": "scl-212",
-    "title": "Perform Final Build Check (Verify users, forms, calendar integrations, and phone routings are flawless).",
+    "title": "Final build check & self-test the AI funnel",
     "category": "AI Test Call & Final Checks (Day 14)",
     "phase": "Testing",
     "status": "queued",
@@ -3627,17 +1107,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Day 14",
     "priority": "critical",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Perform Final Build Check (Verify users, forms, calendar integrations, and phone routings are flawless).\n- Log into the GHL account.\n- Navigate to Sites -> Funnels -> AI Test Funnel.\n- Click the \"View Page\" button to launch the AI test funnel in a browser.\n- Test the Live Chat and Voice Chat yourself.\n- If either fails, flag a developer via Slack/LaunchBay immediately.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 212
+    "portalConfigured": true,
+    "sortOrder": 52
   },
   {
-    "id": "scl-213",
-    "title": "Log into the GHL account.",
+    "id": "scl-218",
+    "title": "On the call: confirm the client's connections are working",
     "category": "AI Test Call & Final Checks (Day 14)",
     "phase": "Testing",
     "status": "queued",
@@ -3647,117 +1127,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-212"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Ensure Read.ai is recording the client call.\n- On the call, confirm the client has downloaded the LeadConnector App on their phone.\n- Confirm their email signature is set up.\n- Confirm their calendar is connected and user availability/timezone is correct.\n- Confirm social media DMs are connected.\n- Confirm a call to the client's TradeAI phone number rings their LeadConnector mobile app.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 213
+    "portalConfigured": true,
+    "sortOrder": 53
   },
   {
-    "id": "scl-214",
-    "title": "Navigate to Sites -> Funnels -> AI Test Funnel.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-213"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 214
-  },
-  {
-    "id": "scl-215",
-    "title": "Click the \"View Page\" button to launch the AI test funnel in a browser.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-214"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 215
-  },
-  {
-    "id": "scl-216",
-    "title": "Test the Live Chat and Voice Chat yourself.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "normal",
-    "dependencies": [
-      "scl-215"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 216
-  },
-  {
-    "id": "scl-217",
-    "title": "If either fails, flag a developer via Slack/LaunchBay immediately.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-216"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 217
-  },
-  {
-    "id": "scl-218",
-    "title": "Ensure Read.ai is recording the client call.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-217"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 218
-  },
-  {
-    "id": "scl-219",
-    "title": "On the call, confirm the client has downloaded the LeadConnector App on their phone.",
+    "id": "scl-224",
+    "title": "Test your AI receptionist live",
     "category": "AI Test Call & Final Checks (Day 14)",
     "phase": "Testing",
     "status": "queued",
@@ -3767,117 +1147,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-218"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 219
-  },
-  {
-    "id": "scl-220",
-    "title": "Confirm their email signature is set up.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-219"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 220
-  },
-  {
-    "id": "scl-221",
-    "title": "Confirm their calendar is connected and user availability/timezone is correct.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-220"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 221
-  },
-  {
-    "id": "scl-222",
-    "title": "Confirm social media DMs are connected.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-221"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 222
-  },
-  {
-    "id": "scl-223",
-    "title": "Confirm a call to the client's TradeAI phone number rings their LeadConnector mobile app.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-222"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 223
-  },
-  {
-    "id": "scl-224",
-    "title": "Send the client the link to the AI testing environment funnel.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-223"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Send the client the link to the AI testing environment funnel.\n- Instruct the client to live-chat and speak with the agent.\n- Tell the client to pretend to be different personas (price shopper, emergency, browsing) to try and stump the bot.\n- Collect actionable feedback from the client during the test.",
     "portalVisible": true,
     "portalTitle": "Test your AI receptionist live",
     "portalNote": "Use the link we send you to chat and speak with your AI — try different personas to put it through its paces.",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 224
+    "sortOrder": 54
   },
   {
-    "id": "scl-225",
-    "title": "Instruct the client to live-chat and speak with the agent.",
+    "id": "scl-228",
+    "title": "Log & apply client test feedback (internal)",
     "category": "AI Test Call & Final Checks (Day 14)",
     "phase": "Testing",
     "status": "queued",
@@ -3887,113 +1167,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-224"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Document the feedback in GHL notes and via Read.ai.\n- Post the feedback in LaunchBay for the AISS Dev Team.\n- Update the CloseBot/snapshot configuration based on the feedback.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 225
-  },
-  {
-    "id": "scl-226",
-    "title": "Tell the client to pretend to be different personas (price shopper, emergency, browsing) to try and stump the bot.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-225"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 226
-  },
-  {
-    "id": "scl-227",
-    "title": "Collect actionable feedback from the client during the test.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-226"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 227
-  },
-  {
-    "id": "scl-228",
-    "title": "Document the feedback in GHL notes and via Read.ai.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-227"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 228
-  },
-  {
-    "id": "scl-229",
-    "title": "Post the feedback in LaunchBay for the AISS Dev Team.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-228"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 229
-  },
-  {
-    "id": "scl-230",
-    "title": "Update the CloseBot/snapshot configuration based on the feedback.",
-    "category": "AI Test Call & Final Checks (Day 14)",
-    "phase": "Testing",
-    "status": "queued",
-    "assignee": "Voice AI Specialist",
-    "dueWindow": "Day 14",
-    "priority": "high",
-    "dependencies": [
-      "scl-229"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 230
+    "portalConfigured": true,
+    "sortOrder": 55
   },
   {
     "id": "scl-231",
@@ -4005,7 +1185,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Day 14",
     "priority": "critical",
     "dependencies": [
-      "scl-230"
+      "scl-228"
     ],
     "notes": "",
     "portalVisible": true,
@@ -4013,11 +1193,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'll confirm the exact date and time via your portal messages.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 231
+    "sortOrder": 56
   },
   {
     "id": "scl-232",
-    "title": "CRITICAL PRE-CALL TASK: Go into GHL Automations, search for 001. AISS - Inbound Lead Submitted.",
+    "title": "Pre-call: activate automations & billing settings",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4025,157 +1205,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Day 30",
     "priority": "critical",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- CRITICAL PRE-CALL TASK: Go into GHL Automations, search for 001. AISS - Inbound Lead Submitted.\n- Turn this automation from Draft to ON.\n- Go to GHL Settings -> Billing.\n- Update Wallet Settings: Ensure auto-recharge is ON.\n- Set the recharge amount to $100.\n- Set the trigger threshold to $10.\n- Confirm SaaS subscriptions are active.\n- Confirm rebilling fees (2.5x phone items, 3x other items) are set correctly.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 232
-  },
-  {
-    "id": "scl-233",
-    "title": "Turn this automation from Draft to ON.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "critical",
-    "dependencies": [
-      "scl-232"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 233
-  },
-  {
-    "id": "scl-234",
-    "title": "Go to GHL Settings -> Billing.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "critical",
-    "dependencies": [
-      "scl-233"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 234
-  },
-  {
-    "id": "scl-235",
-    "title": "Update Wallet Settings: Ensure auto-recharge is ON.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-234"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 235
-  },
-  {
-    "id": "scl-236",
-    "title": "Set the recharge amount to $100.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-235"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 236
-  },
-  {
-    "id": "scl-237",
-    "title": "Set the trigger threshold to $10.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-236"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 237
-  },
-  {
-    "id": "scl-238",
-    "title": "Confirm SaaS subscriptions are active.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-237"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 238
-  },
-  {
-    "id": "scl-239",
-    "title": "Confirm rebilling fees (2.5x phone items, 3x other items) are set correctly.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "critical",
-    "dependencies": [
-      "scl-238"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 239
+    "portalConfigured": true,
+    "sortOrder": 57
   },
   {
     "id": "scl-240",
-    "title": "On the call, frame the session: Explain the goal is simplicity and getting the team confident using the live system.",
+    "title": "Open the Go-Live call & frame the session",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4183,19 +1223,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Day 30",
     "priority": "high",
     "dependencies": [
-      "scl-239"
+      "scl-232"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- On the call, frame the session: Explain the goal is simplicity and getting the team confident using the live system.\n- Have the client open https://aiss-live.rtdigital.com.au/.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 240
+    "portalConfigured": true,
+    "sortOrder": 58
   },
   {
-    "id": "scl-241",
-    "title": "Have the client open https://aiss-live.rtdigital.com.au/.",
+    "id": "scl-242",
+    "title": "Walk the client through the live system",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4205,157 +1245,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-240"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 241
-  },
-  {
-    "id": "scl-242",
-    "title": "Walk the client through the LeadConnector app features.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-241"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Walk the client through the LeadConnector app features.\n- Show them how to navigate Contacts.\n- Show them how to make and receive calls.\n- Show them how to handle missed calls.\n- Show them how to send SMS.\n- Show them how to access and view conversations.\n- Show them how to check push notifications.",
     "portalVisible": true,
     "portalTitle": "Your live system walkthrough",
     "portalNote": "On the Go-Live Call we'll show you how to handle calls, manage contacts, and use notifications.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 242
-  },
-  {
-    "id": "scl-243",
-    "title": "Show them how to navigate Contacts.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-242"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 243
-  },
-  {
-    "id": "scl-244",
-    "title": "Show them how to make and receive calls.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-243"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 244
-  },
-  {
-    "id": "scl-245",
-    "title": "Show them how to handle missed calls.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-244"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 245
-  },
-  {
-    "id": "scl-246",
-    "title": "Show them how to send SMS.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-245"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 246
-  },
-  {
-    "id": "scl-247",
-    "title": "Show them how to access and view conversations.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-246"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 247
-  },
-  {
-    "id": "scl-248",
-    "title": "Show them how to check push notifications.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-247"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 248
+    "sortOrder": 59
   },
   {
     "id": "scl-249",
-    "title": "Demo the AI Summaries (call transcripts, notes, follow-up suggestions) in the contact records.",
+    "title": "Demo the AI in action & the live lead flow",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4363,19 +1263,19 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Day 30",
     "priority": "high",
     "dependencies": [
-      "scl-248"
+      "scl-242"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Demo the AI Summaries (call transcripts, notes, follow-up suggestions) in the contact records.\n- Demo the AI Coaching Notes (call scoring, insights) in the contact records.\n- Demo the AI answering a missed call.\n- Walk through their live ad campaign setup.\n- Submit a live test webform or FB/IG DM to demo an inbound lead.\n- Show them the test lead instantly appearing in the Opportunities pipeline.\n- Show them the AI sending an immediate SMS/Email nurture.\n- Show them how to stop the bot manually by adding the ai off tag.\n- Show them how the opportunity card moves to the \"Booked\" stage.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 249
+    "portalConfigured": true,
+    "sortOrder": 60
   },
   {
-    "id": "scl-250",
-    "title": "Demo the AI Coaching Notes (call scoring, insights) in the contact records.",
+    "id": "scl-258",
+    "title": "Set team usage standards & confirm fees commenced",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4385,177 +1285,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-249"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Establish team usage standards: All business calls must go through the app, avoid personal mobiles, review summaries daily, reply from inside the app.\n- Remind the client that SaaS fees have officially commenced.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 250
+    "portalConfigured": true,
+    "sortOrder": 61
   },
   {
-    "id": "scl-251",
-    "title": "Demo the AI answering a missed call.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-250"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 251
-  },
-  {
-    "id": "scl-252",
-    "title": "Walk through their live ad campaign setup.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-251"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 252
-  },
-  {
-    "id": "scl-253",
-    "title": "Submit a live test webform or FB/IG DM to demo an inbound lead.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-252"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 253
-  },
-  {
-    "id": "scl-254",
-    "title": "Show them the test lead instantly appearing in the Opportunities pipeline.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-253"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 254
-  },
-  {
-    "id": "scl-255",
-    "title": "Show them the AI sending an immediate SMS/Email nurture.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-254"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 255
-  },
-  {
-    "id": "scl-256",
-    "title": "Show them how to stop the bot manually by adding the ai off tag.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-255"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 256
-  },
-  {
-    "id": "scl-257",
-    "title": "Show them how the opportunity card moves to the \"Booked\" stage.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "normal",
-    "dependencies": [
-      "scl-256"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 257
-  },
-  {
-    "id": "scl-258",
-    "title": "Establish team usage standards: All business calls must go through the app, avoid personal mobiles, review summaries daily, reply from inside the app.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-257"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 258
-  },
-  {
-    "id": "scl-259",
-    "title": "Remind the client that SaaS fees have officially commenced.",
+    "id": "scl-260",
+    "title": "Post-call: confirm live & send recording/support links",
     "category": "Go Live Call (Day 30)",
     "phase": "Go-Live",
     "status": "queued",
@@ -4565,97 +1305,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-258"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 259
-  },
-  {
-    "id": "scl-260",
-    "title": "Post-Call: Send a LaunchBay message confirming their system is live.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-259"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Post-Call: Send a LaunchBay message confirming their system is live.\n- Include the AISS User Manual link in the message.\n- Include the Read.ai call recording link in the message.\n- Remind them to tag @AISS Developer Team in LaunchBay/Slack for support.",
     "portalVisible": true,
     "portalTitle": "You're live! Access your recording & support links",
     "portalNote": "Your system is now live. Check your portal messages for your call recording and support resources.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 260
-  },
-  {
-    "id": "scl-261",
-    "title": "Include the AISS User Manual link in the message.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-260"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 261
-  },
-  {
-    "id": "scl-262",
-    "title": "Include the Read.ai call recording link in the message.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-261"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 262
-  },
-  {
-    "id": "scl-263",
-    "title": "Remind them to tag @AISS Developer Team in LaunchBay/Slack for support.",
-    "category": "Go Live Call (Day 30)",
-    "phase": "Go-Live",
-    "status": "queued",
-    "assignee": "Account Manager",
-    "dueWindow": "Day 30",
-    "priority": "high",
-    "dependencies": [
-      "scl-262"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 263
+    "sortOrder": 62
   },
   {
     "id": "scl-264",
-    "title": "Open the shared \"AISS Fees Summary for Accounts\" Google Sheet (bookmarked in the #accounts Slack channel).",
+    "title": "Verify billing live & update the Accounts sheet",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -4663,17 +1323,17 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Post Go-Live / Weekly",
     "priority": "high",
     "dependencies": [],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Open the shared \"AISS Fees Summary for Accounts\" Google Sheet (bookmarked in the #accounts Slack channel).\n- Log into the client's GHL sub-account to confirm their product configuration is active.\n- Log into Stripe and search for the client's company name or customer name.\n- Verify that their monthly billing subscription is active and successfully charging in Stripe.\n- Update the Google Sheet with the product name, SaaS plan name, SaaS fee in AUD (including GST), and Ad management fee.\n- Change their status to \"Live\" in the Google Sheet.\n- Post a message in the #accounts Slack channel tagging Sandy (e.g., \"Hi Sandy, we launched a new client today. Their fees are live. Updated our sheet here: Link\").",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 264
+    "portalConfigured": true,
+    "sortOrder": 63
   },
   {
-    "id": "scl-265",
-    "title": "Log into the client's GHL sub-account to confirm their product configuration is active.",
+    "id": "scl-271",
+    "title": "Weekly Ads Team milestone & performance reports",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -4683,137 +1343,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-264"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Every week, log into Upwork.\n- Find the \"Facebook optimization\" milestone for the Ads team.\n- Update the milestone, allocating 2 hours per week per live client.\n- Ensure the Ads team is posting their automated fortnightly and monthly campaign performance reports in LaunchBay.\n- Review the Ads team's recommendations in the reports.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 265
+    "portalConfigured": true,
+    "sortOrder": 64
   },
   {
-    "id": "scl-266",
-    "title": "Log into Stripe and search for the client's company name or customer name.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-265"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 266
-  },
-  {
-    "id": "scl-267",
-    "title": "Verify that their monthly billing subscription is active and successfully charging in Stripe.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "critical",
-    "dependencies": [
-      "scl-266"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 267
-  },
-  {
-    "id": "scl-268",
-    "title": "Update the Google Sheet with the product name, SaaS plan name, SaaS fee in AUD (including GST), and Ad management fee.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-267"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 268
-  },
-  {
-    "id": "scl-269",
-    "title": "Change their status to \"Live\" in the Google Sheet.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-268"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 269
-  },
-  {
-    "id": "scl-270",
-    "title": "Post a message in the #accounts Slack channel tagging Sandy (e.g., \"Hi Sandy, we launched a new client today. Their fees are live. Updated our sheet here: Link\").",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-269"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 270
-  },
-  {
-    "id": "scl-271",
-    "title": "Every week, log into Upwork.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-270"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 271
-  },
-  {
-    "id": "scl-272",
-    "title": "Find the \"Facebook optimization\" milestone for the Ads team.",
+    "id": "scl-276",
+    "title": "Mark LaunchBay fee & satisfaction tasks complete (internal)",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -4823,113 +1363,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-271"
     ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 272
-  },
-  {
-    "id": "scl-273",
-    "title": "Update the milestone, allocating 2 hours per week per live client.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-272"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 273
-  },
-  {
-    "id": "scl-274",
-    "title": "Ensure the Ads team is posting their automated fortnightly and monthly campaign performance reports in LaunchBay.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-273"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 274
-  },
-  {
-    "id": "scl-275",
-    "title": "Review the Ads team's recommendations in the reports.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-274"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 275
-  },
-  {
-    "id": "scl-276",
-    "title": "Mark LaunchBay tasks \"Your SaaS fees will switch on in: 30 days, 14 days, 7 days\" as completed.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-275"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 276
-  },
-  {
-    "id": "scl-277",
-    "title": "Mark LaunchBay tasks \"Client Satisfaction Call (Day 3)\" and \"Send A Testimonial (Day 5)\" as completed.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-276"
-    ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Mark LaunchBay tasks \"Your SaaS fees will switch on in: 30 days, 14 days, 7 days\" as completed.\n- Mark LaunchBay tasks \"Client Satisfaction Call (Day 3)\" and \"Send A Testimonial (Day 5)\" as completed.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 277
+    "sortOrder": 65
   },
   {
     "id": "scl-278",
@@ -4941,7 +1381,7 @@ export const scaleTasks: Task[] = [
     "dueWindow": "Post Go-Live / Weekly",
     "priority": "high",
     "dependencies": [
-      "scl-277"
+      "scl-276"
     ],
     "notes": "",
     "portalVisible": true,
@@ -4949,7 +1389,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "A 30-minute Zoom to review your first week — we'll be in touch to confirm the time.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 278
+    "sortOrder": 66
   },
   {
     "id": "scl-279",
@@ -4969,7 +1409,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "A 30-minute Zoom to review your progress and answer any questions.",
     "portalActionRequired": false,
     "portalConfigured": true,
-    "sortOrder": 279
+    "sortOrder": 67
   },
   {
     "id": "scl-308",
@@ -4989,11 +1429,11 @@ export const scaleTasks: Task[] = [
     "portalNote": "We'd love to hear how your journey has gone. A short video or written testimonial means the world to us!",
     "portalActionRequired": true,
     "portalConfigured": true,
-    "sortOrder": 308
+    "sortOrder": 68
   },
   {
     "id": "scl-280",
-    "title": "Transition to monthly client check-in calls.",
+    "title": "Transition to monthly check-ins & log follow-ups",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -5003,17 +1443,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-279"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Transition to monthly client check-in calls.\n- Send proof of your follow-ups (e.g., Read.ai links, SMS attempts) in LaunchBay.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 280
+    "portalConfigured": true,
+    "sortOrder": 69
   },
   {
-    "id": "scl-281",
-    "title": "Send proof of your follow-ups (e.g., Read.ai links, SMS attempts) in LaunchBay.",
+    "id": "scl-282",
+    "title": "Weekly account audit (dashboard, conversations, pipeline)",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -5023,37 +1463,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-280"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Perform a Weekly Account Audit: Log into GHL Agency View -> Subaccounts table.\n- Check the client dashboard for call activity, texts, and appointments.\n- Check Conversations to ensure calls are recorded/transcribed, texts are happening, and missed calls result in AI text-backs and AI answering.\n- Check Opportunities pipeline to verify inbound leads are prequalified, nurtured if not responding, followed up by AI, and moving to Booked/Closed stages.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 281
+    "portalConfigured": true,
+    "sortOrder": 70
   },
   {
-    "id": "scl-282",
-    "title": "Perform a Weekly Account Audit: Log into GHL Agency View -> Subaccounts table.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-281"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 282
-  },
-  {
-    "id": "scl-283",
-    "title": "Check the client dashboard for call activity, texts, and appointments.",
+    "id": "scl-286",
+    "title": "Support ticket triage & escalation",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -5063,77 +1483,17 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-282"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Monitor all incoming LaunchBay/GHL support requests daily.\n- Create tasks in GHL attached to the contact record for all support tickets.\n- Diagnose issues (configuration, bug, change request).\n- Execute Tier 1 technical fixes yourself: fix configuration issues, adjust automations, resolve integration issues, reconnect services.\n- Escalate Tier 2 technical issues to Joseph or the AISS Dev team.\n- Provide clear documentation and reproduction steps when escalating.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 283
+    "portalConfigured": true,
+    "sortOrder": 71
   },
   {
-    "id": "scl-284",
-    "title": "Check Conversations to ensure calls are recorded/transcribed, texts are happening, and missed calls result in AI text-backs and AI answering.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-283"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 284
-  },
-  {
-    "id": "scl-285",
-    "title": "Check Opportunities pipeline to verify inbound leads are prequalified, nurtured if not responding, followed up by AI, and moving to Booked/Closed stages.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-284"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 285
-  },
-  {
-    "id": "scl-286",
-    "title": "Monitor all incoming LaunchBay/GHL support requests daily.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-285"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 286
-  },
-  {
-    "id": "scl-287",
-    "title": "Create tasks in GHL attached to the contact record for all support tickets.",
+    "id": "scl-292",
+    "title": "Weekly CEO pipeline update",
     "category": "Post Go-Live Check-ins, Reporting & Admin",
     "phase": "Post-Launch",
     "status": "queued",
@@ -5143,133 +1503,13 @@ export const scaleTasks: Task[] = [
     "dependencies": [
       "scl-286"
     ],
-    "notes": "",
+    "notes": "Merged SOP steps:\n- Update the \"Active Clients Pipeline\" for the Monday CEO Update.\n- Report on: Client Name, Plan/Subscription, Launch Stage, Last Contact Attempt, Last Contact Made, Hot Notes, calls last week/this week, and issues.",
     "portalVisible": false,
     "portalTitle": "",
     "portalNote": "",
     "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 287
-  },
-  {
-    "id": "scl-288",
-    "title": "Diagnose issues (configuration, bug, change request).",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "normal",
-    "dependencies": [
-      "scl-287"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 288
-  },
-  {
-    "id": "scl-289",
-    "title": "Execute Tier 1 technical fixes yourself: fix configuration issues, adjust automations, resolve integration issues, reconnect services.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "normal",
-    "dependencies": [
-      "scl-288"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 289
-  },
-  {
-    "id": "scl-290",
-    "title": "Escalate Tier 2 technical issues to Joseph or the AISS Dev team.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-289"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 290
-  },
-  {
-    "id": "scl-291",
-    "title": "Provide clear documentation and reproduction steps when escalating.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "normal",
-    "dependencies": [
-      "scl-290"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 291
-  },
-  {
-    "id": "scl-292",
-    "title": "Update the \"Active Clients Pipeline\" for the Monday CEO Update.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-291"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 292
-  },
-  {
-    "id": "scl-293",
-    "title": "Report on: Client Name, Plan/Subscription, Launch Stage, Last Contact Attempt, Last Contact Made, Hot Notes, calls last week/this week, and issues.",
-    "category": "Post Go-Live Check-ins, Reporting & Admin",
-    "phase": "Post-Launch",
-    "status": "queued",
-    "assignee": "Support Lead",
-    "dueWindow": "Post Go-Live / Weekly",
-    "priority": "high",
-    "dependencies": [
-      "scl-292"
-    ],
-    "notes": "",
-    "portalVisible": false,
-    "portalTitle": "",
-    "portalNote": "",
-    "portalActionRequired": false,
-    "portalConfigured": false,
-    "sortOrder": 293
+    "portalConfigured": true,
+    "sortOrder": 72
   },
   {
     "id": "scl-294",
@@ -5287,7 +1527,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 294
+    "sortOrder": 73
   },
   {
     "id": "scl-295",
@@ -5307,7 +1547,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 295
+    "sortOrder": 74
   },
   {
     "id": "scl-296",
@@ -5327,7 +1567,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 296
+    "sortOrder": 75
   },
   {
     "id": "scl-297",
@@ -5347,7 +1587,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 297
+    "sortOrder": 76
   },
   {
     "id": "scl-298",
@@ -5367,7 +1607,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 298
+    "sortOrder": 77
   },
   {
     "id": "scl-299",
@@ -5387,7 +1627,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 299
+    "sortOrder": 78
   },
   {
     "id": "scl-300",
@@ -5407,7 +1647,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 300
+    "sortOrder": 79
   },
   {
     "id": "scl-301",
@@ -5427,7 +1667,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 301
+    "sortOrder": 80
   },
   {
     "id": "scl-302",
@@ -5447,7 +1687,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 302
+    "sortOrder": 81
   },
   {
     "id": "scl-303",
@@ -5467,7 +1707,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 303
+    "sortOrder": 82
   },
   {
     "id": "scl-304",
@@ -5487,7 +1727,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 304
+    "sortOrder": 83
   },
   {
     "id": "scl-305",
@@ -5507,7 +1747,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 305
+    "sortOrder": 84
   },
   {
     "id": "scl-306",
@@ -5527,7 +1767,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 306
+    "sortOrder": 85
   },
   {
     "id": "scl-307",
@@ -5547,7 +1787,7 @@ export const scaleTasks: Task[] = [
     "portalNote": "",
     "portalActionRequired": false,
     "portalConfigured": false,
-    "sortOrder": 307
+    "sortOrder": 86
   }
 ];
 

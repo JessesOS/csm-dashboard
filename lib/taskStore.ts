@@ -119,7 +119,7 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-07-01-portal-defaults-v2";
+const currentStorageVersion = "2026-07-12-scale-consolidation-v1";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
@@ -866,6 +866,7 @@ async function seedClients() {
             id,
             environment,
             product,
+            scale_variant,
             portal_token,
             name,
             company_name,
@@ -886,7 +887,7 @@ async function seedClients() {
             completed_tasks,
             timeline,
             attention
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...clientInsertValues(client))
     )
@@ -1259,6 +1260,46 @@ async function migrateScalePortalDefaults() {
   }
 }
 
+// Propagate the Scale task consolidation (many micro-steps merged into fewer milestones)
+// to existing client workspaces: delete tasks whose template is gone, and refresh the
+// surviving tasks' title / dependencies / order / merged-step notes from the template.
+async function migrateScaleTaskConsolidation() {
+  const d1 = getD1();
+  const clients = await d1
+    .prepare("SELECT id, environment, scale_variant AS scaleVariant FROM clients WHERE product = 'scale'")
+    .all<{ id: string; environment: string; scaleVariant: string }>();
+
+  for (const client of clients.results ?? []) {
+    const environment = normalizeEnvironment(client.environment);
+    const variant = normalizeScaleVariant(client.scaleVariant);
+
+    // 1. Remove tasks whose template_id no longer exists in the consolidated template (repoints deps).
+    await removeTemplateTasksOutsideVariant(client.id, environment, "scale", variant);
+
+    // 2. Refresh surviving tasks from the template. Title / dependencies / sort order are always
+    //    synced (idempotent for unchanged tasks); notes are only overwritten when the template has
+    //    merged-step content, so any hand-written notes on untouched tasks are preserved.
+    const templateTasks = scaleTasksForVariant(variant);
+    const updates = templateTasks.map((template) =>
+      template.notes && template.notes.trim()
+        ? d1
+            .prepare(
+              "UPDATE tasks SET title = ?, notes = ?, dependencies = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE environment = ? AND product = 'scale' AND client_id = ? AND template_id = ?"
+            )
+            .bind(template.title, template.notes, JSON.stringify(template.dependencies), template.sortOrder, environment, client.id, template.id)
+        : d1
+            .prepare(
+              "UPDATE tasks SET title = ?, dependencies = ?, sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE environment = ? AND product = 'scale' AND client_id = ? AND template_id = ?"
+            )
+            .bind(template.title, JSON.stringify(template.dependencies), template.sortOrder, environment, client.id, template.id)
+    );
+
+    for (let i = 0; i < updates.length; i += 50) {
+      await d1.batch(updates.slice(i, i + 50));
+    }
+  }
+}
+
 async function prepareTaskStorage() {
   const d1 = getD1();
 
@@ -1445,6 +1486,7 @@ async function prepareTaskStorage() {
 
   await migrateGlobalTasksToClient();
   await seedTaskWorkspaces();
+  await migrateScaleTaskConsolidation();
   await migrateScalePortalDefaults();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
