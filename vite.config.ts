@@ -8,7 +8,9 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 const workerConfig = {
   name: "csm-dashboard",
   main: "./worker/index.ts",
-  compatibility_date: "2026-06-01",
+  // Keep <= the date supported by the local workerd binary (currently 2026-05-22),
+  // or `npm run dev` fails with ERR_RUNTIME_FAILURE while remote deploys still work.
+  compatibility_date: "2026-05-01",
   // nodejs_compat is injected by vinext automatically — declaring it here too
   // makes the Cloudflare API reject the upload as a duplicate flag.
   d1_databases: [

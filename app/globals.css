@@ -259,18 +259,23 @@ button:disabled {
 .rail-settings-compact {
   display: flex;
   justify-content: flex-end;
-  width: 100%;
+  /* width: 100% here crushed the sibling .mission-user to zero width in the
+     flex row (avatar slid under the name). Size to the gear button and let
+     margin-left push it to the row's end instead. */
   flex: 0 0 auto;
   margin-top: 0;
+  margin-left: auto;
   border-top: 0;
   padding-top: 0;
 }
 
 .rail-settings-compact .rail-settings-menu {
-  left: 0;
+  /* anchor the popover to the gear's right edge with its own width, since the
+     section is now only as wide as the button */
+  left: auto;
   right: 0;
-  width: auto;
-  max-width: 100%;
+  width: 232px;
+  max-width: calc(100vw - 44px);
 }
 
 .rail-settings-compact .rail-settings-button {
@@ -6908,6 +6913,115 @@ progress::-webkit-progress-value {
     display: none;
   }
 
+  /* Compact both stacked rails (Mission Control + Tasks view) so the content
+     isn't a full viewport scroll away on phones. */
+  .mission-side,
+  .side-rail {
+    padding: 12px 16px;
+  }
+
+  .mission-brand,
+  .brand {
+    padding-bottom: 10px;
+  }
+
+  .mission-brand-mark,
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+  }
+
+  .mission-brand strong {
+    font-size: 15px;
+  }
+
+  /* subtitle lines add a row each for no mobile value */
+  .mission-brand > div span,
+  .brand > div span {
+    display: none;
+  }
+
+  .product-switcher {
+    padding: 8px;
+  }
+
+  /* the two workspace buttons sit side by side; the aria-label keeps the
+     group announced, so the visual label can go */
+  .product-switcher > span {
+    display: none;
+  }
+
+  .product-switcher > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .product-switcher button {
+    min-height: 36px;
+  }
+
+  .mission-nav {
+    margin-top: 8px;
+  }
+
+  .mission-nav button {
+    min-height: 36px;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .environment-switcher {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  .environment-switcher > span {
+    display: none;
+  }
+
+  .environment-switcher button {
+    min-height: 32px;
+  }
+
+  .mission-user-row {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  /* keep the avatar from sliding under a wrapping name */
+  .mission-user .avatar {
+    flex-shrink: 0;
+  }
+
+  .mission-user > div {
+    min-width: 0;
+  }
+
+  .mission-user strong,
+  .mission-user span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .rail-section {
+    margin-bottom: 10px;
+  }
+
+  .rail-section-nav {
+    padding: 8px 0 10px;
+  }
+
+  /* the settings popover opens upward on desktop (gear sits at the rail's
+     bottom); with the rail stacked on top at mobile it must drop DOWN and
+     stay within the viewport */
+  .rail-settings-compact .rail-settings-menu {
+    top: calc(100% + 10px);
+    bottom: auto;
+    width: min(280px, calc(100vw - 32px));
+    max-height: 60vh;
+    overflow: auto;
+  }
+
   .portfolio-strip,
   .mission-client-grid {
     grid-template-columns: 1fr;
@@ -7113,6 +7227,9 @@ progress::-webkit-progress-value {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+    /* scroll the stage tree inside the rail so the board isn't pushed
+       multiple viewports down when phases are expanded */
+    max-height: 42vh;
   }
 
   .topbar {
