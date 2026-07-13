@@ -3357,8 +3357,12 @@ button:disabled {
 .column-header span {
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.1);
-  color: rgba(17, 24, 39, 0.72);
+  /* A light chip with solid dark text reads as a crisp pill against any of
+     the three pastel stage-header colors; the previous translucent-black
+     version read as a muddy gray smear, especially in dark mode where the
+     text opacity was dropped further. */
+  background: rgba(255, 255, 255, 0.6);
+  color: #111827;
   font-size: 11px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -5394,10 +5398,6 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .column-header strong,
 .dashboard-shell-dark .column-header b {
   color: #111827;
-}
-
-.dashboard-shell-dark .column-header span {
-  color: rgba(17, 24, 39, 0.62);
 }
 
 .dashboard-shell-dark .task-card {
