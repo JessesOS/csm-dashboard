@@ -72,7 +72,7 @@ button:disabled {
   color: inherit;
   padding: 0 9px;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .theme-toggle button.active {
@@ -92,7 +92,7 @@ button:disabled {
 .product-switcher > span {
   color: #8fa2b7;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -142,7 +142,7 @@ button:disabled {
   overflow: hidden;
   color: inherit;
   font-size: 12px;
-  font-weight: 780;
+  font-weight: 550;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -158,7 +158,7 @@ button:disabled {
 .environment-switcher > span {
   color: #71849a;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -175,7 +175,7 @@ button:disabled {
   background: rgba(255, 255, 255, 0.04);
   color: #c8d7e8;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .environment-switcher button:hover,
@@ -213,7 +213,7 @@ button:disabled {
   gap: 7px;
   color: #71849a;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -234,7 +234,7 @@ button:disabled {
   color: #c8d7e8;
   padding: 0 10px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .rail-settings-button span {
@@ -307,7 +307,7 @@ button:disabled {
   color: #c8d7e8;
   padding: 0 10px;
   font-size: 12px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .attachment-lenses button span {
@@ -331,7 +331,7 @@ button:disabled {
   background: rgba(148, 163, 184, 0.16);
   color: #dce8f6;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .attachment-lenses button:hover,
@@ -374,7 +374,7 @@ button:disabled {
   border-radius: 999px;
   padding: 0 10px;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0;
 }
 
@@ -431,7 +431,7 @@ button:disabled {
   gap: 7px;
   color: #c8d7e8;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .backup-settings-head strong {
@@ -478,7 +478,7 @@ button:disabled {
   color: #c9f82b;
   padding: 0 10px;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -547,7 +547,7 @@ button:disabled {
   color: #c9f82b;
   padding: 0 13px;
   font-size: 12px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .walkthrough-button:hover {
@@ -596,21 +596,21 @@ button:disabled {
 .walkthrough-kicker span {
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
 .walkthrough-kicker strong {
   color: #8fa2b7;
   font-size: 11px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .walkthrough-panel h2 {
   margin: 0;
   color: #f8fbff;
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1.25;
   letter-spacing: 0;
 }
@@ -651,7 +651,7 @@ button:disabled {
   border-radius: 8px;
   padding: 0 12px;
   font-size: 12px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .walkthrough-secondary {
@@ -780,7 +780,7 @@ button:disabled {
   padding: 0 12px;
   text-align: left;
   font-size: 13px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .mission-nav button.active,
@@ -806,7 +806,7 @@ button:disabled {
 .mission-side-section span {
   color: #5a6f85;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0 8px;
@@ -833,7 +833,7 @@ button:disabled {
   background: rgba(193, 255, 36, 0.08);
   color: #c9f82b;
   box-shadow: inset 2px 0 0 rgba(193, 255, 36, 0.7);
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .mission-user {
@@ -908,7 +908,7 @@ button:disabled {
   margin: 0;
   color: #f8fbff;
   font-size: 28px;
-  font-weight: 820;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -946,7 +946,7 @@ button:disabled {
   color: #c9f82b;
   padding: 0 12px;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .system-pill span {
@@ -976,7 +976,7 @@ button:disabled {
   color: #07121f;
   padding: 0 14px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .mission-primary:disabled:hover {
@@ -994,7 +994,7 @@ button:disabled {
   color: #67e8f9;
   padding: 0 14px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .mission-secondary:hover {
@@ -1051,7 +1051,7 @@ button:disabled {
 .new-client-head span {
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -1068,7 +1068,7 @@ button:disabled {
   margin-top: 12px;
   color: #8fa2b7;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .new-client-panel input {
@@ -1120,7 +1120,7 @@ button:disabled {
   margin: 9px 0 4px;
   color: #f8fbff;
   font-size: 26px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .portfolio-kpi small,
@@ -1208,7 +1208,7 @@ button:disabled {
 .empty-workspace-panel > span {
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 860;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -1217,7 +1217,7 @@ button:disabled {
   margin: 0;
   color: #f8fbff;
   font-size: 22px;
-  font-weight: 820;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -1249,7 +1249,7 @@ button:disabled {
   border-radius: 8px;
   padding: 0 14px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .mission-client-card {
@@ -1306,14 +1306,14 @@ button:disabled {
   background: #112c43;
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .mission-client-name {
   overflow: hidden;
   color: #f8fbff;
   font-size: 15px;
-  font-weight: 820;
+  font-weight: 600;
   line-height: 1.2;
 }
 
@@ -1323,7 +1323,7 @@ button:disabled {
   margin-top: 2px;
   color: #93a7ba;
   font-size: 10px;
-  font-weight: 760;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1393,7 +1393,7 @@ button:disabled {
 
 .mission-client-foot strong {
   color: #c9f82b;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 
@@ -1407,7 +1407,7 @@ button:disabled {
   border-radius: 999px;
   padding: 0 8px;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -1471,7 +1471,7 @@ button:disabled {
   margin: 0;
   color: #f8fbff;
   font-size: 15px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0;
 }
 
@@ -1490,7 +1490,7 @@ button:disabled {
   background: #ff6961;
   color: #ffffff;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .mission-panel-head button {
@@ -1501,7 +1501,7 @@ button:disabled {
   color: #c9f82b;
   padding: 0 12px;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .attention-table-wrap {
@@ -1525,7 +1525,7 @@ button:disabled {
 .attention-table th {
   color: #8fa2b7;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -1577,7 +1577,7 @@ button:disabled {
   color: #f8fbff;
   padding: 0;
   text-align: left;
-  font-weight: 780;
+  font-weight: 550;
   line-height: 1.25;
 }
 
@@ -1590,7 +1590,7 @@ button:disabled {
   background: #14334c;
   color: #c9f82b;
   font-size: 9px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .open-client-button {
@@ -1602,7 +1602,7 @@ button:disabled {
   color: #dce8f6;
   padding: 0 10px;
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .timeline-panel {
@@ -1627,7 +1627,7 @@ button:disabled {
   min-height: 42px;
   color: #91a5b9;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -1653,7 +1653,7 @@ button:disabled {
   background: #14334c;
   color: #c9f82b;
   font-size: 9px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .timeline-client strong {
@@ -1667,7 +1667,7 @@ button:disabled {
 .timeline-phase,
 .timeline-golive {
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .timeline-bar {
@@ -1680,7 +1680,7 @@ button:disabled {
   color: #ffffff;
   padding: 0 14px;
   font-size: 11px;
-  font-weight: 780;
+  font-weight: 550;
   white-space: nowrap;
 }
 
@@ -1711,7 +1711,7 @@ button:disabled {
   border-radius: 50%;
   background: #0a2035;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .timeline-marker-milestone {
@@ -1751,7 +1751,7 @@ button:disabled {
   color: #9ff6ea;
   padding: 0 12px;
   font-size: 11px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .ghl-sync-pill span {
@@ -1799,7 +1799,7 @@ button:disabled {
 .ghl-pipeline-stage-head strong {
   overflow: hidden;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1814,12 +1814,12 @@ button:disabled {
 .ghl-pipeline-stage-head span {
   color: rgba(17, 24, 39, 0.62);
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .ghl-pipeline-stage-head b {
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -1881,7 +1881,7 @@ button:disabled {
   color: #f7fbff;
   font-size: 12px;
   line-height: 1.35;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .ghl-opportunity-card-top span {
@@ -1895,7 +1895,7 @@ button:disabled {
   background: #102b45;
   color: #d9f9ff;
   font-size: 9px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .ghl-opportunity-card dl {
@@ -1920,7 +1920,7 @@ button:disabled {
 
 .ghl-opportunity-card dt {
   color: #8fa2b7;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .ghl-opportunity-card dd {
@@ -1938,7 +1938,7 @@ button:disabled {
   margin-top: 10px;
   color: #8fa2b7;
   font-size: 10px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .ghl-opportunity-card-foot span {
@@ -1969,7 +1969,7 @@ button:disabled {
   border-style: solid;
   background: rgba(193, 255, 36, 0.06);
   color: #c9f82b;
-  font-weight: 850;
+  font-weight: 650;
   text-align: center;
 }
 
@@ -2067,7 +2067,7 @@ button:disabled {
   background: #eef5ff;
   color: #174ac9;
   box-shadow: inset 2px 0 0 #174ac9;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .mission-shell-light .mission-header-toolbar select,
@@ -2598,7 +2598,7 @@ button:disabled {
 .rail-section-label {
   color: #7b8798;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 0 2px;
@@ -2659,7 +2659,7 @@ button:disabled {
   padding: 0 10px;
   text-align: left;
   font-size: 13px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .view-nav button:hover,
@@ -2685,7 +2685,7 @@ button:disabled {
   background: #f4f7fb;
   color: #475569;
   font-size: 11px;
-  font-weight: 860;
+  font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0 12px;
@@ -2718,7 +2718,7 @@ button:disabled {
 .phase-label-meta {
   flex: 0 0 auto;
   font-size: 10px;
-  font-weight: 860;
+  font-weight: 650;
   opacity: 0.8;
 }
 
@@ -2817,7 +2817,7 @@ button:disabled {
 .category-link > span:nth-child(3) {
   overflow: hidden;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 450;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2831,7 +2831,7 @@ button:disabled {
   border-radius: 50%;
   color: #64748b;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .category-state {
@@ -2895,7 +2895,7 @@ button:disabled {
 .category-nav-task > span:nth-child(2) {
   overflow: hidden;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.25;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2907,7 +2907,7 @@ button:disabled {
   color: #8791a2;
   font-size: 10px;
   font-style: normal;
-  font-weight: 760;
+  font-weight: 500;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2929,7 +2929,7 @@ button:disabled {
   margin: 0;
   color: var(--ink);
   font-size: 28px;
-  font-weight: 760;
+  font-weight: 500;
   letter-spacing: 0;
 }
 
@@ -3026,13 +3026,13 @@ button:disabled {
 .task-overview-toggle strong {
   color: var(--ink);
   font-size: 13px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .task-overview-toggle small {
   color: var(--muted);
   font-size: 11px;
-  font-weight: 680;
+  font-weight: 450;
 }
 
 .task-overview-chevron {
@@ -3102,7 +3102,7 @@ button:disabled {
   margin: 0;
   color: var(--ink);
   font-size: 22px;
-  font-weight: 790;
+  font-weight: 550;
   line-height: 1;
 }
 
@@ -3131,7 +3131,7 @@ button:disabled {
   overflow: hidden;
   color: var(--muted);
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0.04em;
   text-overflow: ellipsis;
   text-transform: uppercase;
@@ -3141,7 +3141,7 @@ button:disabled {
 .stage-window-head strong {
   color: var(--ink);
   font-size: 16px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1;
 }
 
@@ -3162,7 +3162,7 @@ button:disabled {
   overflow: hidden;
   color: var(--muted);
   font-size: 11px;
-  font-weight: 680;
+  font-weight: 450;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3226,7 +3226,7 @@ button:disabled {
   color: #ffffff;
   padding: 0 13px;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .new-task button {
@@ -3263,7 +3263,7 @@ button:disabled {
   background: transparent;
   color: #475569;
   font-size: 12px;
-  font-weight: 720;
+  font-weight: 500;
 }
 
 .segmented button {
@@ -3342,7 +3342,7 @@ button:disabled {
   overflow: hidden;
   color: #111827;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3360,7 +3360,7 @@ button:disabled {
   background: rgba(0, 0, 0, 0.1);
   color: rgba(17, 24, 39, 0.72);
   font-size: 11px;
-  font-weight: 820;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 1px 8px;
@@ -3369,7 +3369,7 @@ button:disabled {
 .column-header b {
   color: #111827;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   white-space: nowrap;
 }
 
@@ -3447,7 +3447,7 @@ button:disabled {
   gap: 5px;
   color: #8fa2b7;
   font-size: 10px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .task-card h3 {
@@ -3455,7 +3455,7 @@ button:disabled {
   margin: 0;
   color: #0f172a;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1.35;
 }
 
@@ -3468,7 +3468,7 @@ button:disabled {
   color: #0f172a;
   padding: 8px 9px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1.35;
 }
 
@@ -3485,7 +3485,7 @@ button:disabled {
   background: #eef5ff;
   color: #174ac9;
   font-size: 9px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .task-card-details {
@@ -3511,7 +3511,7 @@ button:disabled {
 
 .task-card-details dt {
   color: #647084;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .task-card-details dd {
@@ -3558,7 +3558,7 @@ button:disabled {
   background: #172033;
   color: #ffffff;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .mini-meta,
@@ -3574,7 +3574,7 @@ button:disabled {
   color: #526071;
   padding: 0 8px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
 }
 
 .loom-card-indicator {
@@ -3664,12 +3664,12 @@ button:disabled {
 
 .client-task-toggle-copy strong {
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .client-task-toggle-copy em {
   font-size: 10px;
-  font-weight: 700;
+  font-weight: 500;
   color: #64748b;
 }
 
@@ -3718,7 +3718,7 @@ button:disabled {
   color: #a16207;
   padding: 0 11px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .priority {
@@ -3729,7 +3729,7 @@ button:disabled {
   border-radius: 999px;
   padding: 0 8px;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -3766,7 +3766,7 @@ button:disabled {
   background: #f7fbff;
   color: #37516f;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   padding: 10px 12px;
 }
 
@@ -3899,7 +3899,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   color: #64748b;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 450;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3923,7 +3923,7 @@ progress::-webkit-progress-value {
   color: #64748b;
   font-size: 11px;
   font-style: normal;
-  font-weight: 720;
+  font-weight: 500;
 }
 
 .inspector {
@@ -3964,7 +3964,7 @@ progress::-webkit-progress-value {
   gap: 7px;
   color: #475569;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .status-grid {
@@ -4022,21 +4022,21 @@ progress::-webkit-progress-value {
 
 .portal-toggle span {
   font-size: 12px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .portal-toggle small {
   margin-top: 2px;
   color: #64748b;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.35;
 }
 
 .inspector-section-title {
   color: var(--ink);
   font-size: 12px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .category-task-row-controls {
@@ -4066,7 +4066,7 @@ progress::-webkit-progress-value {
   color: #64748b;
   font-size: 11px;
   font-style: normal;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .inspector-footer {
@@ -4083,7 +4083,7 @@ progress::-webkit-progress-value {
 .saving {
   color: #64748b;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .saving.active {
@@ -4129,7 +4129,7 @@ progress::-webkit-progress-value {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 720;
+  font-weight: 500;
 }
 
 .task-modal-chip-row {
@@ -4224,7 +4224,7 @@ progress::-webkit-progress-value {
   min-height: 40px;
   padding: 0 13px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .training-admin-toggle {
@@ -4255,7 +4255,7 @@ progress::-webkit-progress-value {
   color: inherit;
   padding: 0 11px;
   font-size: 12px;
-  font-weight: 840;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -4331,7 +4331,7 @@ progress::-webkit-progress-value {
   gap: 8px;
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 880;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -4346,7 +4346,7 @@ progress::-webkit-progress-value {
   margin: 0;
   color: #8fa2b7;
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 500;
 }
 
 .training-room-toolbar {
@@ -4420,7 +4420,7 @@ progress::-webkit-progress-value {
 .training-room-stat small {
   color: #8fa2b7;
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .training-room-stat strong {
@@ -4467,7 +4467,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   color: #e9f2fb;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -4504,7 +4504,7 @@ progress::-webkit-progress-value {
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.14);
   color: #c9f82b;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .training-admin-hint {
@@ -4517,7 +4517,7 @@ progress::-webkit-progress-value {
   color: #8fa2b7;
   padding: 12px;
   font-size: 12px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .training-library {
@@ -4560,7 +4560,7 @@ progress::-webkit-progress-value {
 .training-category summary span {
   color: #f8fbff;
   font-size: 15px;
-  font-weight: 880;
+  font-weight: 700;
 }
 
 .training-category summary strong {
@@ -4642,7 +4642,7 @@ progress::-webkit-progress-value {
   gap: 8px;
   color: #8fa2b7;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .training-card-body {
@@ -4659,7 +4659,7 @@ progress::-webkit-progress-value {
   color: #2dd4bf;
   padding: 4px 8px;
   font-size: 10px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -4691,7 +4691,7 @@ progress::-webkit-progress-value {
   color: #a8b8ca;
   padding: 4px 8px;
   font-size: 10px;
-  font-weight: 820;
+  font-weight: 600;
 }
 
 .training-card-actions a,
@@ -4706,7 +4706,7 @@ progress::-webkit-progress-value {
   color: #c9f82b;
   padding: 0 10px;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -4756,7 +4756,7 @@ progress::-webkit-progress-value {
   width: fit-content;
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 880;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -4809,7 +4809,7 @@ progress::-webkit-progress-value {
   color: #c9f82b;
   padding: 0 12px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -4951,7 +4951,7 @@ progress::-webkit-progress-value {
   border-radius: 999px;
   padding: 0 10px;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-decoration: none;
 }
 
@@ -5009,7 +5009,7 @@ progress::-webkit-progress-value {
 .task-modal-summary span {
   color: var(--muted);
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
@@ -5017,7 +5017,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   color: var(--ink);
   font-size: 14px;
-  font-weight: 790;
+  font-weight: 550;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -5046,7 +5046,7 @@ progress::-webkit-progress-value {
   gap: 7px;
   color: #475569;
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .task-field-grid {
@@ -5717,7 +5717,7 @@ progress::-webkit-progress-value {
   color: #c9f82b;
   padding: 0 12px;
   font-size: 11px;
-  font-weight: 880;
+  font-weight: 700;
   text-decoration: none;
   text-transform: uppercase;
 }
@@ -5760,7 +5760,7 @@ progress::-webkit-progress-value {
   background: rgba(193, 255, 36, 0.08);
   padding: 7px 10px;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -5801,14 +5801,14 @@ progress::-webkit-progress-value {
   background: rgba(193, 255, 36, 0.08);
   color: #c9f82b;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-hero-copy h1 {
   margin: 14px 0 0;
   color: #f8fbff;
   font-size: clamp(34px, 5vw, 58px);
-  font-weight: 880;
+  font-weight: 700;
   line-height: 0.98;
   letter-spacing: 0;
 }
@@ -5818,7 +5818,7 @@ progress::-webkit-progress-value {
   margin-top: 10px;
   color: #c9f82b;
   font-size: 14px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0;
 }
 
@@ -5854,7 +5854,7 @@ progress::-webkit-progress-value {
 .portal-progress-panel span {
   color: #8fa2b7;
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 500;
   text-transform: uppercase;
 }
 
@@ -5862,7 +5862,7 @@ progress::-webkit-progress-value {
   margin: 6px 0 0;
   color: #f8fbff;
   font-size: 13px;
-  font-weight: 780;
+  font-weight: 550;
 }
 
 .portal-progress-panel {
@@ -5901,7 +5901,7 @@ progress::-webkit-progress-value {
   grid-area: 1 / 1;
   color: #f8fbff;
   font-size: 25px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-progress-panel strong {
@@ -5939,7 +5939,7 @@ progress::-webkit-progress-value {
   margin-top: 9px;
   color: #f8fbff;
   font-size: 19px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1.25;
 }
 
@@ -5976,7 +5976,7 @@ progress::-webkit-progress-value {
   display: block;
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -5985,7 +5985,7 @@ progress::-webkit-progress-value {
   margin: 6px 0 0;
   color: #f8fbff;
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
@@ -6015,7 +6015,7 @@ progress::-webkit-progress-value {
 .portal-guided-progress span {
   color: #8fa2b7;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
@@ -6023,7 +6023,7 @@ progress::-webkit-progress-value {
   margin-top: 5px;
   color: #f8fbff;
   font-size: 26px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-guided-meter {
@@ -6093,7 +6093,7 @@ progress::-webkit-progress-value {
   border-radius: 50%;
   color: #c9f82b;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-step-locked .portal-step-marker {
@@ -6111,7 +6111,7 @@ progress::-webkit-progress-value {
   min-width: 0;
   color: #f8fbff;
   font-size: 14px;
-  font-weight: 850;
+  font-weight: 650;
   line-height: 1.35;
 }
 
@@ -6123,7 +6123,7 @@ progress::-webkit-progress-value {
   padding: 4px 8px;
   font-size: 10px;
   font-style: normal;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -6142,7 +6142,7 @@ progress::-webkit-progress-value {
 
 .portal-step-card small {
   color: #f5b22c;
-  font-weight: 760;
+  font-weight: 500;
 }
 
 .portal-focus-card {
@@ -6185,7 +6185,7 @@ progress::-webkit-progress-value {
   border-radius: 8px;
   padding: 0 13px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   text-decoration: none;
 }
 
@@ -6236,7 +6236,7 @@ progress::-webkit-progress-value {
 .portal-resource-item span {
   color: #8fa2b7;
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -6291,7 +6291,7 @@ progress::-webkit-progress-value {
 .portal-native-form-toggle strong {
   color: #f8fbff;
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-native-form-toggle small {
@@ -6310,7 +6310,7 @@ progress::-webkit-progress-value {
   padding: 5px 8px;
   font-size: 10px;
   font-style: normal;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -6364,7 +6364,7 @@ progress::-webkit-progress-value {
 .portal-form-section legend strong {
   color: #c9f82b;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -6394,7 +6394,7 @@ progress::-webkit-progress-value {
   gap: 8px;
   color: #dce9f7;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -6403,7 +6403,7 @@ progress::-webkit-progress-value {
   color: #f5b22c;
   font-size: 9px;
   font-style: normal;
-  font-weight: 900;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -6543,7 +6543,7 @@ progress::-webkit-progress-value {
   margin: 0;
   color: #f8fbff;
   font-size: 17px;
-  font-weight: 850;
+  font-weight: 650;
   letter-spacing: 0;
 }
 
@@ -6563,7 +6563,7 @@ progress::-webkit-progress-value {
   background: rgba(193, 255, 36, 0.12);
   color: #c9f82b;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
 }
 
 .portal-timeline-list,
@@ -6597,7 +6597,7 @@ progress::-webkit-progress-value {
   border-radius: 8px;
   color: #c9f82b;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .portal-timeline-title {
@@ -6619,7 +6619,7 @@ progress::-webkit-progress-value {
   padding: 4px 8px;
   font-size: 10px;
   font-style: normal;
-  font-weight: 850;
+  font-weight: 650;
   text-transform: uppercase;
 }
 
@@ -6688,7 +6688,7 @@ progress::-webkit-progress-value {
   color: #c9f82b;
   padding: 0 12px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 650;
   text-decoration: none;
 }
 
