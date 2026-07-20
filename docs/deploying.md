@@ -34,10 +34,14 @@ The deploy prints the live URL and a version id on success.
 - **No manual schema or seed step.** On the first request after a deploy the
   app runs `prepareTaskStorage()` (lib/taskStore.ts): it creates all tables,
   seeds demo clients/tasks, and runs any pending data migrations.
-- **Data migrations** are triggered by bumping `currentStorageVersion` in
-  `lib/taskStore.ts`. If your change should rewrite existing rows (not just
-  new seeds), add a `migrate...()` function, call it from
-  `prepareTaskStorage()`, and bump the version string.
+- **Data migrations** re-run on an existing DB only when the *shape check*
+  fails (`seedWorkspaceShapeReady()` in `lib/taskStore.ts`) — e.g. the
+  migration adds a new column that's listed in `requiredTaskColumns`. Bumping
+  `currentStorageVersion` alone does **not** re-trigger migrations (the check
+  silently re-stamps it when the shape passes). If your change should rewrite
+  existing rows, add a `migrate...()` function, call it from
+  `prepareTaskStorage()`, make sure it changes the shape, and bump the
+  version string for the audit trail.
 - Inspect the remote DB: `npx wrangler d1 execute csm-dashboard-db --remote
   --command "SELECT COUNT(*) FROM tasks;"`
 

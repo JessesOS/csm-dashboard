@@ -68,8 +68,6 @@ const scaleVariantLabels: Record<ScaleVariant, string> = {
 const statusColumnDetails: Record<TaskStatus, string> = {
   queued: "Ready to start",
   in_progress: "Being worked",
-  blocked: "Needs attention",
-  review: "Awaiting review",
   complete: "Done",
 };
 const scaleAdminEditableCategories = ["Accounts Stage Verification", "Admin & Account Setup", "Welcome Onboarding Call"] as const;
@@ -143,7 +141,7 @@ const tourSteps: TourStep[] = [
     section: "tasks",
     target: "task-board",
     title: "Move work through statuses",
-    body: "Drag cards between columns or use the quick actions on each card to mark work done, return it to review, or flag blockers.",
+    body: "Drag cards between columns or use the quick actions on each card to mark work done, reopen it, or flag blockers.",
     clientId: "northlane-health",
   },
   {
@@ -1240,6 +1238,7 @@ function TaskCard({
   isDeleting,
   onSelect,
   onQuickMove,
+  onToggleBlocked,
   onTitleChange,
   onDelete,
   onClientTaskToggle,
@@ -1252,6 +1251,7 @@ function TaskCard({
   isDeleting: boolean;
   onSelect: (task: Task) => void;
   onQuickMove: (task: Task, status: TaskStatus) => void;
+  onToggleBlocked: (task: Task) => void;
   onTitleChange: (task: Task, title: string) => void;
   onDelete: (task: Task) => void;
   onClientTaskToggle: (task: Task, checked: boolean) => void;
@@ -1347,6 +1347,12 @@ function TaskCard({
       <div className="task-card-footer">
         <div className="task-card-chips">
           <span className={`priority priority-${task.priority}`}>{task.priority}</span>
+          {task.blockedReason ? (
+            <span className="blocked-chip" title={task.blockedReason}>
+              <Icon name="alert" />
+              Blocked
+            </span>
+          ) : null}
           {loomUrl ? (
             <span className="loom-card-indicator" title={task.loomTitle || "Loom instructions attached"}>
               <Icon name="video" />
@@ -1370,8 +1376,8 @@ function TaskCard({
               </>
             ) : null}
             {isDone ? (
-              <button type="button" onClick={() => onQuickMove(task, "review")} title="Move back to review">
-                Review
+              <button type="button" onClick={() => onQuickMove(task, "in_progress")} title="Reopen task">
+                Reopen
               </button>
             ) : (
               <button type="button" onClick={() => onQuickMove(task, "complete")} title="Mark complete">
@@ -1379,8 +1385,12 @@ function TaskCard({
                 Done
               </button>
             )}
-            {dependencyState.isBlockedByDependencies && task.status !== "blocked" ? (
-              <button type="button" onClick={() => onQuickMove(task, "blocked")} title="Mark blocked">
+            {task.blockedReason ? (
+              <button type="button" onClick={() => onToggleBlocked(task)} title={`Clear blocked flag (${task.blockedReason})`}>
+                Unblock
+              </button>
+            ) : !isDone && dependencyState.isBlockedByDependencies ? (
+              <button type="button" onClick={() => onToggleBlocked(task)} title="Flag as blocked">
                 Block
               </button>
             ) : null}
@@ -1582,7 +1592,7 @@ function TaskDetailModal({
         <div className="task-modal-summary" aria-label="Task summary">
           <div>
             <span>Status</span>
-            <strong>{statusLabels[task.status]}</strong>
+            <strong>{task.blockedReason ? `${statusLabels[task.status]} · Blocked` : statusLabels[task.status]}</strong>
           </div>
           <div>
             <span>Owner</span>
@@ -1643,6 +1653,16 @@ function TaskDetailModal({
             <label>
               Due window
               <input aria-label="Due window" value={task.dueWindow} onChange={(event) => onUpdate(task.id, { dueWindow: event.target.value })} />
+            </label>
+
+            <label>
+              Blocked reason
+              <input
+                aria-label="Blocked reason"
+                value={task.blockedReason ?? ""}
+                onChange={(event) => onUpdate(task.id, { blockedReason: event.target.value })}
+                placeholder="Why is this task stuck? Leave empty to clear the blocked flag."
+              />
             </label>
 
             <label>
@@ -3195,8 +3215,10 @@ export default function RespondDashboard({
 
   const metrics = useMemo(() => {
     const completed = tasks.filter((task) => task.status === "complete").length;
-    const blocked = tasks.filter((task) => task.status === "blocked" || getDependencyState(task, taskMap).isBlockedByDependencies).length;
-    const active = tasks.filter((task) => task.status === "in_progress" || task.status === "review").length;
+    const blocked = tasks.filter(
+      (task) => task.status !== "complete" && (task.blockedReason || getDependencyState(task, taskMap).isBlockedByDependencies)
+    ).length;
+    const active = tasks.filter((task) => task.status === "in_progress").length;
     const percent = tasks.length > 0 ? Math.round((completed / tasks.length) * 100) : 0;
 
     return {
@@ -3436,15 +3458,20 @@ export default function RespondDashboard({
 
   function moveTask(task: Task, status: TaskStatus) {
     const successMessage =
-      status === "complete"
-        ? `Task completed: ${task.title}`
-        : status === "review"
-          ? `Task moved to Review: ${task.title}`
-          : status === "blocked"
-            ? `Task marked Blocked: ${task.title}`
-            : `Task moved to ${statusLabels[status]}: ${task.title}`;
+      status === "complete" ? `Task completed: ${task.title}` : `Task moved to ${statusLabels[status]}: ${task.title}`;
 
     updateTask(task.id, { status }, successMessage);
+  }
+
+  function toggleTaskBlocked(task: Task) {
+    if (task.blockedReason) {
+      updateTask(task.id, { blockedReason: "" }, `Task unblocked: ${task.title}`);
+      return;
+    }
+
+    const dependencyState = getDependencyState(task, taskMap);
+    const reason = dependencyState.isBlockedByDependencies ? "Waiting on prerequisite tasks" : "Needs attention — see notes";
+    updateTask(task.id, { blockedReason: reason }, `Task marked blocked: ${task.title}`);
   }
 
   function moveTaskToCategory(task: Task, categoryName: string) {
@@ -3505,6 +3532,21 @@ export default function RespondDashboard({
 
       return next;
     });
+  }
+
+  const allStagesExpanded =
+    phaseOrder.every((phase) => expandedPhases.has(phase)) && categories.every((category) => expandedCategories.has(category.name));
+
+  function toggleAllStages() {
+    setCategoryFilter("all");
+
+    if (allStagesExpanded) {
+      setExpandedPhases(new Set());
+      setExpandedCategories(new Set());
+    } else {
+      setExpandedPhases(new Set(phaseOrder));
+      setExpandedCategories(new Set(categories.map((category) => category.name)));
+    }
   }
 
   function selectTaskFromCategory(task: Task) {
@@ -3918,7 +3960,17 @@ export default function RespondDashboard({
         </section>
 
         <section className="rail-section rail-section-stages" aria-label="Delivery stages section">
-          <span className="rail-section-label">Delivery stages</span>
+          <div className="rail-section-stages-head">
+            <span className="rail-section-label">Delivery stages</span>
+            <button
+              type="button"
+              className="stage-expand-toggle"
+              onClick={toggleAllStages}
+              title={allStagesExpanded ? "Collapse all stages" : "Expand all stages"}
+            >
+              {allStagesExpanded ? "Collapse all" : "Expand all"}
+            </button>
+          </div>
           <nav className="phase-nav" aria-label="Task categories">
             {phaseOrder.map((phase) => {
               const phaseCategories = categoryStats.filter((category) => category.phase === phase);
@@ -4117,7 +4169,7 @@ export default function RespondDashboard({
 
               <section className="command-strip">
                 <Metric label="Progress" value={`${metrics.percent}%`} detail={`${metrics.completed} of ${tasks.length} complete`} />
-                <Metric label="Active" value={metrics.active} detail="In progress or review" />
+                <Metric label="Active" value={metrics.active} detail="In progress" />
                 <Metric label="Waiting" value={metrics.blocked} detail="Open dependencies or holds" />
                 <Metric label="Categories" value={categories.length} detail="Onboarding to support" />
               </section>
@@ -4228,11 +4280,11 @@ export default function RespondDashboard({
                 }}
               >
                 <div className={`column-header task-stage-${status}`}>
-                  <strong>{statusLabels[status]}</strong>
-                  <div>
-                    <span>{columnTasks.length} {columnTasks.length === 1 ? "Task" : "Tasks"}</span>
-                    <b>{statusColumnDetails[status]}</b>
+                  <div className="column-header-topline">
+                    <strong>{statusLabels[status]}</strong>
+                    <span aria-label={`${columnTasks.length} ${columnTasks.length === 1 ? "task" : "tasks"}`}>{columnTasks.length}</span>
                   </div>
+                  <b>{statusColumnDetails[status]}</b>
                 </div>
                 <div className="column-scroll">
                   {columnTasks.map((task) => (
@@ -4245,6 +4297,7 @@ export default function RespondDashboard({
                       isDeleting={deletingTaskId === task.id}
                       onSelect={selectOrOpenTask}
                       onQuickMove={moveTask}
+                      onToggleBlocked={toggleTaskBlocked}
                       onTitleChange={(targetTask, title) => updateTask(targetTask.id, { title })}
                       onDelete={removeTask}
                       onClientTaskToggle={(targetTask, checked) => updateTask(targetTask.id, { portalVisible: checked })}

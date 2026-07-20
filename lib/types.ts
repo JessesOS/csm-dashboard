@@ -1,20 +1,26 @@
 export const taskStatuses = [
   "queued",
   "in_progress",
-  "blocked",
-  "review",
   "complete",
 ] as const;
 
 export type TaskStatus = (typeof taskStatuses)[number];
 
 export const statusLabels: Record<TaskStatus, string> = {
-  queued: "Queued",
+  queued: "To do",
   in_progress: "In progress",
-  blocked: "Blocked",
-  review: "Review",
   complete: "Complete",
 };
+
+// Legacy statuses from the five-stage board ("blocked", "review") may still exist in
+// old rows and snapshot payloads.
+export function normalizeTaskStatus(status: string): TaskStatus {
+  if (status === "review") {
+    return "in_progress";
+  }
+
+  return (taskStatuses as readonly string[]).includes(status) ? (status as TaskStatus) : "queued";
+}
 
 export type Priority = "low" | "normal" | "high" | "critical";
 
@@ -48,6 +54,8 @@ export interface Task {
   category: string;
   phase: Phase;
   status: TaskStatus;
+  /** Non-empty = task is flagged blocked (badge on the board); the text says why. */
+  blockedReason?: string;
   assignee: string;
   dueWindow: string;
   priority: Priority;
@@ -72,6 +80,7 @@ export interface TaskUpdatePayload {
   category?: string;
   phase?: Phase;
   status?: TaskStatus;
+  blockedReason?: string;
   assignee?: string;
   dueWindow?: string;
   priority?: Priority;

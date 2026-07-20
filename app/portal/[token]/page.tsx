@@ -9,15 +9,31 @@ export const dynamic = "force-dynamic";
 
 const portalPhaseOrder: Phase[] = ["Onboarding", "Build", "Testing", "Go-Live", "Post-Launch", "Support"];
 
-const statusClass: Record<TaskStatus, string> = {
+// "blocked" is no longer a task status — it's derived from the blockedReason flag,
+// but the portal still renders it as its own state (red pill, "Needs attention").
+type PortalTaskState = TaskStatus | "blocked";
+
+const statusClass: Record<PortalTaskState, string> = {
   queued: "portal-status-queued",
   in_progress: "portal-status-in_progress",
   blocked: "portal-status-blocked",
-  review: "portal-status-review",
   complete: "portal-status-complete",
 };
 
-function phaseStatus(tasks: Task[]): TaskStatus {
+const portalStateLabels: Record<PortalTaskState, string> = {
+  ...statusLabels,
+  blocked: "Needs attention",
+};
+
+function isBlockedTask(task: Task) {
+  return task.status !== "complete" && Boolean(task.blockedReason);
+}
+
+function taskPortalState(task: Task): PortalTaskState {
+  return isBlockedTask(task) ? "blocked" : task.status;
+}
+
+function phaseStatus(tasks: Task[]): PortalTaskState {
   if (tasks.length === 0) {
     return "queued";
   }
@@ -26,16 +42,12 @@ function phaseStatus(tasks: Task[]): TaskStatus {
     return "complete";
   }
 
-  if (tasks.some((task) => task.status === "blocked")) {
+  if (tasks.some(isBlockedTask)) {
     return "blocked";
   }
 
   if (tasks.some((task) => task.status === "in_progress")) {
     return "in_progress";
-  }
-
-  if (tasks.some((task) => task.status === "review")) {
-    return "review";
   }
 
   return "queued";
@@ -138,7 +150,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
   const completed = progressTasks.filter((task) => task.status === "complete").length;
   const progress = progressTasks.length > 0 ? Math.round((completed / progressTasks.length) * 100) : 0;
   const openTasks = progressTasks.filter((task) => task.status !== "complete");
-  const blockedTasks = progressTasks.filter((task) => task.status === "blocked");
+  const blockedTasks = progressTasks.filter(isBlockedTask);
   const clientActions = progressTasks.filter((task) => task.status !== "complete" && task.portalActionRequired).slice(0, 6);
   const upcomingTouchpoints = progressTasks.filter((task) => task.status !== "complete" && !task.portalActionRequired).slice(0, 5);
   const nextTask = clientActions[0] ?? openTasks[0];
@@ -226,7 +238,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
                       <div className="portal-step-content">
                         <div className="portal-step-title">
                           <strong>{portalTitle(task)}</strong>
-                          <em>{isComplete ? "Complete" : isActive ? "Current step" : isLocked ? "Locked" : statusLabels[task.status]}</em>
+                          <em>{isComplete ? "Complete" : isActive ? "Current step" : isLocked ? "Locked" : portalStateLabels[taskPortalState(task)]}</em>
                         </div>
                         <p>{portalDetail(task)}</p>
                         {isOnboardingFormTask(task) && isActive ? <small>Use the collapsible form in the current step panel.</small> : null}
@@ -382,7 +394,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
                 <div>
                   <div className="portal-timeline-title">
                     <strong>{phase.phase}</strong>
-                    <span>{statusLabels[phase.status]}</span>
+                    <span>{portalStateLabels[phase.status]}</span>
                   </div>
                   <p>{phase.window}</p>
                   <div className="portal-progress-track">
@@ -415,7 +427,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
                       </a>
                     ) : null}
                   </div>
-                  <em className={statusClass[task.status]}>{statusLabels[task.status]}</em>
+                  <em className={statusClass[taskPortalState(task)]}>{portalStateLabels[taskPortalState(task)]}</em>
                 </article>
               ))
             ) : (
@@ -438,7 +450,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
           {upcomingTouchpoints.length > 0 ? (
             upcomingTouchpoints.map((task) => (
               <article key={task.id} className="portal-touchpoint">
-                <span className={statusClass[task.status]}>{statusLabels[task.status]}</span>
+                <span className={statusClass[taskPortalState(task)]}>{portalStateLabels[taskPortalState(task)]}</span>
                 <strong>{portalTitle(task)}</strong>
                 <p>{portalDetail(task)}</p>
               </article>

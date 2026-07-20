@@ -22,6 +22,7 @@ import {
   productTeamMembers,
 } from "./productWorkspaces";
 import {
+  normalizeTaskStatus,
   taskStatuses,
   type ClientAttentionItem,
   type ClientCreatePayload,
@@ -119,12 +120,12 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-07-12-respond-consolidation-v1";
+const currentStorageVersion = "2026-07-19-three-stage-statuses-v1";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
 const taskSelectFields =
-  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
+  "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, blocked_reason AS blockedReason, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
   "id, environment, product, scale_variant AS scaleVariant, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const portalFormSubmissionSelectFields =
@@ -395,6 +396,8 @@ function fromRow(row: TaskRow): Task {
     product,
     title: normalizeTaskTitle(row),
     category: normalizeTaskCategoryName(product, row.category),
+    status: normalizeTaskStatus(row.status),
+    blockedReason: row.blockedReason ?? "",
     dependencies: parseDependencies(row.dependencies),
     loomUrl: row.loomUrl ?? "",
     loomTitle: row.loomTitle ?? "",
@@ -664,6 +667,7 @@ async function seedWorkspaceShapeReady() {
     "environment",
     "product",
     "template_id",
+    "blocked_reason",
     "loom_url",
     "loom_title",
     "portal_visible",
@@ -819,6 +823,10 @@ async function ensureTaskColumns() {
   if (!columns.has("portal_configured")) {
     await d1.prepare("ALTER TABLE tasks ADD COLUMN portal_configured INTEGER NOT NULL DEFAULT 0").run();
   }
+
+  if (!columns.has("blocked_reason")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN blocked_reason TEXT NOT NULL DEFAULT ''").run();
+  }
 }
 
 async function ensureClientColumns() {
@@ -967,6 +975,7 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
             category,
             phase,
             status,
+            blocked_reason,
             assignee,
             due_window,
             priority,
@@ -982,7 +991,7 @@ async function seedTemplateTasksForClient(clientId: string, environment: Environ
             portal_action_label,
             portal_configured,
             sort_order
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .bind(...taskInsertValues(clientId, environment, product, item, useTemplateState))
     )
@@ -1073,6 +1082,7 @@ function taskInsertValues(clientId: string, environment: EnvironmentKey, product
     item.category,
     item.phase,
     useTemplateState ? item.status : "queued",
+    useTemplateState ? (item.blockedReason ?? "") : "",
     item.assignee,
     item.dueWindow,
     item.priority,
@@ -1344,6 +1354,30 @@ async function migrateRespondTaskConsolidation() {
   }
 }
 
+// Collapse the old five-stage board into three: "blocked" rows become "queued" with a
+// blocked_reason flag (preserving visibility), "review" rows fold into "in_progress".
+async function migrateThreeStageStatuses() {
+  const d1 = getD1();
+  const templateReasons = new Map<string, string>();
+
+  for (const template of [...productTasks("respond"), ...scaleTasksForVariant("meta_google")]) {
+    if (template.blockedReason) {
+      templateReasons.set(template.id, template.blockedReason);
+    }
+  }
+
+  await d1.batch([
+    ...[...templateReasons].map(([templateId, reason]) =>
+      d1
+        .prepare("UPDATE tasks SET blocked_reason = ? WHERE template_id = ? AND status = 'blocked' AND blocked_reason = ''")
+        .bind(reason, templateId)
+    ),
+    d1.prepare("UPDATE tasks SET blocked_reason = 'Carried over from the old Blocked column — see notes' WHERE status = 'blocked' AND blocked_reason = ''"),
+    d1.prepare("UPDATE tasks SET status = 'queued', updated_at = CURRENT_TIMESTAMP WHERE status = 'blocked'"),
+    d1.prepare("UPDATE tasks SET status = 'in_progress', updated_at = CURRENT_TIMESTAMP WHERE status = 'review'"),
+  ]);
+}
+
 async function prepareTaskStorage() {
   const d1 = getD1();
 
@@ -1400,6 +1434,7 @@ async function prepareTaskStorage() {
         category TEXT NOT NULL,
         phase TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'queued',
+        blocked_reason TEXT NOT NULL DEFAULT '',
         assignee TEXT NOT NULL DEFAULT 'Unassigned',
         due_window TEXT NOT NULL DEFAULT '',
         priority TEXT NOT NULL DEFAULT 'normal',
@@ -1533,6 +1568,7 @@ async function prepareTaskStorage() {
   await migrateScaleTaskConsolidation();
   await migrateRespondTaskConsolidation();
   await migrateScalePortalDefaults();
+  await migrateThreeStageStatuses();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
   await seedTrainingCategoryOrders();
@@ -1583,7 +1619,7 @@ export async function listClients(environmentInput: string | null | undefined = 
       .all<ClientRow>(),
     d1
       .prepare(
-        "SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN status = 'blocked' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE environment = ? AND product = ? GROUP BY client_id"
+        "SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN blocked_reason != '' AND status != 'complete' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE environment = ? AND product = ? GROUP BY client_id"
       )
       .bind(environment, product)
       .all<ClientCountRow>(),
@@ -1684,6 +1720,7 @@ export async function createTask(
         category,
         phase,
         status,
+        blocked_reason,
         assignee,
         due_window,
         priority,
@@ -1699,7 +1736,7 @@ export async function createTask(
         portal_action_label,
         portal_configured,
         sort_order
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     .bind(
       id,
@@ -1711,6 +1748,7 @@ export async function createTask(
       category.name,
       category.phase,
       status,
+      payload.blockedReason?.trim() ?? "",
       payload.assignee && teamMembers.includes(payload.assignee) ? payload.assignee : "Unassigned",
       payload.dueWindow?.trim() ?? "",
       priority,
@@ -1790,6 +1828,11 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
     }
     updates.push("status = ?");
     values.push(payload.status satisfies TaskStatus);
+  }
+
+  if (typeof payload.blockedReason === "string") {
+    updates.push("blocked_reason = ?");
+    values.push(payload.blockedReason.trim());
   }
 
   if (typeof payload.assignee === "string") {
@@ -2145,7 +2188,7 @@ export async function createTaskSnapshot(payload: TaskSnapshotCreatePayload) {
 }
 
 function taskRestoreValues(task: Task, environment: EnvironmentKey, product: ProductKey, clientId: string) {
-  const status = validStatuses.has(task.status) ? task.status : "queued";
+  const status = normalizeTaskStatus(task.status);
   const priority = validPriorities.has(task.priority) ? task.priority : "normal";
 
   return [
@@ -2158,6 +2201,7 @@ function taskRestoreValues(task: Task, environment: EnvironmentKey, product: Pro
     task.category,
     task.phase,
     status,
+    task.blockedReason ?? "",
     task.assignee,
     task.dueWindow,
     priority,
@@ -2192,6 +2236,7 @@ function taskRestoreStatement(d1: D1Database, task: Task, environment: Environme
           category,
           phase,
           status,
+          blocked_reason,
           assignee,
           due_window,
           priority,
@@ -2209,7 +2254,7 @@ function taskRestoreStatement(d1: D1Database, task: Task, environment: Environme
           sort_order,
           created_at,
           updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `
     )
     .bind(...taskRestoreValues(task, environment, product, clientId));
@@ -2326,7 +2371,8 @@ function cloneSnapshotTasksForClient(
       product: targetProduct,
       clientId: targetClientId,
       templateId,
-      status: options?.resetWorkflowState ? "queued" : task.status,
+      status: options?.resetWorkflowState ? "queued" : normalizeTaskStatus(task.status),
+      blockedReason: options?.resetWorkflowState ? "" : (task.blockedReason ?? ""),
       dependencies: nextDependencies,
       portalVisible: existingTask?.portalVisible ?? task.portalVisible,
       portalTitle: existingTask?.portalTitle ?? task.portalTitle,
@@ -3147,7 +3193,7 @@ async function getPortalFormSubmissionForClient(client: RespondClient) {
   return row ? fromPortalFormSubmissionRow(row) : null;
 }
 
-async function markOnboardingFormTaskInReview(client: RespondClient) {
+async function markOnboardingFormTaskSubmitted(client: RespondClient) {
   const d1 = getD1();
   const result = await d1
     .prepare(
@@ -3166,7 +3212,7 @@ async function markOnboardingFormTaskInReview(client: RespondClient) {
 
   await d1
     .prepare("UPDATE tasks SET status = ?, notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
-    .bind("review", nextNotes, task.id)
+    .bind("in_progress", nextNotes, task.id)
     .run();
 }
 
@@ -3211,7 +3257,7 @@ export async function savePortalOnboardingFormSubmission(token: string, response
     .bind(id, client.environment, client.product, client.id, form.id, JSON.stringify(responses))
     .run();
 
-  await markOnboardingFormTaskInReview(client);
+  await markOnboardingFormTaskSubmitted(client);
 
   const submission = await getPortalFormSubmissionForClient(client);
 

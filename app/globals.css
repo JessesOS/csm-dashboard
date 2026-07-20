@@ -2604,6 +2604,32 @@ button:disabled {
   padding: 0 2px;
 }
 
+.rail-section-stages-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.stage-expand-toggle {
+  border: 1px solid rgba(123, 135, 152, 0.3);
+  border-radius: 999px;
+  background: transparent;
+  color: #7b8798;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.stage-expand-toggle:hover {
+  border-color: rgba(123, 135, 152, 0.55);
+  color: #4b5563;
+}
+
 .phase-nav {
   min-height: 0;
   overflow: auto;
@@ -3300,7 +3326,8 @@ button:disabled {
 
 .board {
   display: grid;
-  grid-auto-columns: minmax(380px, 430px);
+  /* Three stages now — let the columns share the full row instead of capping width. */
+  grid-auto-columns: minmax(380px, 1fr);
   grid-auto-flow: column;
   gap: 12px;
   height: calc(100vh - 238px);
@@ -3329,51 +3356,50 @@ button:disabled {
 
 .column-header {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   min-height: 62px;
   margin: 8px 8px 0;
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 8px;
   color: #111827;
   padding: 11px 12px;
+  align-content: center;
+}
+
+.column-header-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .column-header strong {
   overflow: hidden;
   color: #111827;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.column-header div {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
 }
 
 .column-header span {
-  overflow: hidden;
   border-radius: 999px;
-  /* A light chip with solid dark text reads as a crisp pill against any of
-     the three pastel stage-header colors; the previous translucent-black
-     version read as a muddy gray smear, especially in dark mode where the
-     text opacity was dropped further. */
-  background: rgba(255, 255, 255, 0.6);
+  /* Solid white chip with dark text — the one treatment that stays crisp on
+     all three pastel stage colors in both themes. Translucent fills here have
+     read as muddy smears twice now; don't reintroduce them. */
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   color: #111827;
   font-size: 11px;
-  font-weight: 600;
-  text-overflow: ellipsis;
+  font-weight: 650;
+  line-height: 1;
   white-space: nowrap;
-  padding: 1px 8px;
+  padding: 3px 8px;
 }
 
 .column-header b {
-  color: #111827;
+  color: rgba(17, 24, 39, 0.62);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -3385,16 +3411,6 @@ button:disabled {
 .task-stage-in_progress {
   background: #d9c8f3;
   border-left: 3px solid #7c5cbf;
-}
-
-.task-stage-blocked {
-  background: #efc9c9;
-  border-left: 3px solid #c04040;
-}
-
-.task-stage-review {
-  background: #c8d8f6;
-  border-left: 3px solid #2f5fc4;
 }
 
 .task-stage-complete {
@@ -3539,12 +3555,16 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  /* Chips + quick actions can exceed the card width on narrow columns
+     (e.g. priority + Blocked + Portal + Done + Unblock) — wrap, don't clip. */
+  flex-wrap: wrap;
 }
 
 .task-card-chips {
   display: flex;
   align-items: center;
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 .task-card-actions-group {
@@ -3568,6 +3588,7 @@ button:disabled {
 .mini-meta,
 .dependency-chip,
 .portal-chip,
+.blocked-chip,
 .loom-card-indicator {
   display: inline-flex;
   align-items: center;
@@ -3599,6 +3620,13 @@ button:disabled {
   border: 1px solid rgba(36, 94, 232, 0.18);
   background: #edf4ff;
   color: #1d4ed8;
+}
+
+.blocked-chip {
+  border: 1px solid rgba(192, 64, 64, 0.24);
+  background: #fdecec;
+  color: #b91c1c;
+  font-weight: 600;
 }
 
 .task-actions {
@@ -5143,6 +5171,16 @@ progress::-webkit-progress-value {
   color: #6f849a;
 }
 
+.dashboard-shell-dark .stage-expand-toggle {
+  border-color: rgba(111, 132, 154, 0.35);
+  color: #6f849a;
+}
+
+.dashboard-shell-dark .stage-expand-toggle:hover {
+  border-color: rgba(193, 255, 36, 0.4);
+  color: #c9f82b;
+}
+
 .dashboard-shell-dark .brand-mark {
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
@@ -5395,8 +5433,7 @@ progress::-webkit-progress-value {
   border-color: rgba(15, 23, 42, 0.12);
 }
 
-.dashboard-shell-dark .column-header strong,
-.dashboard-shell-dark .column-header b {
+.dashboard-shell-dark .column-header strong {
   color: #111827;
 }
 
@@ -5447,6 +5484,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .mini-meta,
 .dashboard-shell-dark .dependency-chip,
 .dashboard-shell-dark .portal-chip,
+.dashboard-shell-dark .blocked-chip,
 .dashboard-shell-dark .loom-card-indicator {
   background: rgba(148, 163, 184, 0.14);
   color: #a8b8ca;
@@ -5467,6 +5505,12 @@ progress::-webkit-progress-value {
   border-color: rgba(193, 255, 36, 0.28);
   background: rgba(193, 255, 36, 0.1);
   color: #c9f82b;
+}
+
+.dashboard-shell-dark .blocked-chip {
+  border-color: rgba(248, 113, 113, 0.32);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fca5a5;
 }
 
 .dashboard-shell-dark .task-actions .admin-delete-task {
@@ -6700,8 +6744,7 @@ progress::-webkit-progress-value {
   color: #a8b4c4 !important;
 }
 
-.portal-status-in_progress,
-.portal-status-review {
+.portal-status-in_progress {
   color: #f5b22c !important;
 }
 

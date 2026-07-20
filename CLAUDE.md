@@ -47,11 +47,21 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   83→53) by merging click-by-click micro-steps into real milestones; the
   granular steps are preserved in each task's `notes` field as "Merged SOP
   steps:" so nothing is lost for staff training — visible on drill-in.
+- Task statuses are **three-stage** (2026-07-19): `queued` ("To do"),
+  `in_progress`, `complete`. "Blocked" is not a status — it's the
+  `blocked_reason` TEXT column (`blockedReason` in the API): non-empty =
+  flagged blocked, the text says why. "Review" was folded into
+  `in_progress` (`normalizeTaskStatus()` in `lib/types.ts` maps legacy
+  values found in old rows/snapshots).
 - `lib/taskStore.ts` — seeding, migrations, and the `prepareTaskStorage()`
-  cold-start path. Data migrations are triggered by bumping
-  `currentStorageVersion`; add a `migrate...()` function and call it from
+  cold-start path. Add a `migrate...()` function and call it from
   `prepareTaskStorage()` for any change that must rewrite existing rows, not
-  just new seeds.
+  just new seeds. **The real re-run trigger is the shape check, not the
+  version string**: `storagePreparationAlreadyCompleted()` returns true (and
+  silently re-stamps `currentStorageVersion`) whenever
+  `seedWorkspaceShapeReady()` passes — so a migration only runs on an
+  existing DB if it also changes the shape (e.g. adds its new column to
+  `requiredTaskColumns`). Bump the version string too, but don't rely on it.
 - Task IDs are **scoped** per client (`clientId__templateId`), but
   `dependencies` arrays must also store **scoped** IDs to resolve correctly
   in the UI — this bit us once (a migration wrote bare template IDs) and is

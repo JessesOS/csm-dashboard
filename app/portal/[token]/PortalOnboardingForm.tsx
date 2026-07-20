@@ -270,7 +270,7 @@ export function PortalOnboardingForm({
           {error ? <p className="portal-form-error">{error}</p> : null}
 
           <div className="portal-form-submit-row">
-            <span>{submission ? "Saving again will update the existing response." : "Submitting moves this step to review for your CSM team."}</span>
+            <span>{submission ? "Saving again will update the existing response." : "Submitting sends this step to your CSM team to verify."}</span>
             <button className="portal-primary-action" type="submit" disabled={isSaving}>
               {isSaving ? "Saving..." : submission ? "Update response" : "Submit onboarding form"}
             </button>

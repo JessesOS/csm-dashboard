@@ -54,6 +54,7 @@ function task(
     category: category.name,
     phase: category.phase,
     status: options.status ?? "queued",
+    blockedReason: options.blockedReason ?? "",
     assignee: options.assignee ?? "Unassigned",
     dueWindow: options.dueWindow ?? "",
     priority: options.priority ?? "normal",
@@ -110,7 +111,7 @@ export const seedTasks: Task[] = [
     portalConfigured: true,
   }),
   task(12, "welcome", "Ensure the client has submitted the onboarding form in LaunchBay to complete the onboarding milestone.", {
-    status: "blocked",
+    blockedReason: "Waiting on the client to submit their onboarding form",
     assignee: "Account Manager",
     dueWindow: "Day 1",
     priority: "critical",
@@ -195,7 +196,7 @@ export const seedTasks: Task[] = [
     portalConfigured: true,
   }),
   task(25, "crm", "Import the client contact database after CSV upload and mark the LaunchBay import task complete.", {
-    status: "blocked",
+    blockedReason: "Waiting on the client's contact CSV upload",
     assignee: "Technical Admin",
     dueWindow: "Days 2-5",
     priority: "high",
@@ -231,7 +232,7 @@ export const seedTasks: Task[] = [
     portalConfigured: true,
   }),
   task(30, "phone", "Purchase an SMS/MMS capable mobile number or manage the Porting stage in LaunchBay.", {
-    status: "blocked",
+    blockedReason: "Waiting on the client's number decision or porting authorisation",
     assignee: "Voice AI Specialist",
     dueWindow: "Days 4-6",
     priority: "critical",
@@ -265,7 +266,7 @@ export const seedTasks: Task[] = [
     portalConfigured: true,
   }),
   task(38, "phone", "Build the Voice AI knowledgebase & prompt", {
-    status: "blocked",
+    blockedReason: "Waiting on client website content for the knowledgebase",
     assignee: "Voice AI Specialist",
     dueWindow: "Days 5-7",
     priority: "high",
