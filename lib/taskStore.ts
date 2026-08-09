@@ -120,7 +120,7 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-07-19-three-stage-statuses-v1";
+const currentStorageVersion = "2026-08-09-visibility-and-events-v1";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
@@ -653,6 +653,7 @@ async function seedWorkspaceShapeReady() {
     trainingCategoryColumns,
     taskSnapshotColumns,
     taskTemplateDeletionColumns,
+    taskEventColumns,
   ] = await Promise.all([
     tableColumns("tasks"),
     tableColumns("clients"),
@@ -661,6 +662,7 @@ async function seedWorkspaceShapeReady() {
     tableColumns("training_categories"),
     tableColumns("task_snapshots"),
     tableColumns("task_template_deletions"),
+    tableColumns("task_events"),
   ]);
   const requiredTaskColumns = [
     "client_id",
@@ -677,6 +679,9 @@ async function seedWorkspaceShapeReady() {
     "portal_action_url",
     "portal_action_label",
     "portal_configured",
+    "team_visible",
+    "rolls_up_to",
+    "status_changed_at",
   ];
   const requiredClientColumns = ["portal_token", "environment", "product", "company_name", "scale_variant"];
   const requiredPortalFormColumns = [
@@ -692,6 +697,7 @@ async function seedWorkspaceShapeReady() {
   const requiredTrainingCategoryColumns = ["product", "category", "sort_order"];
   const requiredTaskSnapshotColumns = ["environment", "product", "client_id", "name", "description", "task_count", "payload"];
   const requiredTaskTemplateDeletionColumns = ["environment", "product", "client_id", "template_id"];
+  const requiredTaskEventColumns = ["task_id", "client_id", "from_status", "to_status", "actor"];
 
   if (
     !requiredTaskColumns.every((column) => taskColumns.has(column)) ||
@@ -700,7 +706,8 @@ async function seedWorkspaceShapeReady() {
     !requiredTrainingVideoColumns.every((column) => trainingVideoColumns.has(column)) ||
     !requiredTrainingCategoryColumns.every((column) => trainingCategoryColumns.has(column)) ||
     !requiredTaskSnapshotColumns.every((column) => taskSnapshotColumns.has(column)) ||
-    !requiredTaskTemplateDeletionColumns.every((column) => taskTemplateDeletionColumns.has(column))
+    !requiredTaskTemplateDeletionColumns.every((column) => taskTemplateDeletionColumns.has(column)) ||
+    !requiredTaskEventColumns.every((column) => taskEventColumns.has(column))
   ) {
     return false;
   }
@@ -827,6 +834,35 @@ async function ensureTaskColumns() {
   if (!columns.has("blocked_reason")) {
     await d1.prepare("ALTER TABLE tasks ADD COLUMN blocked_reason TEXT NOT NULL DEFAULT ''").run();
   }
+
+  // Default 1: adding this column changes nothing on the team board by itself.
+  if (!columns.has("team_visible")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN team_visible INTEGER NOT NULL DEFAULT 1").run();
+  }
+
+  if (!columns.has("rolls_up_to")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN rolls_up_to TEXT NOT NULL DEFAULT ''").run();
+  }
+
+  if (!columns.has("status_changed_at")) {
+    await d1.prepare("ALTER TABLE tasks ADD COLUMN status_changed_at TEXT NOT NULL DEFAULT ''").run();
+  }
+}
+
+async function ensureTaskEventsTable() {
+  await getD1()
+    .prepare(`
+      CREATE TABLE IF NOT EXISTS task_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id TEXT NOT NULL,
+        client_id TEXT NOT NULL DEFAULT '',
+        from_status TEXT NOT NULL DEFAULT '',
+        to_status TEXT NOT NULL DEFAULT '',
+        actor TEXT NOT NULL DEFAULT 'team',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+    .run();
 }
 
 async function ensureClientColumns() {
@@ -1449,9 +1485,23 @@ async function prepareTaskStorage() {
         portal_action_url TEXT NOT NULL DEFAULT '',
         portal_action_label TEXT NOT NULL DEFAULT '',
         portal_configured INTEGER NOT NULL DEFAULT 0,
+        team_visible INTEGER NOT NULL DEFAULT 1,
+        rolls_up_to TEXT NOT NULL DEFAULT '',
+        status_changed_at TEXT NOT NULL DEFAULT '',
         sort_order INTEGER NOT NULL,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `),
+    d1.prepare(`
+      CREATE TABLE IF NOT EXISTS task_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task_id TEXT NOT NULL,
+        client_id TEXT NOT NULL DEFAULT '',
+        from_status TEXT NOT NULL DEFAULT '',
+        to_status TEXT NOT NULL DEFAULT '',
+        actor TEXT NOT NULL DEFAULT 'team',
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
     `),
     d1.prepare(`
@@ -1518,6 +1568,7 @@ async function prepareTaskStorage() {
 
   await ensureTaskColumns();
   await ensureClientColumns();
+  await ensureTaskEventsTable();
 
   await seedClients();
   await syncSeedClientIdentityDefaults();
@@ -1561,6 +1612,10 @@ async function prepareTaskStorage() {
     d1.prepare("CREATE INDEX IF NOT EXISTS training_categories_product_idx ON training_categories (product)"),
     d1.prepare("CREATE UNIQUE INDEX IF NOT EXISTS training_categories_product_category_idx ON training_categories (product, category)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS training_categories_product_sort_idx ON training_categories (product, sort_order)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_events_task_idx ON task_events (task_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_events_client_idx ON task_events (client_id)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS task_events_created_idx ON task_events (created_at)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS tasks_team_visible_idx ON tasks (client_id, team_visible)"),
   ]);
 
   await migrateGlobalTasksToClient();
@@ -1784,7 +1839,7 @@ export async function getTask(id: string) {
   return fromRow(row);
 }
 
-export async function updateTask(id: string, payload: TaskUpdatePayload) {
+export async function updateTask(id: string, payload: TaskUpdatePayload, actor: string = "team") {
   await ensureTaskStorage();
   const d1 = getD1();
   const existing = await d1.prepare("SELECT environment, product FROM tasks WHERE id = ?").bind(id).first<{ environment: string; product: string }>();
@@ -1795,9 +1850,9 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
 
   const product = normalizeProduct(existing.product);
   const taskClient = await d1
-    .prepare("SELECT client_id AS clientId, environment, product FROM tasks WHERE id = ?")
+    .prepare("SELECT client_id AS clientId, environment, product, status FROM tasks WHERE id = ?")
     .bind(id)
-    .first<{ clientId: string; environment: string; product: string }>();
+    .first<{ clientId: string; environment: string; product: string; status: string }>();
   const scaleVariant = taskClient ? await getClientScaleVariant(taskClient.clientId, normalizeEnvironment(taskClient.environment), product) : undefined;
   const categories = productCategories(product, scaleVariant);
   const teamMembers = productTeamMembers(product);
@@ -1822,12 +1877,22 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
     }
   }
 
+  const previousStatus = normalizeTaskStatus(taskClient?.status ?? "");
+  let statusChangedTo: TaskStatus | null = null;
+
   if (payload.status) {
     if (!validStatuses.has(payload.status)) {
       throw new Error("Invalid task status.");
     }
     updates.push("status = ?");
     values.push(payload.status satisfies TaskStatus);
+
+    if (payload.status !== previousStatus) {
+      // status_changed_at moves ONLY on a real status transition — updated_at
+      // moves on any write, so staleness can only be computed from this.
+      statusChangedTo = payload.status;
+      updates.push("status_changed_at = CURRENT_TIMESTAMP");
+    }
   }
 
   if (typeof payload.blockedReason === "string") {
@@ -1933,6 +1998,14 @@ export async function updateTask(id: string, payload: TaskUpdatePayload) {
   values.push(id);
 
   await d1.prepare(`UPDATE tasks SET ${updates.join(", ")} WHERE id = ?`).bind(...values).run();
+
+  if (statusChangedTo) {
+    await d1
+      .prepare("INSERT INTO task_events (task_id, client_id, from_status, to_status, actor) VALUES (?, ?, ?, ?, ?)")
+      .bind(id, taskClient?.clientId ?? "", previousStatus, statusChangedTo, actor)
+      .run();
+  }
+
   return getTask(id);
 }
 

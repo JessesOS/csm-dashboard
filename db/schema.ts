@@ -25,9 +25,29 @@ export const tasks = sqliteTable("tasks", {
   portalActionUrl: text("portal_action_url").notNull().default(""),
   portalActionLabel: text("portal_action_label").notNull().default(""),
   portalConfigured: integer("portal_configured").notNull().default(0),
+  // Visibility model (2026-08-09): team_visible and portal_visible are independent.
+  // team=1/portal=0 internal work, 1/1 client acts + team tracks, 0/1 pure client
+  // experience. Defaults keep every pre-existing row exactly as it renders today.
+  teamVisible: integer("team_visible").notNull().default(1),
+  // Client-only child rows (e.g. ob-6/6b/6c) point at their parent team task's
+  // template id; when all children complete, the parent completes.
+  rollsUpTo: text("rolls_up_to").notNull().default(""),
+  // Written ONLY when status actually changes — updated_at moves on any write,
+  // so "not moved in N days" can only be computed from this.
+  statusChangedAt: text("status_changed_at").notNull().default(""),
   sortOrder: integer("sort_order").notNull(),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const taskEvents = sqliteTable("task_events", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  taskId: text("task_id").notNull(),
+  clientId: text("client_id").notNull().default(""),
+  fromStatus: text("from_status").notNull().default(""),
+  toStatus: text("to_status").notNull().default(""),
+  actor: text("actor").notNull().default("team"),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
 export const clients = sqliteTable("clients", {
