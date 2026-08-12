@@ -6,14 +6,14 @@
      7k-line stylesheet keeps working; only the values changed. */
   --background: #f5ead8;
   --foreground: #201e1d;
-  --muted: #82796a;
-  --border: #dcd3c4;
+  --muted: #6f6658;      /* was #82796a — failed WCAG AA (3.9:1) on panels */
+  --border: #cfc4b1;     /* was #dcd3c4 — 1.36:1 gave almost no separation */
   --panel: #f9f4ed;
   --panel-soft: #faf7f2;
   --ink: #201e1d;
   --cobalt: #c67139;   /* terracotta: the one action colour */
   --mint: #56633f;     /* sage: complete */
-  --amber: #c98a2e;
+  --amber: #a6701c;      /* was #c98a2e — 2.68:1, below UI minimum */
   --red: #b3402a;
   --shadow: 0 14px 40px rgba(58, 48, 34, 0.10);
 }
@@ -5148,7 +5148,7 @@ progress::-webkit-progress-value {
   --background: #131118;
   --foreground: #f2efe9;
   --muted: #a49e92;
-  --border: #2e2a36;
+  --border: #403a4d;     /* was #2e2a36 — 1.23:1, cards had no edge */
   --panel: #1d1a23;
   --panel-soft: #241f2c;
   --ink: #f2efe9;
@@ -7397,3 +7397,65 @@ progress::-webkit-progress-value {
     flex-direction: column;
   }
 }
+
+/* Kanban stage headers in dark: the light theme's pastel fills read as glaring
+   slabs on the aubergine ground, so dark gets deep tints of the same hues with
+   light text — colour as accent, not as fill. (2026-08-12 design pass) */
+.dashboard-shell-dark .task-stage-queued {
+  background: #3a2d1c;
+  border-left: 3px solid #e08a4e;
+}
+
+.dashboard-shell-dark .task-stage-in_progress {
+  background: #2c2435;
+  border-left: 3px solid #b39ac4;
+}
+
+.dashboard-shell-dark .task-stage-complete {
+  background: #1d3335;
+  border-left: 3px solid #7fc4c9;
+}
+
+.dashboard-shell-dark .column-header,
+.dashboard-shell-dark .column-header strong {
+  color: #f2efe9;
+}
+
+.dashboard-shell-dark .column-header {
+  border-color: rgba(242, 239, 233, 0.10);
+}
+
+.dashboard-shell-dark .column-header span {
+  background: rgba(242, 239, 233, 0.10);
+  border-color: rgba(242, 239, 233, 0.14);
+  color: #f2efe9;
+}
+
+.dashboard-shell-dark .column-header b {
+  color: rgba(242, 239, 233, 0.62);
+}
+
+.dashboard-shell-dark .column {
+  background: #17151d;
+}
+
+/* ---------------------------------------------------------------------------
+   Phase accents, harmonised (2026-08-12 design pass)
+   Journey phases need to be tellable apart, but the original set was a six-hue
+   rainbow (green/blue/amber/teal/purple/pink) that fought the warm palette.
+   These are six hues from the portal's own family at matched saturation and
+   luminance: still distinct, now one product.
+   --------------------------------------------------------------------------- */
+.phase-accent-onboarding { background: #f7e3d2; border-color: #e0b892; color: #8a4a1c; }
+.phase-accent-build      { background: #eee4f2; border-color: #cbb3d6; color: #6b4a80; }
+.phase-accent-testing    { background: #f7edd3; border-color: #ddc98f; color: #7a5c14; }
+.phase-accent-golive     { background: #d9ecec; border-color: #a8cfd1; color: #2f6265; }
+.phase-accent-postlaunch { background: #f4e2e2; border-color: #dbb6b6; color: #8a3f3f; }
+.phase-accent-support    { background: #e6ecdd; border-color: #bccaa9; color: #4f6135; }
+
+.dashboard-shell-dark .phase-accent-onboarding { background: #3a2d1c; border-color: rgba(224, 138, 78, 0.34); color: #e8a570; }
+.dashboard-shell-dark .phase-accent-build      { background: #2c2435; border-color: rgba(179, 154, 196, 0.34); color: #c7b2d6; }
+.dashboard-shell-dark .phase-accent-testing    { background: #35301c; border-color: rgba(224, 197, 110, 0.32); color: #e0c56e; }
+.dashboard-shell-dark .phase-accent-golive     { background: #1d3335; border-color: rgba(127, 196, 201, 0.34); color: #7fc4c9; }
+.dashboard-shell-dark .phase-accent-postlaunch { background: #38262a; border-color: rgba(217, 154, 154, 0.32); color: #d99a9a; }
+.dashboard-shell-dark .phase-accent-support    { background: #2a3126; border-color: rgba(157, 176, 138, 0.32); color: #9db08a; }
