@@ -57,8 +57,8 @@ button:disabled {
   height: 40px;
   border: 1px solid rgba(160, 148, 128, 0.28);
   border-radius: 8px;
-  background: #241f18;
-  color: #a89d8c;
+  background: #1d1a23;
+  color: #a49e92;
   padding: 3px;
 }
 
@@ -79,8 +79,8 @@ button:disabled {
 }
 
 .theme-toggle button.active {
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
 }
 
 .product-switcher {
@@ -93,7 +93,7 @@ button:disabled {
 }
 
 .product-switcher > span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   font-weight: 650;
   text-transform: uppercase;
@@ -131,7 +131,7 @@ button:disabled {
   height: 28px;
   border: 1px solid rgba(193, 255, 36, 0.44);
   border-radius: 50%;
-  background-color: #102333;
+  background-color: #1d1a23;
 }
 
 .respond-mark-image {
@@ -185,7 +185,7 @@ button:disabled {
 .environment-switcher button.active {
   border-color: rgba(193, 255, 36, 0.5);
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .rail-settings {
@@ -256,7 +256,7 @@ button:disabled {
 .rail-settings-open .rail-settings-button {
   border-color: rgba(193, 255, 36, 0.5);
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .rail-settings-compact {
@@ -341,12 +341,12 @@ button:disabled {
 .attachment-lenses button.active {
   border-color: rgba(193, 255, 36, 0.5);
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .attachment-lenses button.active strong {
   background: rgba(193, 255, 36, 0.18);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .rail-settings-divider {
@@ -415,7 +415,7 @@ button:disabled {
 }
 
 .template-card-head span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   white-space: nowrap;
 }
@@ -444,14 +444,14 @@ button:disabled {
   height: 22px;
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.16);
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 10px;
 }
 
 .backup-settings p,
 .backup-settings small {
   margin: 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   line-height: 1.35;
 }
@@ -478,7 +478,7 @@ button:disabled {
   border: 1px solid rgba(193, 255, 36, 0.3);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 10px;
   font-size: 11px;
   font-weight: 650;
@@ -534,7 +534,7 @@ button:disabled {
 }
 
 .backup-row span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
 }
 
@@ -547,7 +547,7 @@ button:disabled {
   border: 1px solid rgba(193, 255, 36, 0.32);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 13px;
   font-size: 12px;
   font-weight: 600;
@@ -577,7 +577,7 @@ button:disabled {
   width: min(390px, calc(100vw - 32px));
   border: 1px solid rgba(193, 255, 36, 0.32);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   color: #f4ece0;
   padding: 18px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
@@ -597,21 +597,21 @@ button:disabled {
 }
 
 .walkthrough-kicker span {
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 650;
   text-transform: uppercase;
 }
 
 .walkthrough-kicker strong {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   font-weight: 550;
 }
 
 .walkthrough-panel h2 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 18px;
   font-weight: 650;
   line-height: 1.25;
@@ -637,7 +637,7 @@ button:disabled {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #e08a4d;
+  background: #e08a4e;
 }
 
 .walkthrough-actions {
@@ -669,8 +669,8 @@ button:disabled {
 
 .walkthrough-primary {
   border: 1px solid rgba(193, 255, 36, 0.45);
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
 }
 
 .walkthrough-primary:disabled,
@@ -695,7 +695,7 @@ button:disabled {
 .dashboard-shell[data-tour-target="theme"] .theme-toggle {
   position: relative;
   z-index: 50;
-  outline: 2px solid #e08a4d;
+  outline: 2px solid #e08a4e;
   outline-offset: 4px;
   box-shadow: 0 0 0 8px rgba(193, 255, 36, 0.08), 0 24px 80px rgba(0, 0, 0, 0.32);
 }
@@ -704,7 +704,7 @@ button:disabled {
   display: grid;
   grid-template-columns: 264px minmax(0, 1fr);
   min-height: 100vh;
-  background: #1c1916;
+  background: #131118;
   color: #f4ece0;
 }
 
@@ -715,7 +715,7 @@ button:disabled {
   height: 100vh;
   flex-direction: column;
   border-right: 1px solid rgba(160, 148, 128, 0.18);
-  background: #05101d;
+  background: #131118;
   padding: 24px 18px;
 }
 
@@ -742,7 +742,7 @@ button:disabled {
   height: 38px;
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background-color: #102333;
+  background-color: #1d1a23;
 }
 
 .mission-brand strong,
@@ -763,7 +763,7 @@ button:disabled {
 .mission-brand > div span,
 .mission-user span {
   margin-top: 2px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
 }
 
@@ -790,7 +790,7 @@ button:disabled {
 .mission-nav button:hover:not(:disabled) {
   border-color: rgba(193, 255, 36, 0.32);
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .mission-nav button:disabled {
@@ -820,7 +820,7 @@ button:disabled {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #a89d8c;
+  color: #a49e92;
   padding: 7px 10px;
   text-align: left;
   font-size: 12px;
@@ -834,7 +834,7 @@ button:disabled {
 
 .mission-side-section button.active {
   background: rgba(193, 255, 36, 0.08);
-  color: #e08a4d;
+  color: #e08a4e;
   box-shadow: inset 2px 0 0 rgba(193, 255, 36, 0.7);
   font-weight: 500;
 }
@@ -894,7 +894,7 @@ button:disabled {
   height: 36px;
   border: 1px solid rgba(160, 148, 128, 0.28);
   border-radius: 8px;
-  background: #241f18;
+  background: #1d1a23;
   color: #eaf2fb;
   padding: 0 12px;
   outline: 0;
@@ -909,7 +909,7 @@ button:disabled {
 
 .mission-header h1 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 28px;
   font-weight: 600;
   letter-spacing: 0;
@@ -931,13 +931,13 @@ button:disabled {
   border: 1px solid rgba(160, 148, 128, 0.28);
   border-radius: 8px;
   background: transparent;
-  color: #a89d8c;
+  color: #a49e92;
   flex-shrink: 0;
 }
 
 .walkthrough-icon-button:hover {
   border-color: rgba(160, 148, 128, 0.5);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .system-pill {
@@ -946,7 +946,7 @@ button:disabled {
   border: 1px solid rgba(193, 255, 36, 0.2);
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.08);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
@@ -956,7 +956,7 @@ button:disabled {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #e08a4d;
+  background: #e08a4e;
 }
 
 .mission-date {
@@ -975,8 +975,8 @@ button:disabled {
   height: 40px;
   border: 1px solid rgba(193, 255, 36, 0.45);
   border-radius: 8px;
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
   padding: 0 14px;
   font-size: 12px;
   font-weight: 650;
@@ -1033,7 +1033,7 @@ button:disabled {
   width: min(460px, calc(100vw - 28px));
   border: 1px solid rgba(193, 255, 36, 0.26);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   color: #f4ece0;
   padding: 18px;
   box-shadow: 0 24px 90px rgba(0, 0, 0, 0.48);
@@ -1052,7 +1052,7 @@ button:disabled {
 }
 
 .new-client-head span {
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 650;
   text-transform: uppercase;
@@ -1060,7 +1060,7 @@ button:disabled {
 
 .new-client-head h2 {
   margin: 4px 0 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 20px;
   letter-spacing: 0;
 }
@@ -1069,7 +1069,7 @@ button:disabled {
   display: grid;
   gap: 7px;
   margin-top: 12px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   font-weight: 500;
 }
@@ -1107,7 +1107,7 @@ button:disabled {
 .portfolio-kpi,
 .portfolio-health {
   min-height: 110px;
-  background: #272219;
+  background: #1d1a23;
   padding: 16px;
 }
 
@@ -1121,20 +1121,20 @@ button:disabled {
 .portfolio-health strong {
   display: block;
   margin: 9px 0 4px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 26px;
   font-weight: 650;
 }
 
 .portfolio-kpi small,
 .portfolio-health small {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   line-height: 1.35;
 }
 
 .tone-lime {
-  color: #e08a4d !important;
+  color: #e08a4e !important;
 }
 
 .tone-amber {
@@ -1179,7 +1179,7 @@ button:disabled {
   position: absolute;
   inset: 9px;
   border-radius: 50%;
-  background: #272219;
+  background: #1d1a23;
   content: "";
 }
 
@@ -1209,7 +1209,7 @@ button:disabled {
 
 .empty-state-card > span,
 .empty-workspace-panel > span {
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 650;
   text-transform: uppercase;
@@ -1218,7 +1218,7 @@ button:disabled {
 .empty-state-card h2,
 .empty-workspace-panel h2 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 0;
@@ -1264,7 +1264,7 @@ button:disabled {
   overflow: hidden;
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   color: #efe6d8;
   text-align: left;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
@@ -1273,7 +1273,7 @@ button:disabled {
 .mission-client-card:hover,
 .mission-client-card.active {
   border-color: rgba(193, 255, 36, 0.55);
-  background: #0c263d;
+  background: #1d1a23;
 }
 
 .mission-client-card-main {
@@ -1294,7 +1294,7 @@ button:disabled {
 
 .mission-client-card-main:focus-visible,
 .mission-client-portal-icon:focus-visible {
-  outline: 2px solid #e08a4d;
+  outline: 2px solid #e08a4e;
   outline-offset: -2px;
 }
 
@@ -1306,15 +1306,15 @@ button:disabled {
   height: 34px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 8px;
-  background: #112c43;
-  color: #e08a4d;
+  background: #1d1a23;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 700;
 }
 
 .mission-client-name {
   overflow: hidden;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.2;
@@ -1346,7 +1346,7 @@ button:disabled {
   border: 1px solid rgba(201, 248, 43, 0.28);
   border-radius: 6px;
   background: rgba(201, 248, 43, 0.07);
-  color: #e08a4d;
+  color: #e08a4e;
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -1383,7 +1383,7 @@ button:disabled {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #8fa771;
+  background: #7fc4c9;
 }
 
 .mission-client-foot {
@@ -1395,7 +1395,7 @@ button:disabled {
 }
 
 .mission-client-foot strong {
-  color: #e08a4d;
+  color: #e08a4e;
   font-weight: 500;
 }
 
@@ -1415,7 +1415,7 @@ button:disabled {
 }
 
 .client-health-on_track {
-  color: #e08a4d !important;
+  color: #e08a4e !important;
 }
 
 .client-health-at_risk {
@@ -1437,7 +1437,7 @@ button:disabled {
 }
 
 .risk-low {
-  color: #e08a4d !important;
+  color: #e08a4e !important;
 }
 
 .risk-medium {
@@ -1452,7 +1452,7 @@ button:disabled {
   overflow: hidden;
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
 }
 
@@ -1472,7 +1472,7 @@ button:disabled {
 
 .mission-panel-head h2 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 15px;
   font-weight: 650;
   letter-spacing: 0;
@@ -1480,7 +1480,7 @@ button:disabled {
 
 .mission-panel-head p {
   margin: 4px 0 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
 }
 
@@ -1501,7 +1501,7 @@ button:disabled {
   border: 1px solid rgba(193, 255, 36, 0.28);
   border-radius: 8px;
   background: transparent;
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 12px;
   font-size: 12px;
   font-weight: 500;
@@ -1526,7 +1526,7 @@ button:disabled {
 }
 
 .attention-table th {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   font-weight: 650;
   text-transform: uppercase;
@@ -1577,7 +1577,7 @@ button:disabled {
   gap: 9px;
   border: 0;
   background: transparent;
-  color: #faf6ee;
+  color: #f2efe9;
   padding: 0;
   text-align: left;
   font-weight: 550;
@@ -1590,8 +1590,8 @@ button:disabled {
   width: 25px;
   height: 25px;
   border-radius: 6px;
-  background: #14334c;
-  color: #e08a4d;
+  background: #241f2c;
+  color: #e08a4e;
   font-size: 9px;
   font-weight: 700;
 }
@@ -1601,7 +1601,7 @@ button:disabled {
   min-height: 28px;
   border: 1px solid rgba(160, 148, 128, 0.24);
   border-radius: 6px;
-  background: #0f2a43;
+  background: #1d1a23;
   color: #efe6d8;
   padding: 0 10px;
   font-size: 11px;
@@ -1653,15 +1653,15 @@ button:disabled {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: #14334c;
-  color: #e08a4d;
+  background: #241f2c;
+  color: #e08a4e;
   font-size: 9px;
   font-weight: 700;
 }
 
 .timeline-client strong {
   overflow: hidden;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1700,7 +1700,7 @@ button:disabled {
 }
 
 .timeline-bar-on_hold {
-  background: linear-gradient(90deg, #526174, #7b8797);
+  background: linear-gradient(90deg, #2e2a36, #7b8797);
 }
 
 .timeline-marker {
@@ -1712,14 +1712,14 @@ button:disabled {
   height: 25px;
   border: 2px solid currentColor;
   border-radius: 50%;
-  background: #272219;
+  background: #1d1a23;
   font-size: 11px;
   font-weight: 700;
 }
 
 .timeline-marker-milestone {
   border-radius: 6px;
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .timeline-marker-risk,
@@ -1796,7 +1796,7 @@ button:disabled {
   gap: 6px;
   min-height: 62px;
   padding: 11px 12px;
-  color: #221f1b;
+  color: #1d1a23;
 }
 
 .ghl-pipeline-stage-head strong {
@@ -1867,7 +1867,7 @@ button:disabled {
 .ghl-opportunity-card {
   border: 1px solid rgba(160, 148, 128, 0.16);
   border-radius: 8px;
-  background: #0d2236;
+  background: #1d1a23;
   padding: 10px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
@@ -1895,7 +1895,7 @@ button:disabled {
   height: 27px;
   border: 1px solid rgba(103, 232, 249, 0.35);
   border-radius: 50%;
-  background: #102b45;
+  background: #1d1a23;
   color: #d9f9ff;
   font-size: 9px;
   font-weight: 700;
@@ -1922,7 +1922,7 @@ button:disabled {
 }
 
 .ghl-opportunity-card dt {
-  color: #a89d8c;
+  color: #a49e92;
   font-weight: 650;
 }
 
@@ -1939,7 +1939,7 @@ button:disabled {
   justify-content: space-between;
   gap: 8px;
   margin-top: 10px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   font-weight: 550;
 }
@@ -1954,7 +1954,7 @@ button:disabled {
 .ghl-opportunity-card-foot svg {
   width: 13px;
   height: 13px;
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .ghl-pipeline-empty,
@@ -1962,7 +1962,7 @@ button:disabled {
   margin: 0;
   border: 1px dashed rgba(160, 148, 128, 0.24);
   border-radius: 8px;
-  color: #a89d8c;
+  color: #a49e92;
   padding: 12px;
   font-size: 12px;
   line-height: 1.4;
@@ -1971,7 +1971,7 @@ button:disabled {
 .ghl-pipeline-more {
   border-style: solid;
   background: rgba(193, 255, 36, 0.06);
-  color: #e08a4d;
+  color: #e08a4e;
   font-weight: 650;
   text-align: center;
 }
@@ -2019,7 +2019,7 @@ button:disabled {
 }
 
 .mission-shell-light .mission-nav button {
-  color: #544c42;
+  color: #3a3545;
 }
 
 .mission-shell-light .mission-nav button.active,
@@ -2035,7 +2035,7 @@ button:disabled {
 }
 
 .mission-shell-light .mission-side-section span {
-  color: #585045;
+  color: #46404f;
 }
 
 /* Light-theme status badges: the base colors are tuned for the dark shell and
@@ -2053,17 +2053,17 @@ button:disabled {
   background: #fdeceb;
 }
 .mission-shell-light .client-health-on_hold {
-  color: #475467 !important;
+  color: #2e2a36 !important;
   background: #eef1f5;
 }
 
 .mission-shell-light .mission-side-section button {
-  color: #463f37;
+  color: #2e2a36;
 }
 
 .mission-shell-light .mission-side-section button:hover {
   background: #fbf4e9;
-  color: #463f37;
+  color: #2e2a36;
 }
 
 .mission-shell-light .mission-side-section button.active {
@@ -2077,7 +2077,7 @@ button:disabled {
 .mission-shell-light .theme-toggle {
   border-color: #d6dee8;
   background: #f9f4ed;
-  color: #544c42;
+  color: #3a3545;
 }
 
 .mission-shell-light .product-switcher,
@@ -2095,7 +2095,7 @@ button:disabled {
 .dashboard-shell-light .product-switcher button {
   border-color: #dcd3c4;
   background: #f9f4ed;
-  color: #253348;
+  color: #241f2c;
 }
 
 .mission-shell-light .product-switcher button:hover,
@@ -2104,7 +2104,7 @@ button:disabled {
 .dashboard-shell-light .product-switcher button.active {
   border-color: rgba(198, 113, 57, 0.35);
   background: #fbf4e9;
-  color: #10213d;
+  color: #1d1a23;
 }
 
 .mission-shell-light .product-switcher-mark,
@@ -2141,7 +2141,7 @@ button:disabled {
 .dashboard-shell-light .attachment-lenses button {
   border-color: #dcd3c4;
   background: #f9f4ed;
-  color: #544c42;
+  color: #3a3545;
 }
 
 .mission-shell-light .environment-switcher button:hover,
@@ -2203,20 +2203,20 @@ button:disabled {
 .mission-shell-light .backup-settings input,
 .dashboard-shell-light .backup-settings input {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
   color: #241f1a;
 }
 
 .mission-shell-light .backup-row,
 .dashboard-shell-light .backup-row {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
 }
 
 .mission-shell-light .template-card,
 .dashboard-shell-light .template-card {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
 }
 
 .mission-shell-light .template-pill-legacy,
@@ -2247,8 +2247,8 @@ button:disabled {
 .mission-shell-light .backup-primary-action.secondary,
 .dashboard-shell-light .backup-primary-action.secondary {
   border-color: #dcd3c4;
-  background: #faf6ee;
-  color: #463f37;
+  background: #f2efe9;
+  color: #2e2a36;
 }
 
 .mission-shell-light .empty-state-card,
@@ -2327,7 +2327,7 @@ button:disabled {
 .dashboard-shell-light .mission-secondary {
   border-color: #bae6fd;
   background: #ecfeff;
-  color: #0369a1;
+  color: #2e2a36;
 }
 
 .modal-backdrop-light {
@@ -2387,7 +2387,7 @@ button:disabled {
 }
 
 .mission-shell-light .mission-client-foot strong {
-  color: #0e7490;
+  color: #2e2a36;
 }
 
 .mission-shell-light .mission-client-card:hover,
@@ -2439,7 +2439,7 @@ button:disabled {
 }
 
 .mission-shell-light .attention-table td {
-  color: #263445;
+  color: #241f2c;
 }
 
 .mission-shell-light .attention-client {
@@ -2485,7 +2485,7 @@ button:disabled {
 }
 
 .mission-shell-light .ghl-opportunity-card dd {
-  color: #463f37;
+  color: #2e2a36;
 }
 
 .mission-shell-light .ghl-pipeline-empty {
@@ -2541,7 +2541,7 @@ button:disabled {
 .mission-shell-light .walkthrough-secondary,
 .dashboard-shell-light .walkthrough-secondary {
   border-color: #d6dee8;
-  color: #544c42;
+  color: #3a3545;
 }
 
 .mission-shell-light .walkthrough-primary,
@@ -2630,7 +2630,7 @@ button:disabled {
 
 .stage-expand-toggle:hover {
   border-color: rgba(123, 135, 152, 0.55);
-  color: #585045;
+  color: #46404f;
 }
 
 .phase-nav {
@@ -2684,7 +2684,7 @@ button:disabled {
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: #544c42;
+  color: #3a3545;
   padding: 0 10px;
   text-align: left;
   font-size: 13px;
@@ -2712,7 +2712,7 @@ button:disabled {
   border: 1px solid #dcd3c4;
   border-radius: 8px;
   background: #f4f7fb;
-  color: #544c42;
+  color: #3a3545;
   font-size: 11px;
   font-weight: 650;
   letter-spacing: 0.04em;
@@ -2793,7 +2793,7 @@ button:disabled {
 .phase-accent-postlaunch {
   background: linear-gradient(180deg, #faf5ff 0%, #f2e8ff 100%);
   border-color: #dcc4ff;
-  color: #7c3aed;
+  color: #2e2a36;
 }
 
 .phase-accent-support {
@@ -2817,7 +2817,7 @@ button:disabled {
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
-  color: #463f37;
+  color: #2e2a36;
   padding: 7px 8px;
   text-align: left;
 }
@@ -2904,7 +2904,7 @@ button:disabled {
   border: 1px solid transparent;
   border-radius: 7px;
   background: transparent;
-  color: #544c42;
+  color: #3a3545;
   padding: 6px 7px;
   text-align: left;
 }
@@ -2913,7 +2913,7 @@ button:disabled {
 .category-nav-task.active {
   border-color: #e5dbca;
   background: #f9f4ed;
-  color: #10213d;
+  color: #1d1a23;
 }
 
 .category-task-state {
@@ -3290,7 +3290,7 @@ button:disabled {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #544c42;
+  color: #3a3545;
   font-size: 12px;
   font-weight: 500;
 }
@@ -3364,7 +3364,7 @@ button:disabled {
   margin: 8px 8px 0;
   border: 1px solid rgba(32, 30, 29, 0.08);
   border-radius: 8px;
-  color: #221f1b;
+  color: #1d1a23;
   padding: 11px 12px;
   align-content: center;
 }
@@ -3377,7 +3377,7 @@ button:disabled {
 
 .column-header strong {
   overflow: hidden;
-  color: #221f1b;
+  color: #1d1a23;
   font-size: 14px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -3391,7 +3391,7 @@ button:disabled {
      read as muddy smears twice now; don't reintroduce them. */
   background: #f9f4ed;
   border: 1px solid rgba(32, 30, 29, 0.08);
-  color: #221f1b;
+  color: #1d1a23;
   font-size: 11px;
   font-weight: 650;
   line-height: 1;
@@ -3468,7 +3468,7 @@ button:disabled {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   font-weight: 550;
 }
@@ -3487,7 +3487,7 @@ button:disabled {
   min-width: 0;
   border: 1px solid #bfd2e6;
   border-radius: 8px;
-  background: #faf6ee;
+  background: #f2efe9;
   color: #201e1d;
   padding: 8px 9px;
   font-size: 12px;
@@ -3539,7 +3539,7 @@ button:disabled {
 
 .task-card-details dd {
   overflow: hidden;
-  color: #463f37;
+  color: #2e2a36;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -3599,7 +3599,7 @@ button:disabled {
   min-height: 26px;
   border-radius: 999px;
   background: #f1f5f9;
-  color: #526071;
+  color: #2e2a36;
   padding: 0 8px;
   font-size: 11px;
   font-weight: 500;
@@ -3670,7 +3670,7 @@ button:disabled {
   min-height: 30px;
   border-radius: 999px;
   border: 1px solid rgba(198, 113, 57, 0.18);
-  background: #faf6ee;
+  background: #f2efe9;
   color: #c67139;
   padding: 4px 10px 4px 6px;
 }
@@ -3799,7 +3799,7 @@ button:disabled {
   border: 1px dashed #bfd2e6;
   border-radius: 8px;
   background: #f7fbff;
-  color: #37516f;
+  color: #2e2a36;
   font-size: 12px;
   font-weight: 500;
   padding: 10px 12px;
@@ -3816,7 +3816,7 @@ button:disabled {
 .category-panel-drop-target {
   border-color: #8fb3f8;
   box-shadow: 0 0 0 2px rgba(143, 179, 248, 0.18);
-  background: #faf6ee;
+  background: #f2efe9;
 }
 
 .category-panel-head {
@@ -3878,7 +3878,7 @@ progress::-webkit-progress-value {
   border: 1px solid #e0e7ef;
   border-radius: 8px;
   background: #fcf7ee;
-  color: #263445;
+  color: #241f2c;
   padding: 7px 9px;
   text-align: left;
 }
@@ -3892,7 +3892,7 @@ progress::-webkit-progress-value {
   border: 1px solid #e0e7ef;
   border-radius: 8px;
   background: #fcf7ee;
-  color: #263445;
+  color: #241f2c;
   padding: 7px 9px;
   text-align: left;
 }
@@ -3997,7 +3997,7 @@ progress::-webkit-progress-value {
 .inspector label {
   display: grid;
   gap: 7px;
-  color: #544c42;
+  color: #3a3545;
   font-size: 12px;
   font-weight: 500;
 }
@@ -4040,7 +4040,7 @@ progress::-webkit-progress-value {
   grid-template-columns: 18px minmax(0, 1fr);
   align-items: start;
   gap: 10px !important;
-  color: #263445 !important;
+  color: #241f2c !important;
 }
 
 .portal-toggle input {
@@ -4092,7 +4092,7 @@ progress::-webkit-progress-value {
 }
 
 .dependency-list button span {
-  color: #263445;
+  color: #241f2c;
   font-size: 12px;
   line-height: 1.3;
 }
@@ -4187,7 +4187,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   border: 1px solid rgba(193, 255, 36, 0.24);
   border-radius: 8px;
-  background: #191612;
+  background: #131118;
   color: #f4ece0;
   box-shadow: 0 34px 110px rgba(0, 0, 0, 0.46);
 }
@@ -4196,7 +4196,7 @@ progress::-webkit-progress-value {
   min-height: 100vh;
   background:
     radial-gradient(circle at 15% 0%, rgba(45, 212, 191, 0.12), transparent 28%),
-    linear-gradient(180deg, #1c1916 0%, #071a2b 46%, #1c1916 100%);
+    linear-gradient(180deg, #131118 0%, #131118 46%, #131118 100%);
   color: #f4ece0;
   padding: 22px;
 }
@@ -4204,7 +4204,7 @@ progress::-webkit-progress-value {
 .training-page-shell-light {
   background:
     radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.1), transparent 28%),
-    linear-gradient(180deg, #faf6ee 0%, #eef4fb 100%);
+    linear-gradient(180deg, #f2efe9 0%, #eef4fb 100%);
   color: #241f1a;
 }
 
@@ -4269,7 +4269,7 @@ progress::-webkit-progress-value {
 .training-admin-toggle.active {
   border-color: rgba(193, 255, 36, 0.38);
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .training-product-switcher,
@@ -4297,7 +4297,7 @@ progress::-webkit-progress-value {
 .training-product-switcher button.active,
 .training-theme-toggle button.active {
   background: rgba(193, 255, 36, 0.16);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .training-page-shell-light .training-product-switcher button.active,
@@ -4320,7 +4320,7 @@ progress::-webkit-progress-value {
 
 .training-room-page .training-room-head h1 {
   margin: 8px 0 5px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: clamp(28px, 3vw, 46px);
   line-height: 1.02;
 }
@@ -4364,7 +4364,7 @@ progress::-webkit-progress-value {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -4372,14 +4372,14 @@ progress::-webkit-progress-value {
 
 .training-room-head h2 {
   margin: 8px 0 5px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 28px;
   line-height: 1.1;
 }
 
 .training-room-head p {
   margin: 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 13px;
   font-weight: 500;
 }
@@ -4402,7 +4402,7 @@ progress::-webkit-progress-value {
   width: 100%;
   border: 1px solid rgba(160, 148, 128, 0.22);
   border-radius: 8px;
-  background: #0d2236;
+  background: #1d1a23;
   color: #f4ece0;
   outline: 0;
 }
@@ -4453,13 +4453,13 @@ progress::-webkit-progress-value {
 
 .training-room-stat span,
 .training-room-stat small {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   font-weight: 500;
 }
 
 .training-room-stat strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 28px;
 }
 
@@ -4520,7 +4520,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(160, 148, 128, 0.22);
   border-radius: 7px;
   background: rgba(10, 32, 53, 0.82);
-  color: #e08a4d;
+  color: #e08a4e;
   cursor: pointer;
 }
 
@@ -4538,7 +4538,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.34);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.14);
-  color: #e08a4d;
+  color: #e08a4e;
   font-weight: 650;
 }
 
@@ -4549,7 +4549,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
   background: rgba(160, 148, 128, 0.08);
-  color: #a89d8c;
+  color: #a49e92;
   padding: 12px;
   font-size: 12px;
   font-weight: 600;
@@ -4566,7 +4566,7 @@ progress::-webkit-progress-value {
 .training-empty {
   border: 1px dashed rgba(160, 148, 128, 0.28);
   border-radius: 8px;
-  color: #a89d8c;
+  color: #a49e92;
   padding: 24px;
   text-align: center;
 }
@@ -4593,7 +4593,7 @@ progress::-webkit-progress-value {
 }
 
 .training-category summary span {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 15px;
   font-weight: 700;
 }
@@ -4605,7 +4605,7 @@ progress::-webkit-progress-value {
   height: 28px;
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 12px;
 }
 
@@ -4622,7 +4622,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
 }
 
 .training-video-frame {
@@ -4630,7 +4630,7 @@ progress::-webkit-progress-value {
   position: relative;
   overflow: hidden;
   aspect-ratio: 16 / 9;
-  background: #04111f;
+  background: #131118;
 }
 
 .training-video-preview {
@@ -4638,7 +4638,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   width: 100%;
   height: 100%;
-  background: #04111f;
+  background: #131118;
 }
 
 .training-video-preview iframe {
@@ -4659,7 +4659,7 @@ progress::-webkit-progress-value {
 }
 
 .training-video-preview-button:focus-visible {
-  outline: 2px solid #e08a4d;
+  outline: 2px solid #e08a4e;
   outline-offset: -4px;
 }
 
@@ -4675,7 +4675,7 @@ progress::-webkit-progress-value {
   place-items: center;
   align-content: center;
   gap: 8px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   font-weight: 650;
 }
@@ -4691,7 +4691,7 @@ progress::-webkit-progress-value {
   width: fit-content;
   border-radius: 999px;
   background: rgba(45, 212, 191, 0.12);
-  color: #8fa771;
+  color: #7fc4c9;
   padding: 4px 8px;
   font-size: 10px;
   font-weight: 650;
@@ -4700,7 +4700,7 @@ progress::-webkit-progress-value {
 
 .training-card h3 {
   margin: 9px 0 6px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 16px;
   line-height: 1.25;
 }
@@ -4738,7 +4738,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.26);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 10px;
   font-size: 11px;
   font-weight: 650;
@@ -4768,7 +4768,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   border: 1px solid rgba(193, 255, 36, 0.28);
   border-radius: 8px;
-  background: #191612;
+  background: #131118;
   color: #f4ece0;
   box-shadow: 0 34px 120px rgba(0, 0, 0, 0.54);
 }
@@ -4789,7 +4789,7 @@ progress::-webkit-progress-value {
 .training-player-head span {
   display: inline-flex;
   width: fit-content;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -4797,7 +4797,7 @@ progress::-webkit-progress-value {
 
 .training-player-head h2 {
   margin: 4px 0 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: clamp(18px, 2.2vw, 26px);
   line-height: 1.16;
 }
@@ -4819,7 +4819,7 @@ progress::-webkit-progress-value {
   aspect-ratio: 16 / 9;
   width: 100%;
   max-height: min(68vh, 640px);
-  background: #020916;
+  background: #131118;
 }
 
 .training-player-foot {
@@ -4841,7 +4841,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.3);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.11);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 12px;
   font-size: 12px;
   font-weight: 650;
@@ -4871,7 +4871,7 @@ progress::-webkit-progress-value {
 
 .training-player-light .training-player-head button {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
   color: #241f1a;
 }
 
@@ -4886,7 +4886,7 @@ progress::-webkit-progress-value {
 
 .training-room-light {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
   color: #241f1a;
   box-shadow: 0 34px 110px rgba(32, 30, 29, 0.28);
 }
@@ -4954,7 +4954,7 @@ progress::-webkit-progress-value {
 
 .training-room-light .training-category-order-row button {
   border-color: #dcd3c4;
-  background: #faf6ee;
+  background: #f2efe9;
   color: #a85c2c;
 }
 
@@ -5079,7 +5079,7 @@ progress::-webkit-progress-value {
 .task-detail-modal label {
   display: grid;
   gap: 7px;
-  color: #544c42;
+  color: #3a3545;
   font-size: 12px;
   font-weight: 500;
 }
@@ -5104,7 +5104,7 @@ progress::-webkit-progress-value {
   gap: 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #faf6ee;
+  background: #f2efe9;
   padding: 13px;
 }
 
@@ -5144,25 +5144,26 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark {
-  --background: #1c1916;
-  --foreground: #f4ece0;
-  --muted: #a89d8c;
-  --border: rgba(160, 148, 128, 0.18);
-  --panel: #272219;
-  --panel-soft: #312a20;
-  --ink: #faf6ee;
-  --cobalt: #e08a4d;
-  --mint: #8fa771;
+  /* Matched to the client portal's handoff dark scheme (2026-08-12) */
+  --background: #131118;
+  --foreground: #f2efe9;
+  --muted: #a49e92;
+  --border: #2e2a36;
+  --panel: #1d1a23;
+  --panel-soft: #241f2c;
+  --ink: #f2efe9;
+  --cobalt: #e08a4e;
+  --mint: #7fc4c9;
   --amber: #f5b22c;
-  --red: #ff6961;
-  --shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
-  background: #1c1916;
-  color: #f4ece0;
+  --red: #ff8a7a;
+  --shadow: 0 12px 26px -16px rgba(0, 0, 0, 0.6);
+  background: #131118;
+  color: #f2efe9;
 }
 
 .dashboard-shell-dark .side-rail {
   border-right-color: rgba(160, 148, 128, 0.18);
-  background: #05101d;
+  background: #131118;
 }
 
 .dashboard-shell-dark .rail-section-nav {
@@ -5181,13 +5182,13 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .stage-expand-toggle:hover {
   border-color: rgba(193, 255, 36, 0.4);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .brand-mark {
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background-color: #102333;
+  background-color: #1d1a23;
 }
 
 .dashboard-shell-dark .brand strong,
@@ -5199,7 +5200,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-modal-summary strong,
 .dashboard-shell-dark .inspector-section-title,
 .dashboard-shell-dark .dependency-list button span {
-  color: #faf6ee;
+  color: #f2efe9;
 }
 
 .dashboard-shell-dark .brand span,
@@ -5215,7 +5216,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-modal-summary span,
 .dashboard-shell-dark .dependency-list button em,
 .dashboard-shell-dark .saving {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .view-nav,
@@ -5245,7 +5246,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .category-nav-task.active {
   border-color: rgba(193, 255, 36, 0.32);
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .phase-label,
@@ -5309,18 +5310,18 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .category-task-state {
   border-color: rgba(160, 148, 128, 0.32);
   background: rgba(160, 148, 128, 0.06);
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .category-state-done,
 .dashboard-shell-dark .category-task-state-done {
   border-color: rgba(193, 255, 36, 0.5);
   background: rgba(193, 255, 36, 0.16);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .workspace {
-  background: #1c1916;
+  background: #131118;
 }
 
 .dashboard-shell-dark .theme-toggle,
@@ -5337,7 +5338,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-detail-modal select,
 .dashboard-shell-dark .task-detail-modal textarea {
   border-color: rgba(160, 148, 128, 0.28);
-  background: #241f18;
+  background: #1d1a23;
   color: #eaf2fb;
 }
 
@@ -5346,7 +5347,7 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .search-box input {
-  color: #faf6ee;
+  color: #f2efe9;
 }
 
 .dashboard-shell-dark .search-box input::placeholder,
@@ -5368,8 +5369,8 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .new-task button,
 .dashboard-shell-dark .inspector-footer button,
 .dashboard-shell-dark .task-modal-primary {
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
 }
 
 .dashboard-shell-dark .new-task button:disabled,
@@ -5388,12 +5389,12 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .inspector,
 .dashboard-shell-dark .task-detail-modal {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #272219;
+  background: #1d1a23;
   box-shadow: var(--shadow);
 }
 
 .dashboard-shell-dark .metric strong {
-  color: #faf6ee;
+  color: #f2efe9;
 }
 
 .dashboard-shell-dark .stage-progress-track {
@@ -5402,13 +5403,13 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .segmented {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #241f18;
+  background: #1d1a23;
 }
 
 .dashboard-shell-dark .segmented button.active,
 .dashboard-shell-dark .status-grid button.active {
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .storage-notice {
@@ -5429,7 +5430,7 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .board-column {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #071827;
+  background: #131118;
 }
 
 .dashboard-shell-dark .column-header {
@@ -5437,19 +5438,19 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .column-header strong {
-  color: #221f1b;
+  color: #1d1a23;
 }
 
 .dashboard-shell-dark .task-card {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #0d2236;
+  background: #1d1a23;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
 }
 
 .dashboard-shell-dark .task-card:hover,
 .dashboard-shell-dark .task-card-active {
   border-color: rgba(193, 255, 36, 0.55);
-  background: #102842;
+  background: #1d1a23;
 }
 
 .dashboard-shell-dark .task-title-edit {
@@ -5465,14 +5466,14 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .task-card .avatar {
   border-color: rgba(103, 232, 249, 0.35);
-  background: #102b45;
+  background: #1d1a23;
   color: #d9f9ff;
 }
 
 .dashboard-shell-dark .task-card-details dt,
 .dashboard-shell-dark .task-card-footer,
 .dashboard-shell-dark .drag-handle {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .task-card-details dd {
@@ -5480,8 +5481,8 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .avatar {
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
 }
 
 .dashboard-shell-dark .mini-meta,
@@ -5496,7 +5497,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .loom-card-indicator {
   border-color: rgba(45, 212, 191, 0.32);
   background: rgba(45, 212, 191, 0.12);
-  color: #8fa771;
+  color: #7fc4c9;
 }
 
 .dashboard-shell-dark .dependency-open {
@@ -5507,7 +5508,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .portal-chip {
   border-color: rgba(193, 255, 36, 0.28);
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .blocked-chip {
@@ -5539,17 +5540,17 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .client-task-toggle-copy em {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .client-task-toggle-on {
   border-color: rgba(193, 255, 36, 0.34);
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .client-task-toggle-on .client-task-toggle-knob {
-  background: #e08a4d;
+  background: #e08a4e;
   box-shadow: 0 0 0 3px rgba(193, 255, 36, 0.16);
 }
 
@@ -5565,13 +5566,13 @@ progress::-webkit-progress-value {
 
 .dashboard-shell-dark .task-actions button {
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .task-loom-trigger,
 .dashboard-shell-dark .task-portal-action-trigger {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #071827;
+  background: #131118;
   color: #efe6d8;
 }
 
@@ -5580,7 +5581,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .loom-watch-link {
   border-color: rgba(45, 212, 191, 0.32);
   background: rgba(45, 212, 191, 0.12);
-  color: #8fa771;
+  color: #7fc4c9;
 }
 
 .dashboard-shell-dark .task-portal-action-trigger.active,
@@ -5588,20 +5589,20 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .portal-action-preview-link {
   border-color: rgba(193, 255, 36, 0.34);
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .loom-editor,
 .dashboard-shell-dark .portal-action-editor {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #081b2d;
+  background: #131118;
 }
 
 .dashboard-shell-dark .priority-low,
 .dashboard-shell-dark .priority-normal {
   border: 1px solid rgba(193, 255, 36, 0.38);
   background: rgba(193, 255, 36, 0.09);
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .priority-high {
@@ -5625,7 +5626,7 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .category-panel-head b {
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .dashboard-shell-dark .category-admin-banner {
@@ -5644,18 +5645,18 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .dependency-list button,
 .dashboard-shell-dark .status-grid button {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #0f2a43;
+  background: #1d1a23;
   color: #efe6d8;
 }
 
 .dashboard-shell-dark .category-task-row {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #0f2a43;
+  background: #1d1a23;
   color: #efe6d8;
 }
 
 .dashboard-shell-dark .category-task-row-meta span {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .category-task-list em {
@@ -5672,15 +5673,15 @@ progress::-webkit-progress-value {
 }
 
 .dashboard-shell-dark .portal-toggle {
-  color: #faf6ee !important;
+  color: #f2efe9 !important;
 }
 
 .dashboard-shell-dark .portal-toggle input {
-  accent-color: #e08a4d;
+  accent-color: #e08a4e;
 }
 
 .dashboard-shell-dark .portal-toggle small {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .dashboard-shell-dark .inspector-footer,
@@ -5696,7 +5697,7 @@ progress::-webkit-progress-value {
 .dashboard-shell-dark .task-modal-secondary,
 .dashboard-shell-dark .task-modal-summary div {
   border-color: rgba(160, 148, 128, 0.18);
-  background: #071827;
+  background: #131118;
   color: #efe6d8;
 }
 
@@ -5708,7 +5709,7 @@ progress::-webkit-progress-value {
 .client-portal-shell {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, #1c1916 0%, #071a2b 48%, #1c1916 100%);
+    linear-gradient(180deg, #131118 0%, #131118 48%, #131118 100%);
   color: #f4ece0;
   padding: 24px;
 }
@@ -5718,7 +5719,7 @@ progress::-webkit-progress-value {
   margin: 0 auto 16px;
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
 }
 
@@ -5761,7 +5762,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.32);
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 12px;
   font-size: 11px;
   font-weight: 700;
@@ -5775,7 +5776,7 @@ progress::-webkit-progress-value {
   height: 38px;
   border: 1px solid rgba(193, 255, 36, 0.55);
   border-radius: 50%;
-  background-color: #102333;
+  background-color: #1d1a23;
 }
 
 .portal-brand strong,
@@ -5791,13 +5792,13 @@ progress::-webkit-progress-value {
 }
 
 .portal-brand strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 16px;
 }
 
 .portal-brand span {
   margin-top: 2px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
 }
 
@@ -5812,7 +5813,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-health-on_track {
-  color: #e08a4d;
+  color: #e08a4e;
 }
 
 .portal-health-at_risk {
@@ -5846,14 +5847,14 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.32);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.08);
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 12px;
   font-weight: 700;
 }
 
 .portal-hero-copy h1 {
   margin: 14px 0 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: clamp(34px, 5vw, 58px);
   font-weight: 700;
   line-height: 0.98;
@@ -5863,7 +5864,7 @@ progress::-webkit-progress-value {
 .portal-company-name {
   display: block;
   margin-top: 10px;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 14px;
   font-weight: 650;
   letter-spacing: 0;
@@ -5899,7 +5900,7 @@ progress::-webkit-progress-value {
 .portal-meta-grid dt,
 .portal-summary-strip span,
 .portal-progress-panel span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
@@ -5907,7 +5908,7 @@ progress::-webkit-progress-value {
 
 .portal-meta-grid dd {
   margin: 6px 0 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 13px;
   font-weight: 550;
 }
@@ -5930,7 +5931,7 @@ progress::-webkit-progress-value {
   width: 112px;
   height: 112px;
   border-radius: 50%;
-  background: conic-gradient(#e08a4d 0deg var(--portal-progress), rgba(160, 148, 128, 0.18) var(--portal-progress) 360deg);
+  background: conic-gradient(#e08a4e 0deg var(--portal-progress), rgba(160, 148, 128, 0.18) var(--portal-progress) 360deg);
 }
 
 .portal-progress-ring::before {
@@ -5946,14 +5947,14 @@ progress::-webkit-progress-value {
   position: relative;
   z-index: 1;
   grid-area: 1 / 1;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 25px;
   font-weight: 700;
 }
 
 .portal-progress-panel strong {
   margin-top: 7px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 18px;
   line-height: 1.25;
 }
@@ -5979,12 +5980,12 @@ progress::-webkit-progress-value {
 
 .portal-summary-strip div {
   min-height: 94px;
-  background: #272219;
+  background: #1d1a23;
 }
 
 .portal-summary-strip strong {
   margin-top: 9px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 19px;
   font-weight: 650;
   line-height: 1.25;
@@ -5998,7 +5999,7 @@ progress::-webkit-progress-value {
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(193, 255, 36, 0.1), rgba(45, 212, 191, 0.05) 42%, transparent 74%),
-    #272219;
+    #1d1a23;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
@@ -6021,7 +6022,7 @@ progress::-webkit-progress-value {
 .portal-focus-eyebrow,
 .portal-resource-list h4 {
   display: block;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -6030,7 +6031,7 @@ progress::-webkit-progress-value {
 .portal-guided-head h2,
 .portal-focus-card h3 {
   margin: 6px 0 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 26px;
   font-weight: 700;
   letter-spacing: 0;
@@ -6060,7 +6061,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-guided-progress span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -6068,7 +6069,7 @@ progress::-webkit-progress-value {
 
 .portal-guided-progress strong {
   margin-top: 5px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 26px;
   font-weight: 700;
 }
@@ -6085,7 +6086,7 @@ progress::-webkit-progress-value {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #e08a4d;
+  background: #e08a4e;
 }
 
 .portal-guided-layout {
@@ -6120,7 +6121,7 @@ progress::-webkit-progress-value {
 
 .portal-step-active {
   border-color: rgba(193, 255, 36, 0.55);
-  background: #0d263d;
+  background: #1d1a23;
 }
 
 .portal-step-complete {
@@ -6138,13 +6139,13 @@ progress::-webkit-progress-value {
   height: 34px;
   border: 1px solid currentColor;
   border-radius: 50%;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 12px;
   font-weight: 700;
 }
 
 .portal-step-locked .portal-step-marker {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .portal-step-title {
@@ -6156,7 +6157,7 @@ progress::-webkit-progress-value {
 
 .portal-step-title strong {
   min-width: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 14px;
   font-weight: 650;
   line-height: 1.35;
@@ -6166,7 +6167,7 @@ progress::-webkit-progress-value {
   flex: 0 0 auto;
   border: 1px solid currentColor;
   border-radius: 999px;
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 4px 8px;
   font-size: 10px;
   font-style: normal;
@@ -6175,14 +6176,14 @@ progress::-webkit-progress-value {
 }
 
 .portal-step-locked .portal-step-title em {
-  color: #a89d8c;
+  color: #a49e92;
 }
 
 .portal-step-card p,
 .portal-step-card small {
   display: block;
   margin: 7px 0 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   line-height: 1.45;
 }
@@ -6238,8 +6239,8 @@ progress::-webkit-progress-value {
 
 .portal-primary-action {
   border: 1px solid rgba(193, 255, 36, 0.48);
-  background: #e08a4d;
-  color: #191612;
+  background: #e08a4e;
+  color: #131118;
 }
 
 .portal-secondary-action {
@@ -6281,14 +6282,14 @@ progress::-webkit-progress-value {
 }
 
 .portal-resource-item span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .portal-resource-item strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 12px;
   line-height: 1.35;
 }
@@ -6319,8 +6320,8 @@ progress::-webkit-progress-value {
   width: 9px;
   height: 9px;
   margin-top: 5px;
-  border-right: 2px solid #e08a4d;
-  border-bottom: 2px solid #e08a4d;
+  border-right: 2px solid #e08a4e;
+  border-bottom: 2px solid #e08a4e;
   transform: rotate(-45deg);
   transition: transform 160ms ease;
 }
@@ -6336,14 +6337,14 @@ progress::-webkit-progress-value {
 }
 
 .portal-native-form-toggle strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 14px;
   font-weight: 700;
 }
 
 .portal-native-form-toggle small {
   margin-top: 4px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   line-height: 1.4;
 }
@@ -6353,7 +6354,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.35);
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.1);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 5px 8px;
   font-size: 10px;
   font-style: normal;
@@ -6379,7 +6380,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-native-form-intro strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 13px;
   line-height: 1.35;
 }
@@ -6388,7 +6389,7 @@ progress::-webkit-progress-value {
 .portal-form-section legend span,
 .portal-form-field small,
 .portal-form-submit-row span {
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   line-height: 1.45;
 }
@@ -6409,7 +6410,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-form-section legend strong {
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -6463,8 +6464,8 @@ progress::-webkit-progress-value {
   width: 100%;
   border: 1px solid rgba(160, 148, 128, 0.2);
   border-radius: 8px;
-  background: #272219;
-  color: #faf6ee;
+  background: #1d1a23;
+  color: #f2efe9;
   font: inherit;
   font-size: 13px;
   outline: none;
@@ -6507,7 +6508,7 @@ progress::-webkit-progress-value {
   width: 16px;
   height: 16px;
   margin: 1px 0 0;
-  accent-color: #e08a4d;
+  accent-color: #e08a4e;
 }
 
 .portal-form-option strong,
@@ -6516,14 +6517,14 @@ progress::-webkit-progress-value {
 }
 
 .portal-form-option strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 12px;
   line-height: 1.35;
 }
 
 .portal-form-option small {
   margin-top: 4px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   line-height: 1.4;
 }
@@ -6574,7 +6575,7 @@ progress::-webkit-progress-value {
   overflow: hidden;
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
 
@@ -6588,7 +6589,7 @@ progress::-webkit-progress-value {
 
 .portal-panel-head h2 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 17px;
   font-weight: 650;
   letter-spacing: 0;
@@ -6596,7 +6597,7 @@ progress::-webkit-progress-value {
 
 .portal-panel-head p {
   margin: 5px 0 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
   line-height: 1.4;
 }
@@ -6608,7 +6609,7 @@ progress::-webkit-progress-value {
   height: 28px;
   border-radius: 999px;
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 12px;
   font-weight: 650;
 }
@@ -6642,7 +6643,7 @@ progress::-webkit-progress-value {
   height: 30px;
   border: 1px solid currentColor;
   border-radius: 8px;
-  color: #e08a4d;
+  color: #e08a4e;
   font-size: 11px;
   font-weight: 700;
 }
@@ -6653,7 +6654,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-timeline-title strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 14px;
 }
 
@@ -6672,7 +6673,7 @@ progress::-webkit-progress-value {
 
 .portal-timeline-list p {
   margin: 6px 0 10px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
 }
 
@@ -6687,7 +6688,7 @@ progress::-webkit-progress-value {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #8fa771;
+  background: #7fc4c9;
 }
 
 .portal-action-row {
@@ -6710,14 +6711,14 @@ progress::-webkit-progress-value {
 }
 
 .portal-action-row strong {
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 13px;
   line-height: 1.35;
 }
 
 .portal-action-row span {
   margin-top: 6px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 11px;
   line-height: 1.35;
 }
@@ -6732,7 +6733,7 @@ progress::-webkit-progress-value {
   border: 1px solid rgba(193, 255, 36, 0.42);
   border-radius: 8px;
   background: rgba(193, 255, 36, 0.12);
-  color: #e08a4d;
+  color: #e08a4e;
   padding: 0 12px;
   font-size: 12px;
   font-weight: 650;
@@ -6756,7 +6757,7 @@ progress::-webkit-progress-value {
 }
 
 .portal-status-complete {
-  color: #e08a4d !important;
+  color: #e08a4e !important;
 }
 
 .portal-touchpoints-panel {
@@ -6781,21 +6782,21 @@ progress::-webkit-progress-value {
 
 .portal-touchpoint strong {
   margin-top: 12px;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 13px;
   line-height: 1.35;
 }
 
 .portal-touchpoint p {
   margin: 10px 0 0;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 12px;
 }
 
 .portal-empty {
   margin: 0;
   padding: 18px;
-  color: #a89d8c;
+  color: #a49e92;
   font-size: 13px;
   line-height: 1.45;
 }
@@ -6809,7 +6810,7 @@ progress::-webkit-progress-value {
   width: min(460px, calc(100vw - 32px));
   border: 1px solid rgba(160, 148, 128, 0.18);
   border-radius: 8px;
-  background: #272219;
+  background: #1d1a23;
   padding: 28px;
   text-align: center;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
@@ -6821,7 +6822,7 @@ progress::-webkit-progress-value {
 
 .portal-unavailable-panel h1 {
   margin: 0;
-  color: #faf6ee;
+  color: #f2efe9;
   font-size: 28px;
 }
 
