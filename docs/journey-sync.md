@@ -134,8 +134,14 @@ live databases: CSM → portal (`bss-008`, `bss-010` done; `bss-011` un-ticked;
 in-progress `bss-009` stays not-done) and Fin's real completion path → CSM
 (`bss-003` complete with its note).
 
-Not yet linked: Fin's real record (created in the portal admin when Jesse is
-ready, then linked to the Live CSM BSS client).
+Client mirror live too (CSM version `d25b73ab`): prod "Fin Test" was
+mirrored into Live BSS as `live-bss-fin-test-90a39b38` with its portal
+progress (`bss-001, 003, 004, 008, 010`, notes included), and a CSM tick/untick
+on it reached the portal. The CSM demo client is **unlinked** — only the Live
+mirror syncs.
+
+Fin's real record: create it in the portal admin; it appears in Live BSS on
+the next load, already linked.
 
 Known gap: a push that fails (portal down, bad deploy) is not retried — that
 task only catches up on its next change. A per-client "resync" that pushes all
