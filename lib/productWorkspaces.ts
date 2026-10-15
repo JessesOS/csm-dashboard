@@ -1,3 +1,5 @@
+import { bssClients } from "./bssClients";
+import { bssCategories, bssSeedTasks, bssSourceDocument, bssTeamMembers } from "./bssTasks";
 import { liveRespondClients, respondClients } from "./respondClients";
 import { categories, seedTasks, sourceDocument, teamMembers } from "./respondTasks";
 import { scaleClients } from "./scaleClients";
@@ -70,6 +72,19 @@ export const productWorkspaces: ProductWorkspace[] = [
     nextStepFallback: "Start Scale operational checklist",
     taskTemplateLabel: "Scale checklist",
   },
+  {
+    key: "bss",
+    label: "BSS Fin Creighton",
+    clientLabel: "BSS Fin Creighton",
+    shortLabel: "BSS",
+    description: "Custom CRM, website, and AI lead agent delivery for Bitcoin Success School.",
+    brandMark: "B",
+    defaultClientId: bssClients[0]?.id ?? "bss-fin-creighton-demo",
+    ownerFallback: "Jesse Allan",
+    currentTaskFallback: "Fresh BSS delivery template",
+    nextStepFallback: "Start BSS onboarding",
+    taskTemplateLabel: "BSS checklist",
+  },
 ];
 
 export const defaultProduct: ProductKey = "respond";
@@ -81,7 +96,9 @@ export function normalizeScaleVariant(value: string | null | undefined): ScaleVa
 }
 
 export function normalizeProduct(value: string | null | undefined): ProductKey {
-  return value === "scale" ? "scale" : "respond";
+  if (value === "scale") return "scale";
+  if (value === "bss") return "bss";
+  return "respond";
 }
 
 export function normalizeEnvironment(value: string | null | undefined): EnvironmentKey {
@@ -97,19 +114,27 @@ export function environmentConfig(environment: EnvironmentKey) {
 }
 
 export function productCategories(product: ProductKey, scaleVariant: ScaleVariant = defaultScaleVariant): Category[] {
-  return product === "scale" ? scaleCategoriesForVariant(scaleVariant) : categories;
+  if (product === "scale") return scaleCategoriesForVariant(scaleVariant);
+  if (product === "bss") return bssCategories;
+  return categories;
 }
 
 export function productTeamMembers(product: ProductKey): string[] {
-  return product === "scale" ? scaleTeamMembers : teamMembers;
+  if (product === "scale") return scaleTeamMembers;
+  if (product === "bss") return bssTeamMembers;
+  return teamMembers;
 }
 
 export function productTasks(product: ProductKey, scaleVariant: ScaleVariant = defaultScaleVariant): Task[] {
-  return product === "scale" ? scaleTasksForVariant(scaleVariant) : seedTasks;
+  if (product === "scale") return scaleTasksForVariant(scaleVariant);
+  if (product === "bss") return bssSeedTasks;
+  return seedTasks;
 }
 
 export function productClients(product: ProductKey): RespondClient[] {
-  return product === "scale" ? scaleClients : respondClients;
+  if (product === "scale") return scaleClients;
+  if (product === "bss") return bssClients;
+  return respondClients;
 }
 
 export function environmentProductClients(environment: EnvironmentKey, product: ProductKey): RespondClient[] {
@@ -121,7 +146,9 @@ export function environmentProductClients(environment: EnvironmentKey, product: 
 }
 
 export function productSourceDocument(product: ProductKey) {
-  return product === "scale" ? scaleSourceDocument : sourceDocument;
+  if (product === "scale") return scaleSourceDocument;
+  if (product === "bss") return bssSourceDocument;
+  return sourceDocument;
 }
 
-export const allSeedClients: RespondClient[] = [...respondClients, ...scaleClients, ...liveRespondClients];
+export const allSeedClients: RespondClient[] = [...respondClients, ...scaleClients, ...bssClients, ...liveRespondClients];
