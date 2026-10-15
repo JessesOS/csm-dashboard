@@ -1990,22 +1990,16 @@ async function reconcileJourneyClients() {
         continue;
       }
 
-      const { client } = await createClient({
-        environment: "live",
-        product: "bss",
-        name: portalClient.name,
-        companyName: portalClient.companyName,
-        owner: "Jesse Allan",
-      });
-
-      // createClient de-duplicates by name; never take over a client that is
-      // already linked to a different portal client.
-      const current = await d1.prepare("SELECT journey_client_id AS journeyClientId FROM clients WHERE id = ?").bind(client.id).first<{ journeyClientId: string }>();
-
-      if (current?.journeyClientId && current.journeyClientId !== portalClient.id) {
-        console.error(`[journey-sync] ${client.id} is already linked to ${current.journeyClientId}; not linking ${portalClient.id}`);
-        continue;
-      }
+      // The portal id is the identity, not the name: two portal clients can
+      // share a name or company. The id is derived from it, so if two page
+      // loads race, the second insert fails on the primary key (caught below)
+      // instead of creating a duplicate.
+      const client = await insertNewClient(
+        { environment: "live", product: "bss", name: portalClient.name, companyName: portalClient.companyName, owner: "Jesse Allan" },
+        "live",
+        "bss",
+        `live-bss-${slugify(portalClient.name) || "client"}-${portalClient.id.slice(0, 8)}`
+      );
 
       await d1.prepare("UPDATE clients SET journey_client_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(portalClient.id, client.id).run();
 
@@ -3306,44 +3300,21 @@ async function updateExistingClientIdentity(client: RespondClient, payload: Clie
   return row ? fromClientRow(row) : client;
 }
 
-export async function createClient(payload: ClientCreatePayload) {
-  await ensureTaskStorage();
-  const name = payload.name?.trim();
-  const companyName = payload.companyName?.trim() ?? "";
-  const environment = normalizeEnvironment(payload.environment);
-  const product = normalizeProduct(payload.product);
+/**
+ * Insert a brand-new client and seed its template tasks — no identity
+ * de-duplication. Pass `explicitId` to make the insert idempotent (a second
+ * insert with the same id fails on the primary key instead of duplicating).
+ */
+async function insertNewClient(
+  payload: ClientCreatePayload & { name: string; companyName: string },
+  environment: EnvironmentKey,
+  product: ProductKey,
+  explicitId?: string
+) {
+  const id = explicitId ?? (await nextClientId(payload.name, environment, product));
+  const client = buildNewClient(payload, id, environment, product);
 
-  if (!name) {
-    throw new Error("Client name is required.");
-  }
-
-  const d1 = getD1();
-  const existingClients = await findExistingClientsByIdentity(environment, product, name, companyName);
-  const existingClient = pickCanonicalClient(existingClients, name, companyName);
-
-  if (existingClient) {
-    await mergeDuplicateClients(
-      existingClient,
-      existingClients.filter((client) => client.id !== existingClient.id),
-      environment,
-      product
-    );
-
-    const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
-    await seedTemplateTasksForClient(client.id, environment, product, false);
-    await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
-
-    return {
-      client,
-      tasks: await listTasks(environment, product, client.id),
-      created: false,
-    };
-  }
-
-  const id = await nextClientId(name, environment, product);
-  const client = buildNewClient({ ...payload, name, companyName }, id, environment, product);
-
-  await d1
+  await getD1()
     .prepare(`
       INSERT INTO clients (
         id,
@@ -3377,6 +3348,44 @@ export async function createClient(payload: ClientCreatePayload) {
 
   await seedTemplateTasksForClient(client.id, environment, product, false);
   await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
+
+  return client;
+}
+
+export async function createClient(payload: ClientCreatePayload) {
+  await ensureTaskStorage();
+  const name = payload.name?.trim();
+  const companyName = payload.companyName?.trim() ?? "";
+  const environment = normalizeEnvironment(payload.environment);
+  const product = normalizeProduct(payload.product);
+
+  if (!name) {
+    throw new Error("Client name is required.");
+  }
+
+  const existingClients = await findExistingClientsByIdentity(environment, product, name, companyName);
+  const existingClient = pickCanonicalClient(existingClients, name, companyName);
+
+  if (existingClient) {
+    await mergeDuplicateClients(
+      existingClient,
+      existingClients.filter((client) => client.id !== existingClient.id),
+      environment,
+      product
+    );
+
+    const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
+    await seedTemplateTasksForClient(client.id, environment, product, false);
+    await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
+
+    return {
+      client,
+      tasks: await listTasks(environment, product, client.id),
+      created: false,
+    };
+  }
+
+  const client = await insertNewClient({ ...payload, name, companyName }, environment, product);
 
   return {
     client,

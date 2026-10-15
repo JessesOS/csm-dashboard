@@ -53,6 +53,10 @@ BSS clients are created **once, in the portal admin**. Whenever CSM lists the
   seeded), linked by `journey_client_id`, with the portal's completed
   milestones imported **once** at link time (notes included). From then on the
   per-milestone sync below keeps them in step.
+- The **portal id is the identity**, never the name — two portal clients can
+  share a name or company. Mirrored clients get a CSM id derived from the
+  portal id (`live-bss-<name-slug>-<first 8 of portal id>`), so a race between
+  two page loads fails on the primary key instead of duplicating.
 - Already-linked clients take the portal's name and company.
 - Portal unreachable / no token → CSM shows what it already has.
 
