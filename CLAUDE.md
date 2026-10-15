@@ -98,6 +98,16 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
 
 ## Design notes
 
+- **Side rail (2026-10-15):** workspace is a dropdown (`WorkspaceMenu`), the
+  two views are one tab row (`ViewTabs`), and the delivery-stage tree fills the
+  rest of the rail. Mode (Live / Demo) lives in **Settings**; a "Demo" badge
+  shows on the workspace control whenever Demo is on.
+- **The dashboard opens on Live** (`app/page.tsx`, `startEnvironment`), with no
+  preview tasks. `defaultEnvironment` in `lib/productWorkspaces.ts` deliberately
+  stays `"demo"`: it decides where the seeded *preview* tasks are allowed
+  (`resetWorkspace`), and flipping it would show template tasks as if they were
+  a real Live client's.
+
 - Font weights were compressed project-wide in 2026-07 (was mostly 760–900,
   now 400–700) — keep new weights in that range, don't reintroduce 800+.
 - Status/count pills sitting on colored surfaces (stage headers, badges)

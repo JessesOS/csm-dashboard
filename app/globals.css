@@ -715,7 +715,7 @@ button:disabled {
   flex-direction: column;
   border-right: 1px solid rgba(160, 148, 128, 0.18);
   background: #131118;
-  padding: 24px 18px;
+  padding: 16px 18px 14px;
 }
 
 .mission-brand,
@@ -2577,7 +2577,7 @@ button:disabled {
   overflow: hidden;
   border-right: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.82);
-  padding: 24px 18px;
+  padding: 16px 18px 14px;
 }
 
 .rail-section {
@@ -2595,6 +2595,9 @@ button:disabled {
 .rail-section-stages {
   flex: 1;
   min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  margin-bottom: 0;
 }
 
 .rail-section-label {
@@ -2631,6 +2634,294 @@ button:disabled {
   border-color: rgba(123, 135, 152, 0.55);
   color: #46404f;
 }
+
+/* ── Compact side rail (2026-10-15) ─────────────────────────────────────────
+   The workspace switcher is a dropdown and the two views are one row, so the
+   delivery-stage tree runs from just under them to the bottom of the rail.
+   Mode (Live / Demo) lives in Settings. Dark is the base; light overrides follow. */
+.rail-top {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(160, 148, 128, 0.18);
+  padding-bottom: 14px;
+}
+
+.workspace-menu {
+  position: relative;
+}
+
+.workspace-menu-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(160, 148, 128, 0.22);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f2efe9;
+  padding: 7px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.workspace-menu-trigger:hover,
+.workspace-menu-open .workspace-menu-trigger {
+  border-color: rgba(193, 255, 36, 0.32);
+}
+
+.workspace-menu-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace-menu-text small {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8f8a9a;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workspace-menu-text strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-demo-pill {
+  border-radius: 999px;
+  background: #f5b22c;
+  color: #1d1a23;
+  padding: 1px 6px;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.workspace-menu-chevron {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: 0.6;
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.15s ease;
+}
+
+.workspace-menu-open .workspace-menu-chevron {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.workspace-menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 40;
+  display: grid;
+  gap: 2px;
+  border: 1px solid rgba(160, 148, 128, 0.22);
+  border-radius: 8px;
+  background: #1b1821;
+  padding: 5px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.32);
+}
+
+.workspace-menu-list button {
+  display: grid;
+  gap: 2px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #ded3c2;
+  padding: 8px 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.workspace-menu-list button strong {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.workspace-menu-list button span {
+  color: #8f8a9a;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.workspace-menu-list button:hover,
+.workspace-menu-list button.active {
+  border-color: rgba(193, 255, 36, 0.32);
+  background: rgba(193, 255, 36, 0.1);
+  color: #e08a4e;
+}
+
+.view-tabs {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 3px;
+  border: 1px solid rgba(160, 148, 128, 0.18);
+  border-radius: 9px;
+  padding: 3px;
+}
+
+.view-tabs button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 32px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #ded3c2;
+  padding: 0 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.view-tabs button:hover:not(:disabled),
+.view-tabs button.active {
+  border-color: rgba(193, 255, 36, 0.32);
+  background: rgba(193, 255, 36, 0.1);
+  color: #e08a4e;
+}
+
+.view-tabs button.active {
+  font-weight: 600;
+}
+
+.view-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.settings-mode {
+  display: grid;
+  gap: 6px;
+}
+
+.settings-mode > span {
+  color: #8f8a9a;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-mode-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.settings-mode-toggle button {
+  min-height: 32px;
+  border: 1px solid rgba(160, 148, 128, 0.22);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ded3c2;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.settings-mode-toggle button.active {
+  border-color: rgba(193, 255, 36, 0.32);
+  background: rgba(193, 255, 36, 0.1);
+  color: #e08a4e;
+}
+
+.mission-shell-light .rail-top,
+.dashboard-shell-light .rail-top {
+  border-bottom-color: #e5dbca;
+}
+
+.mission-shell-light .workspace-menu-trigger,
+.dashboard-shell-light .workspace-menu-trigger {
+  border-color: #dcd3c4;
+  background: #f9f4ed;
+  color: #241f2c;
+}
+
+.mission-shell-light .workspace-menu-trigger:hover,
+.mission-shell-light .workspace-menu-open .workspace-menu-trigger,
+.dashboard-shell-light .workspace-menu-trigger:hover,
+.dashboard-shell-light .workspace-menu-open .workspace-menu-trigger {
+  border-color: rgba(198, 113, 57, 0.35);
+}
+
+.mission-shell-light .workspace-menu-text small,
+.mission-shell-light .settings-mode > span,
+.dashboard-shell-light .workspace-menu-text small,
+.dashboard-shell-light .settings-mode > span {
+  color: #82796a;
+}
+
+.mission-shell-light .workspace-menu-list,
+.dashboard-shell-light .workspace-menu-list {
+  border-color: #dcd3c4;
+  background: #fffdf9;
+  box-shadow: 0 22px 48px rgba(16, 24, 40, 0.16);
+}
+
+.mission-shell-light .workspace-menu-list button,
+.dashboard-shell-light .workspace-menu-list button {
+  color: #3a3545;
+}
+
+.mission-shell-light .workspace-menu-list button span,
+.dashboard-shell-light .workspace-menu-list button span {
+  color: #82796a;
+}
+
+.mission-shell-light .workspace-menu-list button:hover,
+.mission-shell-light .workspace-menu-list button.active,
+.dashboard-shell-light .workspace-menu-list button:hover,
+.dashboard-shell-light .workspace-menu-list button.active,
+.mission-shell-light .view-tabs button:hover:not(:disabled),
+.mission-shell-light .view-tabs button.active,
+.dashboard-shell-light .view-tabs button:hover:not(:disabled),
+.dashboard-shell-light .view-tabs button.active,
+.mission-shell-light .settings-mode-toggle button.active,
+.dashboard-shell-light .settings-mode-toggle button.active {
+  border-color: rgba(198, 113, 57, 0.35);
+  background: #fbf4e9;
+  color: #a85c2c;
+}
+
+.mission-shell-light .view-tabs,
+.dashboard-shell-light .view-tabs {
+  border-color: #e5dbca;
+}
+
+.mission-shell-light .view-tabs button,
+.dashboard-shell-light .view-tabs button {
+  color: #3a3545;
+}
+
+.mission-shell-light .settings-mode-toggle button,
+.dashboard-shell-light .settings-mode-toggle button {
+  border-color: #dcd3c4;
+  background: #f9f4ed;
+  color: #3a3545;
+}
+
 
 .phase-nav {
   min-height: 0;

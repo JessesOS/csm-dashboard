@@ -736,6 +736,9 @@ function TaskBackupSettings({
   );
 }
 
+// Live is the default workspace (2026-10-15); Demo is the seeded training copy.
+const settingsModeOrder: EnvironmentKey[] = ["live", "demo"];
+
 function AttachmentLensSettings({
   attachmentFilter,
   attachmentCounts,
@@ -757,6 +760,8 @@ function AttachmentLensSettings({
   onCreateSnapshot,
   onCreateMasterSnapshot,
   onRestoreSnapshot,
+  activeEnvironment,
+  onEnvironmentChange,
   variant = "rail",
 }: {
   attachmentFilter: AttachmentFilter;
@@ -779,6 +784,8 @@ function AttachmentLensSettings({
   onCreateSnapshot: () => void;
   onCreateMasterSnapshot: () => void;
   onRestoreSnapshot: (snapshot: TaskSnapshot) => void;
+  activeEnvironment: EnvironmentKey;
+  onEnvironmentChange: (environment: EnvironmentKey) => void;
   variant?: "rail" | "compact";
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -824,6 +831,33 @@ function AttachmentLensSettings({
             <Icon name="settings" />
             <span>Settings</span>
           </div>
+          <div className="settings-mode">
+            <span>Mode</span>
+            <div className="settings-mode-toggle" role="radiogroup" aria-label="Operating environment">
+              {settingsModeOrder.map((key) => {
+                const environment = operatingEnvironments.find((item) => item.key === key);
+                return (
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={activeEnvironment === key}
+                    key={key}
+                    className={activeEnvironment === key ? "active" : ""}
+                    title={environment?.description}
+                    onClick={() => {
+                      setIsOpen(false);
+                      if (key !== activeEnvironment) {
+                        onEnvironmentChange(key);
+                      }
+                    }}
+                  >
+                    {environment?.shortLabel ?? key}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="rail-settings-divider" />
           <div className="attachment-lenses" aria-label="Attachment filters">
             <button type="button" className={attachmentFilter === "loom" ? "active" : ""} aria-pressed={attachmentFilter === "loom"} onClick={() => toggleAttachmentFilter("loom")}>
               <span>
@@ -939,66 +973,121 @@ function promptScaleVariant(defaultValue: ScaleVariant = defaultScaleVariant) {
   throw new Error("Choose 1, 2, or 3 for the Scale checklist.");
 }
 
-function RespondMark({ className, product }: { className: string; product?: ProductKey }) {
-  // BSS is a custom client product; it does not carry the RT Digital / Respond mark.
-  if (product === "bss") {
-    return null;
-  }
-
-  return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
-}
-
-function ProductSwitcher({
+function WorkspaceMenu({
   activeProduct,
+  activeEnvironment,
   onProductChange,
 }: {
   activeProduct: ProductKey;
+  activeEnvironment: EnvironmentKey;
   onProductChange: (product: ProductKey) => void;
 }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const current = productConfig(activeProduct);
+  const isDemo = activeEnvironment === "demo";
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    function closeOnOutsidePointer(event: PointerEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="product-switcher" aria-label="Client workspace">
-      <span>Workspace</span>
-      <div>
-        {productWorkspaces.map((workspace) => (
-          <button
-            type="button"
-            key={workspace.key}
-            className={activeProduct === workspace.key ? "active" : ""}
-            onClick={() => onProductChange(workspace.key)}
-            title={workspace.description}
-          >
-            <span>{workspace.clientLabel}</span>
-          </button>
-        ))}
-      </div>
+    <div className={isOpen ? "workspace-menu workspace-menu-open" : "workspace-menu"} ref={menuRef}>
+      <button
+        type="button"
+        className="workspace-menu-trigger"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-controls="workspace-menu-list"
+        onClick={() => setIsOpen((open) => !open)}
+        title="Switch workspace"
+      >
+        <span className="workspace-menu-text">
+          <small>
+            Workspace
+            {/* Mode lives in Settings now, so make Demo impossible to miss. */}
+            {isDemo ? <em className="workspace-demo-pill">Demo</em> : null}
+          </small>
+          <strong>{current.clientLabel}</strong>
+        </span>
+        <span className="workspace-menu-chevron" aria-hidden="true" />
+      </button>
+      {isOpen ? (
+        <div className="workspace-menu-list" id="workspace-menu-list" role="menu" aria-label="Workspaces">
+          {productWorkspaces.map((workspace) => (
+            <button
+              type="button"
+              role="menuitemradio"
+              aria-checked={activeProduct === workspace.key}
+              key={workspace.key}
+              className={activeProduct === workspace.key ? "active" : ""}
+              onClick={() => {
+                setIsOpen(false);
+                if (workspace.key !== activeProduct) {
+                  onProductChange(workspace.key);
+                }
+              }}
+            >
+              <strong>{workspace.clientLabel}</strong>
+              <span>{workspace.description}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function EnvironmentSwitcher({
-  activeEnvironment,
-  onEnvironmentChange,
+function ViewTabs({
+  active,
+  onOpenMissionControl,
+  onOpenTasks,
+  tasksDisabled = false,
 }: {
-  activeEnvironment: EnvironmentKey;
-  onEnvironmentChange: (environment: EnvironmentKey) => void;
+  active: AppSection;
+  onOpenMissionControl: () => void;
+  onOpenTasks: () => void;
+  tasksDisabled?: boolean;
 }) {
   return (
-    <div className="environment-switcher" aria-label="Operating environment">
-      <span>Mode</span>
-      <div>
-        {operatingEnvironments.map((environment) => (
-          <button
-            type="button"
-            key={environment.key}
-            className={activeEnvironment === environment.key ? "active" : ""}
-            onClick={() => onEnvironmentChange(environment.key)}
-            title={environment.description}
-          >
-            {environment.shortLabel}
-          </button>
-        ))}
-      </div>
-    </div>
+    <nav className="view-tabs" aria-label="Primary views">
+      <button type="button" className={active === "home" ? "active" : ""} aria-current={active === "home" ? "page" : undefined} onClick={onOpenMissionControl}>
+        <Icon name="home" />
+        Mission Control
+      </button>
+      <button
+        type="button"
+        className={active === "tasks" ? "active" : ""}
+        aria-current={active === "tasks" ? "page" : undefined}
+        onClick={onOpenTasks}
+        disabled={tasksDisabled}
+      >
+        <Icon name="tasks" />
+        Tasks
+      </button>
+    </nav>
   );
 }
 
@@ -2503,26 +2592,15 @@ function MissionControl({
   return (
     <main className={`mission-shell mission-shell-${theme}`} data-tour-target={tourTarget}>
       <aside className="mission-side">
-        <div className="mission-brand">
-          <RespondMark className="mission-brand-mark" product={product.key} />
-          <div>
-            <strong>{product.label} CSM</strong>
-            <span>Delivery command center</span>
-          </div>
+        <div className="rail-top">
+          <WorkspaceMenu activeProduct={activeProduct} activeEnvironment={activeEnvironment} onProductChange={onProductChange} />
+          <ViewTabs
+            active="home"
+            onOpenMissionControl={() => undefined}
+            onOpenTasks={() => onOpenTasks(selectedClient?.id)}
+            tasksDisabled={emptyPortfolio}
+          />
         </div>
-
-        <ProductSwitcher activeProduct={activeProduct} onProductChange={onProductChange} />
-
-        <nav className="mission-nav" aria-label="Primary views">
-          <button type="button" className="active">
-            <Icon name="home" />
-            Mission Control
-          </button>
-          <button type="button" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
-            <Icon name="tasks" />
-            Tasks
-          </button>
-        </nav>
 
         <div className="mission-side-section">
           <span>Saved lenses</span>
@@ -2531,8 +2609,6 @@ function MissionControl({
           <button type="button" className={activeLens === "golive" && !selectedClient ? "active" : ""} onClick={() => chooseLens("golive")}>Go-live next 30 days</button>
           <button type="button" className={activeLens === "high" && !selectedClient ? "active" : ""} onClick={() => chooseLens("high")}>High risk</button>
         </div>
-
-        <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={onEnvironmentChange} />
 
         <div className="mission-user-row">
           <div className="mission-user">
@@ -2543,6 +2619,8 @@ function MissionControl({
             </div>
           </div>
           <AttachmentLensSettings
+            activeEnvironment={activeEnvironment}
+            onEnvironmentChange={onEnvironmentChange}
             attachmentFilter={attachmentFilter}
             attachmentCounts={attachmentCounts}
             onAttachmentFilterChange={onAttachmentFilterChange}
@@ -2573,7 +2651,7 @@ function MissionControl({
           <div className="mission-header-title">
             <div>
               <h1>Mission Control</h1>
-              <p>Portfolio health across {product.clientLabel}.</p>
+              <p>Portfolio health across {product.shortLabel} clients.</p>
             </div>
             <div className="mission-header-meta">
               <span className="system-pill">
@@ -2673,7 +2751,7 @@ function MissionControl({
           {emptyPortfolio ? (
             <article className="empty-state-card">
               <span>{environment.shortLabel}</span>
-              <h2>No {product.clientLabel.toLowerCase()} yet</h2>
+              <h2>No {product.shortLabel} clients yet</h2>
               <p>Create your first {product.shortLabel} client to generate a fresh checklist, portal link, timeline, and task board.</p>
               <div className="empty-actions">
                 {canImportGhlClient ? (
@@ -2851,8 +2929,12 @@ export default function RespondDashboard({
   const [clients, setClients] = useState(initialClients);
   const [tasks, setTasks] = useState(initialTasks);
   const [selectedId, setSelectedId] = useState(initialTasks[0]?.id ?? "");
+  // Only treat the initial tasks as loaded when there are some (the seeded Demo
+  // preview). Live starts empty and shows "Loading" until its real tasks arrive.
   const [loadedTaskKey, setLoadedTaskKey] = useState(() =>
-    taskWorkspaceKey(initialEnvironment ?? defaultEnvironment, initialProduct ?? defaultProduct, initialClients[0]?.id ?? "")
+    initialTasks.length > 0
+      ? taskWorkspaceKey(initialEnvironment ?? defaultEnvironment, initialProduct ?? defaultProduct, initialClients[0]?.id ?? "")
+      : ""
   );
   const [detailReadyTaskId, setDetailReadyTaskId] = useState<string | null>(null);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
@@ -3937,31 +4019,12 @@ export default function RespondDashboard({
       data-tour-target={currentTourStep?.section === "tasks" ? currentTourStep.target : undefined}
     >
       <aside className="side-rail">
-        <div className="brand">
-          <RespondMark className="brand-mark" product={currentProduct.key} />
-          <div>
-            <strong>{currentProduct.label} CSM</strong>
-            <span>Onboarding & delivery</span>
-          </div>
+        {/* Compact top: the workspace switcher is a dropdown and the views are one
+            row, so the delivery-stage tree gets nearly the full rail height. */}
+        <div className="rail-top">
+          <WorkspaceMenu activeProduct={activeProduct} activeEnvironment={activeEnvironment} onProductChange={switchProduct} />
+          <ViewTabs active="tasks" onOpenMissionControl={() => setActiveSection("home")} onOpenTasks={() => undefined} />
         </div>
-
-        <section className="rail-section rail-section-workspace" aria-label="Workspace section">
-          <ProductSwitcher activeProduct={activeProduct} onProductChange={switchProduct} />
-        </section>
-
-        <section className="rail-section rail-section-nav" aria-label="Navigation section">
-          <span className="rail-section-label">Navigation</span>
-          <nav className="view-nav" aria-label="Primary views">
-            <button type="button" onClick={() => setActiveSection("home")}>
-              <Icon name="home" />
-              Mission Control
-            </button>
-            <button type="button" className="active">
-              <Icon name="tasks" />
-              Tasks
-            </button>
-          </nav>
-        </section>
 
         <section className="rail-section rail-section-stages" aria-label="Delivery stages section">
           <div className="rail-section-stages-head">
@@ -4057,8 +4120,9 @@ export default function RespondDashboard({
           </nav>
         </section>
 
-        <EnvironmentSwitcher activeEnvironment={activeEnvironment} onEnvironmentChange={switchEnvironment} />
         <AttachmentLensSettings
+          activeEnvironment={activeEnvironment}
+          onEnvironmentChange={switchEnvironment}
           attachmentFilter={attachmentFilter}
           attachmentCounts={attachmentCounts}
           onAttachmentFilterChange={setAttachmentFilter}
@@ -4248,7 +4312,7 @@ export default function RespondDashboard({
         {clients.length === 0 ? (
           <section className="empty-workspace-panel" aria-label="Empty workspace">
             <span>{currentEnvironment.shortLabel}</span>
-            <h2>No {currentProduct.clientLabel.toLowerCase()} in this workspace yet</h2>
+            <h2>No {currentProduct.shortLabel} clients in this workspace yet</h2>
             <p>Create a client to generate a fresh {currentProduct.taskTemplateLabel.toLowerCase()}, private portal link, and independent task board.</p>
             <div className="empty-actions">
               {canImportGhlClient ? (
