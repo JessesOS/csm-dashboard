@@ -30,6 +30,13 @@ function readRuntimeEnv(key: string) {
   return undefined;
 }
 
+type ServiceBinding = { fetch: (input: string, init?: RequestInit) => Promise<Response> };
+
+function portalServiceBinding(): ServiceBinding | undefined {
+  const binding = (env as Record<string, unknown>).JOURNEY_PORTAL as ServiceBinding | undefined;
+  return binding && typeof binding.fetch === "function" ? binding : undefined;
+}
+
 export function journeySyncConfigured() {
   return Boolean(readRuntimeEnv("JOURNEY_SYNC_TOKEN"));
 }
@@ -65,10 +72,17 @@ export async function pushTaskStatusToJourney(input: {
     return { ok: false, skipped: "JOURNEY_SYNC_TOKEN not configured" };
   }
 
-  const baseUrl = (readRuntimeEnv("JOURNEY_SYNC_URL") ?? DEFAULT_JOURNEY_SYNC_URL).replace(/\/+$/, "");
+  // In production CSM reaches the portal over the JOURNEY_PORTAL service binding:
+  // a plain fetch() to another workers.dev Worker on the same account fails with
+  // Cloudflare error 1042. An explicit JOURNEY_SYNC_URL (local dev, pointing at
+  // the portal's dev server) takes the plain-fetch path instead.
+  const overrideUrl = readRuntimeEnv("JOURNEY_SYNC_URL");
+  const binding = overrideUrl ? undefined : portalServiceBinding();
+  const baseUrl = (overrideUrl ?? DEFAULT_JOURNEY_SYNC_URL).replace(/\/+$/, "");
+  const send = binding ? binding.fetch.bind(binding) : fetch;
 
   try {
-    const response = await fetch(`${baseUrl}/api/csm-sync/milestone`, {
+    const response = await send(`${baseUrl}/api/csm-sync/milestone`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-journey-sync-token": token },
       body: JSON.stringify({

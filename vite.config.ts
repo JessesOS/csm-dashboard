@@ -20,6 +20,10 @@ const workerConfig = {
       database_id: "680af23d-f64c-40d0-80f9-da8e258bec25",
     },
   ],
+  // BSS journey sync: a Worker can't fetch() another workers.dev Worker on the
+  // same account (Cloudflare error 1042), so CSM reaches the customer-journey
+  // portal through a service binding instead. See docs/journey-sync.md.
+  services: [{ binding: "JOURNEY_PORTAL", service: "scale-onboarding-portal" }],
 };
 
 export default defineConfig({
