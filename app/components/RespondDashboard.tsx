@@ -939,7 +939,12 @@ function promptScaleVariant(defaultValue: ScaleVariant = defaultScaleVariant) {
   throw new Error("Choose 1, 2, or 3 for the Scale checklist.");
 }
 
-function RespondMark({ className }: { className: string }) {
+function RespondMark({ className, product }: { className: string; product?: ProductKey }) {
+  // BSS is a custom client product; it does not carry the RT Digital / Respond mark.
+  if (product === "bss") {
+    return null;
+  }
+
   return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
 }
 
@@ -962,7 +967,7 @@ function ProductSwitcher({
             onClick={() => onProductChange(workspace.key)}
             title={workspace.description}
           >
-            <RespondMark className="product-switcher-mark" />
+            <RespondMark className="product-switcher-mark" product={workspace.key} />
             <span>{workspace.clientLabel}</span>
           </button>
         ))}
@@ -2500,7 +2505,7 @@ function MissionControl({
     <main className={`mission-shell mission-shell-${theme}`} data-tour-target={tourTarget}>
       <aside className="mission-side">
         <div className="mission-brand">
-          <RespondMark className="mission-brand-mark" />
+          <RespondMark className="mission-brand-mark" product={product.key} />
           <div>
             <strong>{product.label} CSM</strong>
             <span>Delivery command center</span>
@@ -3934,7 +3939,7 @@ export default function RespondDashboard({
     >
       <aside className="side-rail">
         <div className="brand">
-          <RespondMark className="brand-mark" />
+          <RespondMark className="brand-mark" product={currentProduct.key} />
           <div>
             <strong>{currentProduct.label} CSM</strong>
             <span>Onboarding & delivery</span>

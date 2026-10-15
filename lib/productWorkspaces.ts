@@ -74,8 +74,8 @@ export const productWorkspaces: ProductWorkspace[] = [
   },
   {
     key: "bss",
-    label: "BSS Fin Creighton",
-    clientLabel: "BSS Fin Creighton",
+    label: "BSS",
+    clientLabel: "BSS clients",
     shortLabel: "BSS",
     description: "Custom CRM, website, and AI lead agent delivery for Bitcoin Success School.",
     brandMark: "B",
