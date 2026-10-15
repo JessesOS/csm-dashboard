@@ -38,7 +38,10 @@ The deploy prints the live URL and a version id on success.
 
 Set with `npx wrangler secret put <NAME> --name csm-dashboard`. Optional var
 `JOURNEY_SYNC_URL` overrides the portal URL (defaults to production). Locally,
-put these in `.env` (gitignored).
+put these in `.env` (gitignored). The build copies `.env` into
+`dist/server/.dev.vars`, which only `wrangler dev` reads — deploys never upload
+it, and the deploy config (`dist/server/wrangler.json`) carries no vars, so
+local dev values can't leak into production.
 
 ## Database notes
 

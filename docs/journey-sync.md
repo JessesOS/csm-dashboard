@@ -99,3 +99,20 @@ down.
 
 `GET {CSM}/api/journey-sync` with the token lists the linked BSS clients and the
 last sync in each direction — the quick "is it synced?" check.
+
+## Status
+
+**Live and verified in production, 2026-10-15** (CSM version `7c7fdd91`, portal
+`8867f9f3`). Test link: CSM demo client `bss-fin-creighton-demo` ↔ portal
+"Fin Test" `90a39b38-0312-4143-b6bf-b58b1b27b579`. Confirmed both ways on the
+live databases: CSM → portal (`bss-008`, `bss-010` done; `bss-011` un-ticked;
+in-progress `bss-009` stays not-done) and Fin's real completion path → CSM
+(`bss-003` complete with its note).
+
+Not yet linked: Fin's real record (created in the portal admin when Jesse is
+ready, then linked to the Live CSM BSS client).
+
+Known gap: a push that fails (portal down, bad deploy) is not retried — that
+task only catches up on its next change. A per-client "resync" that pushes all
+41 statuses would close it.
+
