@@ -6,6 +6,8 @@ import {
   onboardingFormMissingRequired,
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
+import { bssClientTaskIds } from "./bssTasks";
+import { JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
 import { portalDefaultsForTask } from "./portalDefaults";
 import { scaleTasksForVariant } from "./scaleTasks";
 import {
@@ -120,14 +122,14 @@ type TaskSnapshotRow = Omit<TaskSnapshot, "environment" | "product"> & {
 };
 
 const defaultClientId = productConfig(defaultProduct).defaultClientId;
-const currentStorageVersion = "2026-08-09-visibility-and-events-v1";
+const currentStorageVersion = "2026-10-15-bss-journey-sync-v1";
 const storagePreparedMetaKey = "task_storage_prepared";
 const portalDefaultBatchSize = 50;
 const restoreBatchSize = 50;
 const taskSelectFields =
   "id, environment, product, client_id AS clientId, template_id AS templateId, title, category, phase, status, blocked_reason AS blockedReason, assignee, due_window AS dueWindow, priority, dependencies, notes, loom_url AS loomUrl, loom_title AS loomTitle, portal_visible AS portalVisible, portal_title AS portalTitle, portal_note AS portalNote, portal_action_required AS portalActionRequired, portal_action_url AS portalActionUrl, portal_action_label AS portalActionLabel, portal_configured AS portalConfigured, sort_order AS sortOrder, created_at AS createdAt, updated_at AS updatedAt";
 const clientSelectFields =
-  "id, environment, product, scale_variant AS scaleVariant, portal_token AS portalToken, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
+  "id, environment, product, scale_variant AS scaleVariant, portal_token AS portalToken, journey_client_id AS journeyClientId, name, company_name AS companyName, code, industry, owner, phase, health, progress, current_task AS currentTask, go_live_date AS goLiveDate, go_live_label AS goLiveLabel, last_update AS lastUpdate, next_step AS nextStep, blocker, risk, active_tasks AS activeTasks, completed_tasks AS completedTasks, timeline, attention";
 const portalFormSubmissionSelectFields =
   "id, environment, product, client_id AS clientId, form_id AS formId, status, responses, submitted_at AS submittedAt, updated_at AS updatedAt";
 const trainingVideoSelectFields =
@@ -421,6 +423,7 @@ function fromClientRow(row: ClientRow): RespondClient {
     product,
     scaleVariant: product === "scale" ? normalizeScaleVariant(row.scaleVariant) : undefined,
     companyName: row.companyName ?? "",
+    journeyClientId: row.journeyClientId ?? "",
     phase,
     health,
     risk,
@@ -683,7 +686,7 @@ async function seedWorkspaceShapeReady() {
     "rolls_up_to",
     "status_changed_at",
   ];
-  const requiredClientColumns = ["portal_token", "environment", "product", "company_name", "scale_variant"];
+  const requiredClientColumns = ["portal_token", "environment", "product", "company_name", "scale_variant", "journey_client_id"];
   const requiredPortalFormColumns = [
     "client_id",
     "environment",
@@ -868,6 +871,10 @@ async function ensureTaskEventsTable() {
 async function ensureClientColumns() {
   const d1 = getD1();
   const columns = await tableColumns("clients");
+
+  if (!columns.has("journey_client_id")) {
+    await d1.prepare("ALTER TABLE clients ADD COLUMN journey_client_id TEXT NOT NULL DEFAULT ''").run();
+  }
 
   if (!columns.has("portal_token")) {
     await d1.prepare("ALTER TABLE clients ADD COLUMN portal_token TEXT NOT NULL DEFAULT ''").run();
@@ -1392,6 +1399,24 @@ async function migrateRespondTaskConsolidation() {
 
 // Collapse the old five-stage board into three: "blocked" rows become "queued" with a
 // blocked_reason flag (preserving visibility), "review" rows fold into "in_progress".
+// Fin's client-owned tasks (bssClientTaskIds) gained portal_action_required in
+// the template on 2026-10-15; give existing BSS rows the flag too. Touches only
+// that column — never notes, since bss-001 holds Fin's interview transcript.
+async function migrateBssClientActionFlags() {
+  const ids = [...bssClientTaskIds];
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  await getD1()
+    .prepare(
+      `UPDATE tasks SET portal_action_required = 1 WHERE product = 'bss' AND template_id IN (${ids.map(() => "?").join(", ")}) AND portal_action_required = 0`
+    )
+    .bind(...ids)
+    .run();
+}
+
 async function migrateThreeStageStatuses() {
   const d1 = getD1();
   const templateReasons = new Map<string, string>();
@@ -1436,6 +1461,7 @@ async function prepareTaskStorage() {
         product TEXT NOT NULL DEFAULT 'respond',
         scale_variant TEXT NOT NULL DEFAULT 'meta_google',
         portal_token TEXT NOT NULL DEFAULT '',
+        journey_client_id TEXT NOT NULL DEFAULT '',
         name TEXT NOT NULL,
         company_name TEXT NOT NULL DEFAULT '',
         code TEXT NOT NULL,
@@ -1624,6 +1650,7 @@ async function prepareTaskStorage() {
   await migrateRespondTaskConsolidation();
   await migrateScalePortalDefaults();
   await migrateThreeStageStatuses();
+  await migrateBssClientActionFlags();
   await applyPortalDefaultsToUnconfiguredTasks();
   await seedTrainingVideos();
   await seedTrainingCategoryOrders();
@@ -1839,6 +1866,128 @@ export async function getTask(id: string) {
   return fromRow(row);
 }
 
+function journeySyncMetaKey(clientId: string) {
+  return `journey_sync_last:${clientId}`;
+}
+
+async function pushBssStatusToJourney(taskId: string, status: TaskStatus) {
+  const link = await getD1()
+    .prepare(
+      "SELECT t.template_id AS templateId, t.client_id AS clientId, c.journey_client_id AS journeyClientId FROM tasks t JOIN clients c ON c.id = t.client_id WHERE t.id = ?"
+    )
+    .bind(taskId)
+    .first<{ templateId: string; clientId: string; journeyClientId: string }>();
+
+  // Not linked to a portal journey (e.g. the demo walkthrough client) — nothing to mirror.
+  if (!link?.journeyClientId || !link.templateId) {
+    return;
+  }
+
+  const result = await pushTaskStatusToJourney({ journeyClientId: link.journeyClientId, milestoneId: link.templateId, status });
+
+  if (!result.ok && !result.skipped) {
+    console.error(`[journey-sync] push ${link.templateId} -> portal failed: ${result.error}`);
+  }
+
+  await setMetaValue(
+    journeySyncMetaKey(link.clientId),
+    JSON.stringify({ at: new Date().toISOString(), direction: "csm->portal", milestoneId: link.templateId, status, ...result })
+  );
+}
+
+/** Apply a milestone change that arrived from the customer-journey portal. */
+export async function applyJourneyMilestoneUpdate(input: { journeyClientId: string; milestoneId: string; done: boolean; note?: string }) {
+  await ensureTaskStorage();
+  const d1 = getD1();
+  const validMilestoneIds = new Set(productTasks("bss").map((task) => task.id));
+
+  if (!validMilestoneIds.has(input.milestoneId)) {
+    throw new Error("Unknown BSS milestone id.");
+  }
+
+  const linked = await d1
+    .prepare("SELECT id FROM clients WHERE journey_client_id = ? AND product = 'bss'")
+    .bind(input.journeyClientId)
+    .all<{ id: string }>();
+  const clientIds = (linked.results ?? []).map((row: { id: string }) => row.id);
+
+  if (clientIds.length === 0) {
+    throw new Error("No CSM client is linked to that journey client.");
+  }
+
+  const updated: Task[] = [];
+
+  for (const clientId of clientIds) {
+    const taskId = scopedTaskId(clientId, input.milestoneId);
+    const current = await d1.prepare("SELECT status FROM tasks WHERE id = ?").bind(taskId).first<{ status: string }>();
+
+    if (!current) {
+      continue;
+    }
+
+    const payload: TaskUpdatePayload = {};
+    const currentlyDone = normalizeTaskStatus(current.status) === "complete";
+
+    // The portal only knows done / not done. Only move status when done-ness
+    // actually changes, so an in-progress CSM task isn't knocked back to To do.
+    if (input.done && !currentlyDone) {
+      payload.status = "complete";
+    } else if (!input.done && currentlyDone) {
+      payload.status = "queued";
+    }
+
+    if (input.note) {
+      payload.notes = input.note;
+    }
+
+    updated.push(await updateTask(taskId, payload, JOURNEY_SYNC_ACTOR));
+    await setMetaValue(
+      journeySyncMetaKey(clientId),
+      JSON.stringify({ at: new Date().toISOString(), direction: "portal->csm", milestoneId: input.milestoneId, done: input.done, ok: true })
+    );
+  }
+
+  return updated;
+}
+
+/** Link a CSM BSS client to its customer-journey portal client (portal_clients.id). */
+export async function setClientJourneyLink(clientId: string, journeyClientId: string) {
+  await ensureTaskStorage();
+  const d1 = getD1();
+  const client = await d1.prepare("SELECT product FROM clients WHERE id = ?").bind(clientId).first<{ product: string }>();
+
+  if (!client) {
+    throw new Error("Client not found.");
+  }
+
+  if (normalizeProduct(client.product) !== "bss") {
+    throw new Error("Only BSS clients can be linked to a customer journey.");
+  }
+
+  await d1
+    .prepare("UPDATE clients SET journey_client_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+    .bind(journeyClientId.trim(), clientId)
+    .run();
+
+  const row = await d1.prepare(`SELECT ${clientSelectFields} FROM clients WHERE id = ?`).bind(clientId).first<ClientRow>();
+  return row ? fromClientRow(row) : null;
+}
+
+/** Linked BSS clients and the last sync in either direction, for checking the sync is healthy. */
+export async function listJourneySyncStatus() {
+  await ensureTaskStorage();
+  const rows = await getD1()
+    .prepare("SELECT id, environment, name, journey_client_id AS journeyClientId FROM clients WHERE product = 'bss' ORDER BY environment, name")
+    .all<{ id: string; environment: string; name: string; journeyClientId: string }>();
+
+  return Promise.all(
+    (rows.results ?? []).map(async (row: { id: string; environment: string; name: string; journeyClientId: string }) => {
+      const last = await getMetaValue(journeySyncMetaKey(row.id));
+      return { ...row, linked: Boolean(row.journeyClientId), lastSync: last ? JSON.parse(last) : null };
+    })
+  );
+}
+
 export async function updateTask(id: string, payload: TaskUpdatePayload, actor: string = "team") {
   await ensureTaskStorage();
   const d1 = getD1();
@@ -2004,6 +2153,12 @@ export async function updateTask(id: string, payload: TaskUpdatePayload, actor: 
       .prepare("INSERT INTO task_events (task_id, client_id, from_status, to_status, actor) VALUES (?, ?, ?, ?, ?)")
       .bind(id, taskClient?.clientId ?? "", previousStatus, statusChangedTo, actor)
       .run();
+
+    // BSS: mirror the change to the customer-journey portal. Updates that came
+    // FROM the portal are not pushed back, so nothing echoes.
+    if (product === "bss" && actor !== JOURNEY_SYNC_ACTOR) {
+      await pushBssStatusToJourney(id, statusChangedTo);
+    }
   }
 
   return getTask(id);

@@ -29,6 +29,17 @@ npx vinext deploy      # builds with Vite, uploads assets + worker
 
 The deploy prints the live URL and a version id on success.
 
+## Secrets
+
+| Secret | Purpose |
+|---|---|
+| `GHL_API_KEY`, `GHL_LOCATION_ID` | GHL client import |
+| `JOURNEY_SYNC_TOKEN` | BSS sync with the customer-journey portal — the **same value** must be set on the portal worker (`scale-onboarding-portal`). See [journey-sync.md](journey-sync.md). |
+
+Set with `npx wrangler secret put <NAME> --name csm-dashboard`. Optional var
+`JOURNEY_SYNC_URL` overrides the portal URL (defaults to production). Locally,
+put these in `.env` (gitignored).
+
 ## Database notes
 
 - **No manual schema or seed step.** On the first request after a deploy the
