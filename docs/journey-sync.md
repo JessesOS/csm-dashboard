@@ -43,6 +43,27 @@ Shared secret `JOURNEY_SYNC_TOKEN`, set on **both** workers
 `x-journey-sync-token: <token>` (or `Authorization: Bearer <token>`). No token
 configured ⇒ the receiving endpoint rejects, and the sender skips.
 
+## Clients — created in the portal, mirrored by CSM
+
+BSS clients are created **once, in the portal admin**. Whenever CSM lists the
+**Live** BSS workspace it calls the portal for its BSS clients and mirrors them
+(`reconcileJourneyClients` in `lib/taskStore.ts`):
+
+- A portal client CSM doesn't have yet → a new Live CSM client (41 tasks
+  seeded), linked by `journey_client_id`, with the portal's completed
+  milestones imported **once** at link time (notes included). From then on the
+  per-milestone sync below keeps them in step.
+- Already-linked clients take the portal's name and company.
+- Portal unreachable / no token → CSM shows what it already has.
+
+```
+GET {PORTAL}/api/csm-sync/clients        (portal implements)
+x-journey-sync-token: <token>
+→ { "ok": true, "clients": [ { "id", "name", "companyName", "createdAt",
+      "completed": [ { "milestoneId": "bss-003", "note": "…" } ] } ] }
+```
+Only `client_type = "bss"`; read-only; never calls CSM.
+
 ## Linking clients
 
 A CSM BSS client stores its portal client's `portal_clients.id` in

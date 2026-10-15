@@ -37,6 +37,21 @@ function portalServiceBinding(): ServiceBinding | undefined {
   return binding && typeof binding.fetch === "function" ? binding : undefined;
 }
 
+/**
+ * Call the portal. In production this goes over the JOURNEY_PORTAL service
+ * binding: a plain fetch() to another workers.dev Worker on the same account
+ * fails with Cloudflare error 1042. An explicit JOURNEY_SYNC_URL (local dev,
+ * pointing at the portal's dev server) takes the plain-fetch path instead.
+ */
+async function portalFetch(path: string, init: RequestInit) {
+  const overrideUrl = readRuntimeEnv("JOURNEY_SYNC_URL");
+  const binding = overrideUrl ? undefined : portalServiceBinding();
+  const baseUrl = (overrideUrl ?? DEFAULT_JOURNEY_SYNC_URL).replace(/\/+$/, "");
+  const url = `${baseUrl}${path}`;
+
+  return binding ? binding.fetch(url, init) : fetch(url, init);
+}
+
 export function journeySyncConfigured() {
   return Boolean(readRuntimeEnv("JOURNEY_SYNC_TOKEN"));
 }
@@ -72,17 +87,8 @@ export async function pushTaskStatusToJourney(input: {
     return { ok: false, skipped: "JOURNEY_SYNC_TOKEN not configured" };
   }
 
-  // In production CSM reaches the portal over the JOURNEY_PORTAL service binding:
-  // a plain fetch() to another workers.dev Worker on the same account fails with
-  // Cloudflare error 1042. An explicit JOURNEY_SYNC_URL (local dev, pointing at
-  // the portal's dev server) takes the plain-fetch path instead.
-  const overrideUrl = readRuntimeEnv("JOURNEY_SYNC_URL");
-  const binding = overrideUrl ? undefined : portalServiceBinding();
-  const baseUrl = (overrideUrl ?? DEFAULT_JOURNEY_SYNC_URL).replace(/\/+$/, "");
-  const send = binding ? binding.fetch.bind(binding) : fetch;
-
   try {
-    const response = await send(`${baseUrl}/api/csm-sync/milestone`, {
+    const response = await portalFetch("/api/csm-sync/milestone", {
       method: "POST",
       headers: { "content-type": "application/json", "x-journey-sync-token": token },
       body: JSON.stringify({
@@ -103,3 +109,65 @@ export async function pushTaskStatusToJourney(input: {
     return { ok: false, error: error instanceof Error ? error.message : "Portal push failed" };
   }
 }
+
+export interface JourneyBssClient {
+  id: string;
+  name: string;
+  companyName: string;
+  completed: { milestoneId: string; note?: string }[];
+}
+
+/**
+ * The portal's BSS clients (GET /api/csm-sync/clients). BSS clients are created
+ * in the portal admin; CSM mirrors them. Returns null if the portal can't be
+ * reached or the token isn't set — callers carry on with what CSM already has.
+ */
+export async function fetchJourneyBssClients(): Promise<JourneyBssClient[] | null> {
+  const token = readRuntimeEnv("JOURNEY_SYNC_TOKEN");
+
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const response = await portalFetch("/api/csm-sync/clients", {
+      method: "GET",
+      headers: { "x-journey-sync-token": token },
+      signal: AbortSignal.timeout(PUSH_TIMEOUT_MS),
+    });
+
+    if (!response.ok) {
+      console.error(`[journey-sync] portal clients list failed: ${response.status}`);
+      return null;
+    }
+
+    const data = (await response.json()) as { clients?: unknown };
+
+    if (!Array.isArray(data.clients)) {
+      return null;
+    }
+
+    return data.clients.flatMap((item) => {
+      const client = item as Record<string, unknown>;
+
+      if (typeof client.id !== "string" || !client.id || typeof client.name !== "string" || !client.name.trim()) {
+        return [];
+      }
+
+      const completed = Array.isArray(client.completed)
+        ? client.completed.flatMap((entry) => {
+            const milestone = entry as Record<string, unknown>;
+            return typeof milestone.milestoneId === "string"
+              ? [{ milestoneId: milestone.milestoneId, note: typeof milestone.note === "string" ? milestone.note : undefined }]
+              : [];
+          })
+        : [];
+
+      return [{ id: client.id, name: client.name.trim(), companyName: typeof client.companyName === "string" ? client.companyName.trim() : "", completed }];
+    });
+  } catch (error) {
+    console.error(`[journey-sync] portal clients list failed: ${error instanceof Error ? error.message : error}`);
+    return null;
+  }
+}
+

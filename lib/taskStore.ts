@@ -7,7 +7,7 @@ import {
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
 import { bssClientTaskIds } from "./bssTasks";
-import { JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
+import { fetchJourneyBssClients, JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
 import { portalDefaultsForTask } from "./portalDefaults";
 import { scaleTasksForVariant } from "./scaleTasks";
 import {
@@ -1694,6 +1694,11 @@ export async function listClients(environmentInput: string | null | undefined = 
 
   await reconcileDuplicateClients(environment, product);
 
+  // BSS clients are created in the customer-journey portal; mirror them here.
+  if (environment === "live" && product === "bss") {
+    await reconcileJourneyClients();
+  }
+
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
@@ -1948,6 +1953,73 @@ export async function applyJourneyMilestoneUpdate(input: { journeyClientId: stri
   }
 
   return updated;
+}
+
+/**
+ * BSS clients are created in the customer-journey portal admin, and the Live BSS
+ * workspace mirrors them. A portal client CSM doesn't have yet becomes a Live
+ * CSM client (41 tasks seeded) linked by journey_client_id, and the portal's
+ * completed milestones are imported once, at link time — after that the live
+ * per-milestone sync keeps the two in step. Linked clients keep the portal's
+ * name and company. Never throws: if the portal can't be reached, CSM shows
+ * what it already has.
+ */
+async function reconcileJourneyClients() {
+  const portalClients = await fetchJourneyBssClients();
+
+  if (!portalClients) {
+    return;
+  }
+
+  const d1 = getD1();
+
+  for (const portalClient of portalClients) {
+    try {
+      const linked = await d1
+        .prepare("SELECT id, name, company_name AS companyName FROM clients WHERE environment = 'live' AND product = 'bss' AND journey_client_id = ?")
+        .bind(portalClient.id)
+        .first<{ id: string; name: string; companyName: string }>();
+
+      if (linked) {
+        if (linked.name !== portalClient.name || (linked.companyName ?? "") !== portalClient.companyName) {
+          await d1
+            .prepare("UPDATE clients SET name = ?, company_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+            .bind(portalClient.name, portalClient.companyName, linked.id)
+            .run();
+        }
+        continue;
+      }
+
+      const { client } = await createClient({
+        environment: "live",
+        product: "bss",
+        name: portalClient.name,
+        companyName: portalClient.companyName,
+        owner: "Jesse Allan",
+      });
+
+      // createClient de-duplicates by name; never take over a client that is
+      // already linked to a different portal client.
+      const current = await d1.prepare("SELECT journey_client_id AS journeyClientId FROM clients WHERE id = ?").bind(client.id).first<{ journeyClientId: string }>();
+
+      if (current?.journeyClientId && current.journeyClientId !== portalClient.id) {
+        console.error(`[journey-sync] ${client.id} is already linked to ${current.journeyClientId}; not linking ${portalClient.id}`);
+        continue;
+      }
+
+      await d1.prepare("UPDATE clients SET journey_client_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(portalClient.id, client.id).run();
+
+      for (const milestone of portalClient.completed) {
+        const taskId = scopedTaskId(client.id, milestone.milestoneId);
+
+        if (await d1.prepare("SELECT id FROM tasks WHERE id = ?").bind(taskId).first()) {
+          await updateTask(taskId, { status: "complete", ...(milestone.note ? { notes: milestone.note } : {}) }, JOURNEY_SYNC_ACTOR);
+        }
+      }
+    } catch (error) {
+      console.error(`[journey-sync] could not mirror portal client ${portalClient.id}: ${error instanceof Error ? error.message : error}`);
+    }
+  }
 }
 
 /** Link a CSM BSS client to its customer-journey portal client (portal_clients.id). */

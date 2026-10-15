@@ -73,9 +73,12 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   customer-journey portal (`customerjourney-app`) uses the **same ids**, and
   the two apps sync task status both ways: see [docs/journey-sync.md](docs/journey-sync.md).
   Fin's 7 client tasks (`bssClientTaskIds`) are worked in the portal; the
-  team's 34 are worked here. A BSS client syncs only once its
-  `journey_client_id` is set (`PATCH /api/clients/<id>`). Fin never sees this
-  dashboard — his window is the customer-journey portal.
+  team's 34 are worked here. **BSS clients are created in the portal admin,
+  not here:** listing the Live BSS workspace mirrors the portal's BSS clients
+  (`reconcileJourneyClients` → portal `GET /api/csm-sync/clients`), creating
+  and linking (`journey_client_id`) any it doesn't have and importing their
+  progress once. Fin never sees this dashboard — his window is the
+  customer-journey portal.
 
 ## Known trip-wires
 

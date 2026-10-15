@@ -736,6 +736,37 @@ function TaskBackupSettings({
   );
 }
 
+// Fresh keys (2026-10-15): the old "respond-csm-theme" saved "dark" on every
+// load, so it can't tell a real choice from the old default.
+const themeStorageKey = "csm-theme";
+const lastViewStorageKey = "csm-last-view";
+
+function readStoredPreference(key: string) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredPreference(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Private mode / blocked storage: preferences just aren't remembered.
+  }
+}
+
+function readLastView(): { product: ProductKey; clientId: string } | null {
+  try {
+    const parsed = JSON.parse(readStoredPreference(lastViewStorageKey) ?? "null") as { product?: string; clientId?: unknown } | null;
+    const product = productWorkspaces.find((workspace) => workspace.key === parsed?.product)?.key;
+    return product ? { product, clientId: typeof parsed?.clientId === "string" ? parsed.clientId : "" } : null;
+  } catch {
+    return null;
+  }
+}
+
 // Live is the default workspace (2026-10-15); Demo is the seeded training copy.
 const settingsModeOrder: EnvironmentKey[] = ["live", "demo"];
 
@@ -2938,16 +2969,11 @@ export default function RespondDashboard({
   );
   const [detailReadyTaskId, setDetailReadyTaskId] = useState<string | null>(null);
   const [detailTaskId, setDetailTaskId] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<AppSection>("home");
+  const [activeSection, setActiveSection] = useState<AppSection>("tasks");
   const [selectedClientId, setSelectedClientId] = useState("all");
-  const [theme, setTheme] = useState<ThemeMode>(() => {
-    if (typeof window === "undefined") {
-      return "dark";
-    }
-
-    const storedTheme = window.localStorage.getItem("respond-csm-theme");
-    return storedTheme === "light" ? "light" : "dark";
-  });
+  // Light by default. A saved choice is restored after hydration (see the
+  // preferences effect below) so the first render matches the server HTML.
+  const [theme, setTheme] = useState<ThemeMode>("light");
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [ownerFilter, setOwnerFilter] = useState("all");
@@ -2973,7 +2999,7 @@ export default function RespondDashboard({
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskCategory, setNewTaskCategory] = useState(initialCategories[0]?.name ?? "");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => new Set());
-  const [expandedPhases, setExpandedPhases] = useState<Set<string>>(() => new Set(phaseOrder));
+  const [expandedPhases, setExpandedPhases] = useState<Set<string>>(() => new Set());
   const [isTaskOverviewOpen, setIsTaskOverviewOpen] = useState(false);
   const [storageNotice, setStorageNotice] = useState("");
   const [taskActionNotice, setTaskActionNotice] = useState<TaskActionNotice | null>(null);
@@ -3046,7 +3072,7 @@ export default function RespondDashboard({
     setNewTaskTitle("");
     setNewTaskCategory(nextCategories[0]?.name ?? "");
     setExpandedCategories(new Set());
-    setExpandedPhases(new Set(phaseOrder));
+    setExpandedPhases(new Set());
     setIsTaskOverviewOpen(false);
     setShowNewClientPanel(false);
     setStorageNotice("");
@@ -3068,9 +3094,48 @@ export default function RespondDashboard({
     resetWorkspace(activeEnvironment, product);
   }
 
+  // Saved preferences: theme, plus the last workspace + client so the board
+  // reopens where you left off (it always starts in Live). The persist effects
+  // are declared before the restore effect and skip until it has run, so the
+  // defaults never overwrite what was saved.
+  const preferencesRestored = useRef(false);
+
   useEffect(() => {
-    window.localStorage.setItem("respond-csm-theme", theme);
+    if (preferencesRestored.current) {
+      writeStoredPreference(themeStorageKey, theme);
+    }
   }, [theme]);
+
+  useEffect(() => {
+    if (preferencesRestored.current) {
+      const clientId = selectedClientId !== "all" ? selectedClientId : activeTaskClientId;
+      writeStoredPreference(lastViewStorageKey, JSON.stringify({ product: activeProduct, clientId }));
+    }
+  }, [activeProduct, activeTaskClientId, selectedClientId]);
+
+  useEffect(() => {
+    // One-time sync from localStorage after hydration (not available on the server).
+    const lastView = readLastView();
+    preferencesRestored.current = true;
+
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (readStoredPreference(themeStorageKey) === "dark") {
+      setTheme("dark");
+    }
+
+    if (lastView) {
+      if (lastView.product !== activeProduct) {
+        resetWorkspace(activeEnvironment, lastView.product);
+      }
+
+      if (lastView.clientId) {
+        setSelectedClientId(lastView.clientId);
+      }
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+    // Mount only: restoring must not re-run when the workspace changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let active = true;
