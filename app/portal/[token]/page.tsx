@@ -140,7 +140,12 @@ export default async function ClientPortal({ params }: { params: Promise<{ token
   return <ClientPortalView token={token} {...workspace} />;
 }
 
-function RespondMark({ className }: { className: string }) {
+function RespondMark({ className, product }: { className: string; product?: string }) {
+  // BSS clients get a clean portal without the RT Digital / Respond mark.
+  if (product === "bss") {
+    return null;
+  }
+
   return <span className={`${className} respond-mark-image`} aria-hidden="true" />;
 }
 
@@ -194,7 +199,7 @@ function ClientPortalView({ client, tasks, formDefinition, formSubmission, token
       <header className="client-portal-hero">
         <nav className="portal-topline" aria-label="Portal header">
           <div className="portal-brand">
-            <RespondMark className="portal-brand-mark" />
+            <RespondMark className="portal-brand-mark" product={client.product} />
             <div>
               <strong>{product.label} CSM</strong>
               <span>Private project portal</span>

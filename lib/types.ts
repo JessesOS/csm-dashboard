@@ -24,7 +24,7 @@ export function normalizeTaskStatus(status: string): TaskStatus {
 
 export type Priority = "low" | "normal" | "high" | "critical";
 
-export type ProductKey = "respond" | "scale";
+export type ProductKey = "respond" | "scale" | "bss";
 export type ScaleVariant = "meta" | "google" | "meta_google";
 
 export type EnvironmentKey = "demo" | "live";
