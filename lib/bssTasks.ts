@@ -15,7 +15,6 @@ export const bssSourceDocument = {
 export const bssTeamMembers = [
   "Unassigned",
   "Jesse Allan",
-  "RT Digital",
 ];
 
 export const bssCategories: Category[] = [
@@ -107,6 +106,7 @@ export const bssSeedTasks: Task[] = [
     priority: "high",
     dependencies: ["bss-003"],
     notes: "Customer journey mapped end to end and agreed with the client before build starts.",
+    portalActionRequired: true,
   }),
   task(5, "bss-discovery", "Audit current CRM + GHL sub-account → written findings", {
     assignee: "Jesse Allan",
@@ -169,6 +169,7 @@ export const bssSeedTasks: Task[] = [
     portalTitle: "Your new website — core pages",
     portalNote: "Home, About, Podcast & socials, Book a call, Call booked, Not-qualified, Link-in-bio, Privacy. Two rounds of changes included.",
     notes: "Keep existing copy, claims, offers and guarantee unchanged unless the client approves a change. 2 revision rounds on core pages.",
+    portalActionRequired: true,
   }),
   task(15, "bss-website", "Build 2 webinar pages (registration + thank-you)", {
     assignee: "Jesse Allan",
@@ -178,6 +179,7 @@ export const bssSeedTasks: Task[] = [
     portalConfigured: true,
     portalTitle: "Webinar pages",
     portalNote: "Registration and thank-you pages. Three rounds of changes included.",
+    portalActionRequired: true,
   }),
   task(16, "bss-website", "Update partner pages", {
     assignee: "Jesse Allan",
@@ -187,6 +189,7 @@ export const bssSeedTasks: Task[] = [
     portalConfigured: true,
     portalTitle: "Partner pages",
     portalNote: "Exact pages confirmed in the first two weeks. Two rounds of changes included.",
+    portalActionRequired: true,
   }),
   task(17, "bss-website", "Add VSL placeholder slot", {
     assignee: "Jesse Allan",
@@ -263,6 +266,7 @@ export const bssSeedTasks: Task[] = [
     portalConfigured: true,
     portalTitle: "Website launch",
     portalNote: "We launch on your domain on an agreed day.",
+    portalActionRequired: true,
   }),
   task(28, "bss-golive", "Lead nurture sequence live", {
     assignee: "Jesse Allan",
@@ -356,3 +360,8 @@ export const bssSeedTasks: Task[] = [
     portalNote: "We review and support through month 8.",
   }),
 ];
+
+// Tasks Fin completes himself in the customer-journey portal (the portal owns
+// these; the team owns the rest). Derived from the flags above so there is one
+// source of truth. Must match the portal's client tasks in lib/bssJourney.ts.
+export const bssClientTaskIds = new Set(bssSeedTasks.filter((task) => task.portalActionRequired).map((task) => task.id));

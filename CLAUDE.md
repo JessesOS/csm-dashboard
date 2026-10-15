@@ -67,6 +67,15 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   in the UI — this bit us once (a migration wrote bare template IDs) and is
   worth double-checking on any future migration that touches `dependencies`.
 - Portal API: `GET /api/portal/{token}/tasks` → `{ clientId, clientName, tasks }`.
+- **BSS** (2026-10-15) is a third product (`bss`) for Bitcoin Success School /
+  Fin Creighton — custom 41-task template in `lib/bssTasks.ts` (ids
+  `bss-001…041`), drawn from the signed agreement, not from Scale. The
+  customer-journey portal (`customerjourney-app`) uses the **same ids**, and
+  the two apps sync task status both ways: see [docs/journey-sync.md](docs/journey-sync.md).
+  Fin's 7 client tasks (`bssClientTaskIds`) are worked in the portal; the
+  team's 34 are worked here. A BSS client syncs only once its
+  `journey_client_id` is set (`PATCH /api/clients/<id>`). Fin never sees this
+  dashboard — his window is the customer-journey portal.
 
 ## Known trip-wires
 

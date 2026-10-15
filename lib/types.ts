@@ -206,6 +206,8 @@ export interface RespondClient {
   product: ProductKey;
   scaleVariant?: ScaleVariant;
   portalToken?: string;
+  /** BSS: the customer-journey portal client (portal_clients.id) this client syncs with. */
+  journeyClientId?: string;
   name: string;
   companyName?: string;
   code: string;
