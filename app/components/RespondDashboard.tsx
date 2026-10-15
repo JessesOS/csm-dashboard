@@ -967,7 +967,6 @@ function ProductSwitcher({
             onClick={() => onProductChange(workspace.key)}
             title={workspace.description}
           >
-            <RespondMark className="product-switcher-mark" product={workspace.key} />
             <span>{workspace.clientLabel}</span>
           </button>
         ))}
