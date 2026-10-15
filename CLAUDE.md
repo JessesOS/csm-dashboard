@@ -85,6 +85,11 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
 - Don't declare `nodejs_compat` in `vite.config.ts` — `vinext` injects it
   automatically; declaring it twice fails the Cloudflare upload with error
   10021 ("Compatibility flag specified multiple times").
+- A Worker can't `fetch()` another `*.workers.dev` Worker on the same
+  Cloudflare account — it fails in production only (error **1042**; local
+  dev has no such rule, so it passes locally). Worker-to-worker calls must go
+  through a **service binding** (`services` in `vite.config.ts`). The BSS
+  journey sync uses `JOURNEY_PORTAL` → `scale-onboarding-portal`.
 - Any INSERT statement's column list and its bound-values array must match
   in count — a mismatch here (`seedClients`) once broke cold-start seeding
   on any fresh database while working fine on an already-seeded one.

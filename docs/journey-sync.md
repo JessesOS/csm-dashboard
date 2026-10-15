@@ -25,6 +25,17 @@ happens, not a lock.
 CSM tags portal-originated writes `actor = "portal"` and skips the push; the
 portal's `/api/csm-sync/milestone` must likewise never call CSM.
 
+## Transport — service bindings, not public URLs
+
+In production the two Workers call each other over **service bindings**: a
+plain `fetch()` from one `*.workers.dev` Worker to another on the same account
+fails with Cloudflare **error 1042** (only in production — local dev has no
+such rule). CSM binds `JOURNEY_PORTAL` → `scale-onboarding-portal`; the portal
+binds `CSM_DASHBOARD` → `csm-dashboard`. The URLs below are still used for the
+request path (the host is ignored over a binding). Setting
+`JOURNEY_SYNC_URL` / `CSM_SYNC_URL` explicitly (local dev) switches back to a
+plain `fetch()` to that URL.
+
 ## Auth
 
 Shared secret `JOURNEY_SYNC_TOKEN`, set on **both** workers
