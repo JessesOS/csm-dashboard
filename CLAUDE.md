@@ -73,9 +73,12 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   customer-journey portal (`customerjourney-app`) uses the **same ids**, and
   the two apps sync task status both ways: see [docs/journey-sync.md](docs/journey-sync.md).
   Fin's 7 client tasks (`bssClientTaskIds`) are worked in the portal; the
-  team's 34 are worked here. A BSS client syncs only once its
-  `journey_client_id` is set (`PATCH /api/clients/<id>`). Fin never sees this
-  dashboard — his window is the customer-journey portal.
+  team's 34 are worked here. **BSS clients are created in the portal admin,
+  not here:** listing the Live BSS workspace mirrors the portal's BSS clients
+  (`reconcileJourneyClients` → portal `GET /api/csm-sync/clients`), creating
+  and linking (`journey_client_id`) any it doesn't have and importing their
+  progress once. Fin never sees this dashboard — his window is the
+  customer-journey portal.
 
 ## Known trip-wires
 
@@ -97,6 +100,16 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   over from the Codex Sites era. Harmless, unused, safe to ignore or remove.
 
 ## Design notes
+
+- **Side rail (2026-10-15):** workspace is a dropdown (`WorkspaceMenu`), the
+  two views are one tab row (`ViewTabs`), and the delivery-stage tree fills the
+  rest of the rail. Mode (Live / Demo) lives in **Settings**; a "Demo" badge
+  shows on the workspace control whenever Demo is on.
+- **The dashboard opens on Live** (`app/page.tsx`, `startEnvironment`), with no
+  preview tasks. `defaultEnvironment` in `lib/productWorkspaces.ts` deliberately
+  stays `"demo"`: it decides where the seeded *preview* tasks are allowed
+  (`resetWorkspace`), and flipping it would show template tasks as if they were
+  a real Live client's.
 
 - Font weights were compressed project-wide in 2026-07 (was mostly 760–900,
   now 400–700) — keep new weights in that range, don't reintroduce 800+.

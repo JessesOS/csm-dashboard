@@ -7,7 +7,7 @@ import {
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
 import { bssClientTaskIds } from "./bssTasks";
-import { JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
+import { fetchJourneyBssClients, JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
 import { portalDefaultsForTask } from "./portalDefaults";
 import { scaleTasksForVariant } from "./scaleTasks";
 import {
@@ -1694,6 +1694,11 @@ export async function listClients(environmentInput: string | null | undefined = 
 
   await reconcileDuplicateClients(environment, product);
 
+  // BSS clients are created in the customer-journey portal; mirror them here.
+  if (environment === "live" && product === "bss") {
+    await reconcileJourneyClients();
+  }
+
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
@@ -1948,6 +1953,67 @@ export async function applyJourneyMilestoneUpdate(input: { journeyClientId: stri
   }
 
   return updated;
+}
+
+/**
+ * BSS clients are created in the customer-journey portal admin, and the Live BSS
+ * workspace mirrors them. A portal client CSM doesn't have yet becomes a Live
+ * CSM client (41 tasks seeded) linked by journey_client_id, and the portal's
+ * completed milestones are imported once, at link time — after that the live
+ * per-milestone sync keeps the two in step. Linked clients keep the portal's
+ * name and company. Never throws: if the portal can't be reached, CSM shows
+ * what it already has.
+ */
+async function reconcileJourneyClients() {
+  const portalClients = await fetchJourneyBssClients();
+
+  if (!portalClients) {
+    return;
+  }
+
+  const d1 = getD1();
+
+  for (const portalClient of portalClients) {
+    try {
+      const linked = await d1
+        .prepare("SELECT id, name, company_name AS companyName FROM clients WHERE environment = 'live' AND product = 'bss' AND journey_client_id = ?")
+        .bind(portalClient.id)
+        .first<{ id: string; name: string; companyName: string }>();
+
+      if (linked) {
+        if (linked.name !== portalClient.name || (linked.companyName ?? "") !== portalClient.companyName) {
+          await d1
+            .prepare("UPDATE clients SET name = ?, company_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+            .bind(portalClient.name, portalClient.companyName, linked.id)
+            .run();
+        }
+        continue;
+      }
+
+      // The portal id is the identity, not the name: two portal clients can
+      // share a name or company. The id is derived from it, so if two page
+      // loads race, the second insert fails on the primary key (caught below)
+      // instead of creating a duplicate.
+      const client = await insertNewClient(
+        { environment: "live", product: "bss", name: portalClient.name, companyName: portalClient.companyName, owner: "Jesse Allan" },
+        "live",
+        "bss",
+        `live-bss-${slugify(portalClient.name) || "client"}-${portalClient.id.slice(0, 8)}`
+      );
+
+      await d1.prepare("UPDATE clients SET journey_client_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?").bind(portalClient.id, client.id).run();
+
+      for (const milestone of portalClient.completed) {
+        const taskId = scopedTaskId(client.id, milestone.milestoneId);
+
+        if (await d1.prepare("SELECT id FROM tasks WHERE id = ?").bind(taskId).first()) {
+          await updateTask(taskId, { status: "complete", ...(milestone.note ? { notes: milestone.note } : {}) }, JOURNEY_SYNC_ACTOR);
+        }
+      }
+    } catch (error) {
+      console.error(`[journey-sync] could not mirror portal client ${portalClient.id}: ${error instanceof Error ? error.message : error}`);
+    }
+  }
 }
 
 /** Link a CSM BSS client to its customer-journey portal client (portal_clients.id). */
@@ -3234,44 +3300,21 @@ async function updateExistingClientIdentity(client: RespondClient, payload: Clie
   return row ? fromClientRow(row) : client;
 }
 
-export async function createClient(payload: ClientCreatePayload) {
-  await ensureTaskStorage();
-  const name = payload.name?.trim();
-  const companyName = payload.companyName?.trim() ?? "";
-  const environment = normalizeEnvironment(payload.environment);
-  const product = normalizeProduct(payload.product);
+/**
+ * Insert a brand-new client and seed its template tasks — no identity
+ * de-duplication. Pass `explicitId` to make the insert idempotent (a second
+ * insert with the same id fails on the primary key instead of duplicating).
+ */
+async function insertNewClient(
+  payload: ClientCreatePayload & { name: string; companyName: string },
+  environment: EnvironmentKey,
+  product: ProductKey,
+  explicitId?: string
+) {
+  const id = explicitId ?? (await nextClientId(payload.name, environment, product));
+  const client = buildNewClient(payload, id, environment, product);
 
-  if (!name) {
-    throw new Error("Client name is required.");
-  }
-
-  const d1 = getD1();
-  const existingClients = await findExistingClientsByIdentity(environment, product, name, companyName);
-  const existingClient = pickCanonicalClient(existingClients, name, companyName);
-
-  if (existingClient) {
-    await mergeDuplicateClients(
-      existingClient,
-      existingClients.filter((client) => client.id !== existingClient.id),
-      environment,
-      product
-    );
-
-    const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
-    await seedTemplateTasksForClient(client.id, environment, product, false);
-    await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
-
-    return {
-      client,
-      tasks: await listTasks(environment, product, client.id),
-      created: false,
-    };
-  }
-
-  const id = await nextClientId(name, environment, product);
-  const client = buildNewClient({ ...payload, name, companyName }, id, environment, product);
-
-  await d1
+  await getD1()
     .prepare(`
       INSERT INTO clients (
         id,
@@ -3305,6 +3348,44 @@ export async function createClient(payload: ClientCreatePayload) {
 
   await seedTemplateTasksForClient(client.id, environment, product, false);
   await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
+
+  return client;
+}
+
+export async function createClient(payload: ClientCreatePayload) {
+  await ensureTaskStorage();
+  const name = payload.name?.trim();
+  const companyName = payload.companyName?.trim() ?? "";
+  const environment = normalizeEnvironment(payload.environment);
+  const product = normalizeProduct(payload.product);
+
+  if (!name) {
+    throw new Error("Client name is required.");
+  }
+
+  const existingClients = await findExistingClientsByIdentity(environment, product, name, companyName);
+  const existingClient = pickCanonicalClient(existingClients, name, companyName);
+
+  if (existingClient) {
+    await mergeDuplicateClients(
+      existingClient,
+      existingClients.filter((client) => client.id !== existingClient.id),
+      environment,
+      product
+    );
+
+    const client = await updateExistingClientIdentity(existingClient, { ...payload, name, companyName });
+    await seedTemplateTasksForClient(client.id, environment, product, false);
+    await applyPortalDefaultsToUnconfiguredTasks(client.id, environment, product);
+
+    return {
+      client,
+      tasks: await listTasks(environment, product, client.id),
+      created: false,
+    };
+  }
+
+  const client = await insertNewClient({ ...payload, name, companyName }, environment, product);
 
   return {
     client,
