@@ -25,7 +25,9 @@ export function normalizeTaskStatus(status: string): TaskStatus {
 export type Priority = "low" | "normal" | "high" | "critical";
 
 export type ProductKey = "respond" | "scale" | "bss";
-export type ScaleVariant = "meta" | "google" | "meta_google";
+// "bss_meta" = "BSS Meta ads only": Meta-only Scale delivery under BSS branding
+// (matches the customer-journey portal's product of that name; no sync).
+export type ScaleVariant = "meta" | "google" | "meta_google" | "bss_meta";
 
 export type EnvironmentKey = "demo" | "live";
 
