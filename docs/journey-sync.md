@@ -168,4 +168,4 @@ below. Both sessions may append.
 | 2026-10-16 | Cal.com → **Calendly** (`bss-003, 007, 013, 022`) | both |
 | 2026-10-16 | `bss-003` is **invite-based access**: Fin invites `admin@allconvos.ai` on CRM, GHL, Calendly, domain, hosting, Meta Business Suite, YouTube; no passwords | both |
 | 2026-10-16 | Cross-check: both apps show only `jessetest` (f11ea83a), `bss-001` done with transcript; in sync | both |
-
+| 2026-10-16 | Portal strips the voice's bracketed delivery cues (e.g. `[warmly]`, ≤30 chars) from interview transcripts before saving, so `bss-001` notes arrive clean; jessetest's earlier note still has them (test data) | portal |
