@@ -66,7 +66,8 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   `lib/taskStore.ts`: each runs once per database after storage is ready,
   recorded in `app_meta` as `migration:<key>`. Append only; make each fix
   conditional on the old value so it never overwrites later edits (see
-  `bssWordingFixes`, the Cal.com → Calendly rewording, 2026-10-16).
+  `wordingMigration` and the BSS wording fixes: Cal.com → Calendly, and
+  bss-003 invite-based access, 2026-10-16).
 - Task IDs are **scoped** per client (`clientId__templateId`), but
   `dependencies` arrays must also store **scoped** IDs to resolve correctly
   in the UI — this bit us once (a migration wrote bare template IDs) and is

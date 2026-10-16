@@ -88,17 +88,17 @@ export const bssSeedTasks: Task[] = [
     portalTitle: "Kick-off call & portal walkthrough",
     portalNote: "We'll set you up in the portal, walk the journey, and agree next steps.",
   }),
-  task(3, "bss-intake", "Collect access — CRM, GHL, Calendly, domain, hosting, socials", {
+  task(3, "bss-intake", "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting, Meta, YouTube", {
     assignee: "Jesse Allan",
     dueWindow: "Weeks 1-2",
     priority: "high",
     dependencies: ["bss-002"],
     portalVisible: true,
     portalConfigured: true,
-    portalTitle: "Share your access",
-    portalNote: "Give us access to your existing CRM, GoHighLevel sub-account, your Calendly account, domain, hosting, and social accounts.",
+    portalTitle: "Invite us to your accounts",
+    portalNote: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider, website hosting, Meta Business Suite (Facebook and Instagram) and YouTube. No passwords change hands. Anything that won't accept an invite, we sort out together on a call.",
     portalActionRequired: true,
-    notes: "Client responsibility per the agreement: CRM, GHL sub-account, Calendly account, domain, hosting, socials.",
+    notes: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\n- Meta Business Suite, Facebook & Instagram (full control)\n- YouTube (manager)\nNo passwords change hands; anything that won't accept an invite is sorted on a call.",
   }),
   task(4, "bss-discovery", "Map & agree the customer journey (before any build)", {
     assignee: "Jesse Allan",

@@ -1660,7 +1660,9 @@ async function prepareTaskStorage() {
 // Wording fixes for BSS tasks that already exist. Each applies only where the
 // field still holds the old template text, so anything written since (e.g. a
 // note Fin added on bss-003) is never overwritten.
-const bssWordingFixes: { templateId: string; column: "title" | "notes" | "portal_note"; from: string; to: string }[] = [
+type WordingFix = { templateId: string; column: "title" | "notes" | "portal_title" | "portal_note"; from: string; to: string };
+
+const bssCalendlyWordingFixes: WordingFix[] = [
   // 2026-10-16: Fin uses Calendly, not Cal.com (the agreement is out of date).
   { templateId: "bss-003", column: "title", from: "Collect access — CRM, GHL, Cal.com, domain, hosting, socials", to: "Collect access — CRM, GHL, Calendly, domain, hosting, socials" },
   {
@@ -1696,19 +1698,33 @@ const bssWordingFixes: { templateId: string; column: "title" | "notes" | "portal
   },
 ];
 
-async function migrateBssWording() {
-  const d1 = getD1();
-  await d1.batch(
-    bssWordingFixes.map((fix) =>
-      d1.prepare(`UPDATE tasks SET ${fix.column} = ? WHERE product = 'bss' AND template_id = ? AND ${fix.column} = ?`).bind(fix.to, fix.templateId, fix.from)
-    )
-  );
+// 2026-10-16: bss-003 is invite-based access (matches the portal): Fin invites
+// admin@allconvos.ai on each platform; no passwords change hands.
+const bssInviteAccessWordingFixes: WordingFix[] = [
+  { templateId: "bss-003", column: "title", from: "Collect access — CRM, GHL, Calendly, domain, hosting, socials", to: "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting, Meta, YouTube" },
+  { templateId: "bss-003", column: "portal_title", from: "Share your access", to: "Invite us to your accounts" },
+  { templateId: "bss-003", column: "portal_note", from: "Give us access to your existing CRM, GoHighLevel sub-account, your Calendly account, domain, hosting, and social accounts.", to: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider, website hosting, Meta Business Suite (Facebook and Instagram) and YouTube. No passwords change hands. Anything that won't accept an invite, we sort out together on a call." },
+  { templateId: "bss-003", column: "notes", from: "Client responsibility per the agreement: CRM, GHL sub-account, Calendly account, domain, hosting, socials.", to: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\n- Meta Business Suite, Facebook & Instagram (full control)\n- YouTube (manager)\nNo passwords change hands; anything that won't accept an invite is sorted on a call." },
+];
+
+function wordingMigration(fixes: WordingFix[]) {
+  return async () => {
+    const d1 = getD1();
+    await d1.batch(
+      fixes.map((fix) =>
+        d1.prepare(`UPDATE tasks SET ${fix.column} = ? WHERE product = 'bss' AND template_id = ? AND ${fix.column} = ?`).bind(fix.to, fix.templateId, fix.from)
+      )
+    );
+  };
 }
 
 // One-off data fixes that must reach existing databases even when the schema
 // doesn't change (prepareTaskStorage only re-runs on a shape change). Each runs
 // once per database, recorded in app_meta as "migration:<key>". Append only.
-const runOnceMigrations: { key: string; run: () => Promise<void> }[] = [{ key: "2026-10-16-bss-calendly-wording", run: migrateBssWording }];
+const runOnceMigrations: { key: string; run: () => Promise<void> }[] = [
+  { key: "2026-10-16-bss-calendly-wording", run: wordingMigration(bssCalendlyWordingFixes) },
+  { key: "2026-10-16-bss-003-invite-access", run: wordingMigration(bssInviteAccessWordingFixes) },
+];
 
 async function runPendingOnceMigrations() {
   for (const migration of runOnceMigrations) {
