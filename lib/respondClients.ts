@@ -346,48 +346,7 @@ export const respondClients: RespondClient[] = baseRespondClients.map((client) =
   product: "respond",
 }));
 
-export const liveRespondClients: RespondClient[] = [
-  {
-    id: "live-bruce-chaplin",
-    environment: "live",
-    product: "respond",
-    name: "Bruce Chaplin",
-    companyName: "BC TD Management PTY LTD",
-    code: "BC",
-    industry: "GHL Active Client",
-    owner: "GHL import",
-    phase: "Onboarding",
-    health: "on_track",
-    progress: 0,
-    currentTask: "Fresh Respond onboarding template",
-    goLiveDate: "2026-06-28",
-    goLiveLabel: "Jun 28, 2026",
-    lastUpdate: "Jun 14, 2026 5:20 AM",
-    nextStep: "Start Respond onboarding checklist",
-    blocker: "None",
-    risk: "low",
-    activeTasks: seedTasks.length,
-    completedTasks: 0,
-    timeline: [
-      {
-        label: "Respond checklist",
-        phase: "Onboarding",
-        startDay: 0,
-        span: 5,
-        status: "on_track",
-        marker: "milestone",
-      },
-    ],
-    attention: [
-      {
-        issue: "New client ready to start",
-        status: "Ready",
-        owner: "GHL import",
-        lastUpdate: "Jun 14, 2026 5:20 AM",
-        nextStep: "Start Respond onboarding checklist",
-        blocker: "None",
-        risk: "low",
-      },
-    ],
-  },
-];
+// No Live clients are seeded (2026-10-16): Live clients come from GHL import or
+// "New client". Anything listed here is re-created on every cold start, so a
+// seeded client can't be deleted from the UI (Bruce Chaplin used to live here).
+export const liveRespondClients: RespondClient[] = [];
