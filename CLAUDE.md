@@ -1,5 +1,23 @@
 # CLAUDE.md — CSM Dashboard
 
+> **FROZEN — 2026-10-16. Do not run, build, deploy or open this app.**
+>
+> Jesse chose "Option D": this back office is being folded into the client
+> portal app at `~/Master/AI/customerjourney-app`, where each product is defined
+> once (client steps + the team tasks behind them) and there is no sync.
+>
+> - Opening this app **rewrites its own data** (duplicate merges, template
+>   re-seeds on page load), so don't run it, even locally against remote data.
+> - Full database backup: `~/Master/_private/backups/csm-dashboard/csm-dashboard-db-2026-10-16.sql`
+>   (`wrangler d1 export csm-dashboard-db --remote`). No real client work was in it.
+> - Its public workers.dev address is being switched off (reversible). The worker
+>   itself stays until the portal's `CSM_DASHBOARD` service binding is removed.
+> - The task lists in `lib/scaleTasks.ts`, `lib/respondTasks.ts` and
+>   `lib/bssTasks.ts` (commit 5c9abc9) are the source being converted into
+>   `customerjourney-app/products/`. Leave them as they are.
+> - Plan: `~/.claude/plans/temporal-waddling-wave.md`. Work happens in the
+>   customerjourney-app session only.
+
 *Project-level context, inherited by every Claude Code session rooted here.
 See `~/Master/CLAUDE.md` for the layer above this, and
 `~/Master/AI/JesseOS/30_Master_Architecture/Standards/Session_Root_Protocol.md`
