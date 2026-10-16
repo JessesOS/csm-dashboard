@@ -1695,9 +1695,8 @@ export async function listClients(environmentInput: string | null | undefined = 
   await reconcileDuplicateClients(environment, product);
 
   // BSS clients are created in the customer-journey portal; mirror them here.
-  if (environment === "live" && product === "bss") {
-    await reconcileJourneyClients();
-  }
+  const clientsFromPortal = environment === "live" && product === "bss";
+  const portalClientIds = clientsFromPortal ? await reconcileJourneyClients() : null;
 
   const [clientRows, countRows] = await Promise.all([
     d1
@@ -1713,7 +1712,24 @@ export async function listClients(environmentInput: string | null | undefined = 
   ]);
   const counts = new Map((countRows.results ?? []).map((item) => [item.clientId, item]));
 
-  return (clientRows.results ?? []).map(fromClientRow).map((client) => applyClientCounts(client, counts.get(client.id)));
+  return (clientRows.results ?? [])
+    .map(fromClientRow)
+    .filter((client: RespondClient) => !clientsFromPortal || isPortalClientVisible(client, portalClientIds))
+    .map((client) => applyClientCounts(client, counts.get(client.id)));
+}
+
+/**
+ * Live BSS shows exactly the portal's clients. A client that was never linked
+ * (made here by hand) or whose portal record was deleted is hidden — not
+ * deleted, so its data survives a mistaken portal delete. If the portal can't
+ * be reached (null), linked clients stay visible rather than vanishing.
+ */
+function isPortalClientVisible(client: RespondClient, portalClientIds: Set<string> | null) {
+  if (!client.journeyClientId) {
+    return false;
+  }
+
+  return portalClientIds === null || portalClientIds.has(client.journeyClientId);
 }
 
 async function requireClient(environment: EnvironmentKey, product: ProductKey, clientId: string) {
@@ -1964,11 +1980,11 @@ export async function applyJourneyMilestoneUpdate(input: { journeyClientId: stri
  * name and company. Never throws: if the portal can't be reached, CSM shows
  * what it already has.
  */
-async function reconcileJourneyClients() {
+async function reconcileJourneyClients(): Promise<Set<string> | null> {
   const portalClients = await fetchJourneyBssClients();
 
   if (!portalClients) {
-    return;
+    return null;
   }
 
   const d1 = getD1();
@@ -2014,6 +2030,8 @@ async function reconcileJourneyClients() {
       console.error(`[journey-sync] could not mirror portal client ${portalClient.id}: ${error instanceof Error ? error.message : error}`);
     }
   }
+
+  return new Set(portalClients.map((portalClient) => portalClient.id));
 }
 
 /** Link a CSM BSS client to its customer-journey portal client (portal_clients.id). */
@@ -3098,7 +3116,8 @@ async function findExistingClientsByIdentity(environment: EnvironmentKey, produc
   return (result.results ?? [])
     .map(fromClientRow)
     .filter(
-      (client) =>
+      (client: RespondClient) =>
+        !client.journeyClientId &&
         clientIdentityValues(client.name, client.companyName).some((identity) => incoming.has(identity)) &&
         clientMatchesIncomingIdentity(client, name, companyName)
     );
@@ -3221,7 +3240,10 @@ async function reconcileDuplicateClients(environment: EnvironmentKey, product: P
     .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
     .bind(environment, product)
     .all<ClientRow>();
-  const remaining = (result.results ?? []).map(fromClientRow);
+  // Portal-linked (BSS) clients are identified by their portal id, never by
+  // name/company — two can legitimately share both. Merging them deleted the
+  // mirror, which the portal sync then re-created empty, losing its progress.
+  const remaining = (result.results ?? []).map(fromClientRow).filter((client: RespondClient) => !client.journeyClientId);
 
   while (remaining.length > 0) {
     const client = remaining.shift();

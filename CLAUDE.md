@@ -93,6 +93,10 @@ Next.js tooling) and `@cloudflare/vite-plugin`.
   dev has no such rule, so it passes locally). Worker-to-worker calls must go
   through a **service binding** (`services` in `vite.config.ts`). The BSS
   journey sync uses `JOURNEY_PORTAL` → `scale-onboarding-portal`.
+- Never let the old name/company duplicate-merging touch a client that has a
+  `journey_client_id` — portal-linked BSS clients are identified by portal id
+  and may share a name/company. Merging one deletes it and the sync re-creates
+  it empty (this lost progress once, locally, 2026-10-16).
 - Any INSERT statement's column list and its bound-values array must match
   in count — a mismatch here (`seedClients`) once broke cold-start seeding
   on any fresh database while working fine on an already-seeded one.

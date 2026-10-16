@@ -736,6 +736,9 @@ function TaskBackupSettings({
   );
 }
 
+const portalClientsHint =
+  "BSS clients are created in the customer journey portal admin. Create one there and it appears here automatically, with its tasks and progress.";
+
 // Fresh keys (2026-10-15): the old "respond-csm-theme" saved "dark" on every
 // load, so it can't tell a real choice from the old default.
 const themeStorageKey = "csm-theme";
@@ -2475,6 +2478,7 @@ function MissionControl({
   onCreateClientClick,
   onImportGhlClient,
   canImportGhlClient,
+  canCreateClient,
   isImportingGhlClient,
   theme,
   onThemeChange,
@@ -2518,6 +2522,8 @@ function MissionControl({
   onCreateClientClick: () => void;
   onImportGhlClient: () => void;
   canImportGhlClient: boolean;
+  /** False in Live BSS: those clients are created in the customer-journey portal admin. */
+  canCreateClient: boolean;
   isImportingGhlClient: boolean;
   theme: ThemeMode;
   onThemeChange: (theme: ThemeMode) => void;
@@ -2725,10 +2731,12 @@ function MissionControl({
                   {isImportingGhlClient ? "Importing" : "Import from GHL"}
                 </button>
               ) : null}
-              <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
-                <Icon name="plus" />
-                New client
-              </button>
+              {canCreateClient ? (
+                <button type="button" className="mission-secondary" onClick={onCreateClientClick}>
+                  <Icon name="plus" />
+                  New client
+                </button>
+              ) : null}
               <button type="button" className="mission-primary" onClick={() => onOpenTasks(selectedClient?.id)} disabled={emptyPortfolio}>
                 <Icon name="tasks" />
                 Open tasks
@@ -2783,7 +2791,11 @@ function MissionControl({
             <article className="empty-state-card">
               <span>{environment.shortLabel}</span>
               <h2>No {product.shortLabel} clients yet</h2>
-              <p>Create your first {product.shortLabel} client to generate a fresh checklist, portal link, timeline, and task board.</p>
+              {canCreateClient ? (
+                <p>Create your first {product.shortLabel} client to generate a fresh checklist, portal link, timeline, and task board.</p>
+              ) : (
+                <p>{portalClientsHint}</p>
+              )}
               <div className="empty-actions">
                 {canImportGhlClient ? (
                   <button type="button" className="mission-primary" onClick={onImportGhlClient} disabled={isImportingGhlClient}>
@@ -2791,10 +2803,12 @@ function MissionControl({
                     {isImportingGhlClient ? "Importing" : "Import from GHL"}
                   </button>
                 ) : null}
-                <button type="button" className={canImportGhlClient ? "mission-secondary" : "mission-primary"} onClick={onCreateClientClick}>
-                  <Icon name="plus" />
-                  New client
-                </button>
+                {canCreateClient ? (
+                  <button type="button" className={canImportGhlClient ? "mission-secondary" : "mission-primary"} onClick={onCreateClientClick}>
+                    <Icon name="plus" />
+                    New client
+                  </button>
+                ) : null}
               </div>
             </article>
           ) : null}
@@ -3362,7 +3376,10 @@ export default function RespondDashboard({
     }),
     [tasks]
   );
-  const canImportGhlClient = activeEnvironment === "live";
+  // Live BSS clients are created in the customer-journey portal admin and
+  // mirrored here, so this dashboard doesn't offer to create or import them.
+  const clientsFromPortal = activeEnvironment === "live" && activeProduct === "bss";
+  const canImportGhlClient = activeEnvironment === "live" && !clientsFromPortal;
 
   const metrics = useMemo(() => {
     const completed = tasks.filter((task) => task.status === "complete").length;
@@ -4033,6 +4050,7 @@ export default function RespondDashboard({
           onCreateClientClick={() => setShowNewClientPanel(true)}
           onImportGhlClient={importGhlClientWorkspace}
           canImportGhlClient={canImportGhlClient}
+          canCreateClient={!clientsFromPortal}
           isImportingGhlClient={isImportingGhlClient}
           theme={theme}
           onThemeChange={setTheme}
@@ -4246,10 +4264,12 @@ export default function RespondDashboard({
                 <Icon name="play" />
                 Start walkthrough
               </button>
-              <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
-                <Icon name="plus" />
-                New client
-              </button>
+              {!clientsFromPortal ? (
+                <button type="button" className="walkthrough-button" onClick={() => setShowNewClientPanel(true)}>
+                  <Icon name="plus" />
+                  New client
+                </button>
+              ) : null}
               {canImportGhlClient ? (
                 <button type="button" className="walkthrough-button" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
                   <Icon name="download" />
@@ -4378,7 +4398,11 @@ export default function RespondDashboard({
           <section className="empty-workspace-panel" aria-label="Empty workspace">
             <span>{currentEnvironment.shortLabel}</span>
             <h2>No {currentProduct.shortLabel} clients in this workspace yet</h2>
-            <p>Create a client to generate a fresh {currentProduct.taskTemplateLabel.toLowerCase()}, private portal link, and independent task board.</p>
+            {clientsFromPortal ? (
+              <p>{portalClientsHint}</p>
+            ) : (
+              <p>Create a client to generate a fresh {currentProduct.taskTemplateLabel.toLowerCase()}, private portal link, and independent task board.</p>
+            )}
             <div className="empty-actions">
               {canImportGhlClient ? (
                 <button type="button" className="walkthrough-primary" onClick={importGhlClientWorkspace} disabled={isImportingGhlClient}>
@@ -4386,10 +4410,12 @@ export default function RespondDashboard({
                   {isImportingGhlClient ? "Importing" : "Import from GHL"}
                 </button>
               ) : null}
-              <button type="button" className={canImportGhlClient ? "walkthrough-secondary" : "walkthrough-primary"} onClick={() => setShowNewClientPanel(true)}>
-                <Icon name="plus" />
-                New client
-              </button>
+              {!clientsFromPortal ? (
+                <button type="button" className={canImportGhlClient ? "walkthrough-secondary" : "walkthrough-primary"} onClick={() => setShowNewClientPanel(true)}>
+                  <Icon name="plus" />
+                  New client
+                </button>
+              ) : null}
             </div>
           </section>
         ) : isTaskBoardLoading ? (

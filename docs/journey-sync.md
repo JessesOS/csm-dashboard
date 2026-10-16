@@ -58,6 +58,14 @@ BSS clients are created **once, in the portal admin**. Whenever CSM lists the
   portal id (`live-bss-<name-slug>-<first 8 of portal id>`), so a race between
   two page loads fails on the primary key instead of duplicating.
 - Already-linked clients take the portal's name and company.
+- **Live BSS shows exactly the portal's clients.** A client deleted in the
+  portal, or one made by hand in CSM (never linked), is **hidden, not deleted**
+  — its data survives a mistaken portal delete. If the portal can't be
+  reached, linked clients stay visible. CSM offers no "New client" / GHL
+  import in Live BSS; it points to the portal admin instead.
+- Portal-linked clients are **never merged by name/company**
+  (`reconcileDuplicateClients` and `createClient`'s identity match skip them):
+  merging deleted the mirror, which the sync re-created empty — losing progress.
 - Portal unreachable / no token → CSM shows what it already has.
 
 ```
