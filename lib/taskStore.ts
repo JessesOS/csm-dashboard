@@ -6,7 +6,7 @@ import {
   onboardingFormMissingRequired,
   sanitizeOnboardingFormResponses,
 } from "./onboardingForm";
-import { bssClientTaskIds } from "./bssTasks";
+import { bssClientTaskIds, bssRetiredTaskIds } from "./bssTasks";
 import { fetchJourneyBssClients, JOURNEY_SYNC_ACTOR, pushTaskStatusToJourney } from "./journeySync";
 import { portalDefaultsForTask } from "./portalDefaults";
 import { scaleTasksForVariant } from "./scaleTasks";
@@ -1718,12 +1718,31 @@ function wordingMigration(fixes: WordingFix[]) {
   };
 }
 
+// Retired BSS tasks: remove them from other tasks' dependencies, or the
+// dependents would wait on a task nobody can see (bss-003 depended on bss-002).
+async function migrateBssRetiredDependencies() {
+  const d1 = getD1();
+  const rows = await d1
+    .prepare("SELECT id, dependencies FROM tasks WHERE product = 'bss' AND dependencies != '[]'")
+    .all<{ id: string; dependencies: string }>();
+  const updates = (rows.results ?? []).flatMap((row: { id: string; dependencies: string }) => {
+    const dependencies = parseDependencies(row.dependencies);
+    const kept = dependencies.filter((dependencyId) => !bssRetiredTaskIds.has(dependencyId.split("__").pop() ?? dependencyId));
+    return kept.length === dependencies.length ? [] : [d1.prepare("UPDATE tasks SET dependencies = ? WHERE id = ?").bind(JSON.stringify(kept), row.id)];
+  });
+
+  if (updates.length > 0) {
+    await d1.batch(updates);
+  }
+}
+
 // One-off data fixes that must reach existing databases even when the schema
 // doesn't change (prepareTaskStorage only re-runs on a shape change). Each runs
 // once per database, recorded in app_meta as "migration:<key>". Append only.
 const runOnceMigrations: { key: string; run: () => Promise<void> }[] = [
   { key: "2026-10-16-bss-calendly-wording", run: wordingMigration(bssCalendlyWordingFixes) },
   { key: "2026-10-16-bss-003-invite-access", run: wordingMigration(bssInviteAccessWordingFixes) },
+  { key: "2026-10-16-bss-002-retired", run: migrateBssRetiredDependencies },
 ];
 
 async function runPendingOnceMigrations() {
@@ -1780,6 +1799,8 @@ export async function listClients(environmentInput: string | null | undefined = 
   const clientsFromPortal = environment === "live" && product === "bss";
   const portalClientIds = clientsFromPortal ? await reconcileJourneyClients() : null;
 
+  const hiddenTemplateIds = product === "bss" ? [...bssRetiredTaskIds] : [];
+  const hiddenTemplateFilter = hiddenTemplateIds.length > 0 ? ` AND template_id NOT IN (${hiddenTemplateIds.map(() => "?").join(", ")})` : "";
   const [clientRows, countRows] = await Promise.all([
     d1
       .prepare(`SELECT ${clientSelectFields} FROM clients WHERE environment = ? AND product = ? ORDER BY created_at ASC, id ASC`)
@@ -1787,9 +1808,9 @@ export async function listClients(environmentInput: string | null | undefined = 
       .all<ClientRow>(),
     d1
       .prepare(
-        "SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN blocked_reason != '' AND status != 'complete' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE environment = ? AND product = ? GROUP BY client_id"
+        `SELECT client_id AS clientId, COUNT(*) AS total, SUM(CASE WHEN status = 'complete' THEN 1 ELSE 0 END) AS completed, SUM(CASE WHEN blocked_reason != '' AND status != 'complete' THEN 1 ELSE 0 END) AS blocked FROM tasks WHERE environment = ? AND product = ?${hiddenTemplateFilter} GROUP BY client_id`
       )
-      .bind(environment, product)
+      .bind(environment, product, ...hiddenTemplateIds)
       .all<ClientCountRow>(),
   ]);
   const counts = new Map((countRows.results ?? []).map((item) => [item.clientId, item]));
@@ -1860,7 +1881,12 @@ export async function listTasks(
     .bind(environment, product, scopedClientId)
     .all<TaskRow>();
 
-  return (result.results ?? []).map(fromRow);
+  return (result.results ?? []).map(fromRow).filter((task: Task) => !isRetiredTask(task));
+}
+
+/** Retired template tasks (e.g. BSS bss-002) are hidden everywhere, never deleted. */
+function isRetiredTask(task: Pick<Task, "product" | "templateId">) {
+  return task.product === "bss" && bssRetiredTaskIds.has(task.templateId ?? "");
 }
 
 export async function createTask(
@@ -2002,7 +2028,8 @@ async function pushBssStatusToJourney(taskId: string, status: TaskStatus) {
 export async function applyJourneyMilestoneUpdate(input: { journeyClientId: string; milestoneId: string; done: boolean; note?: string }) {
   await ensureTaskStorage();
   const d1 = getD1();
-  const validMilestoneIds = new Set(productTasks("bss").map((task) => task.id));
+  // Retired ids stay valid so the portal's sync messages are still accepted.
+  const validMilestoneIds = new Set([...productTasks("bss").map((task) => task.id), ...bssRetiredTaskIds]);
 
   if (!validMilestoneIds.has(input.milestoneId)) {
     throw new Error("Unknown BSS milestone id.");
@@ -3707,6 +3734,6 @@ export async function listPortalTasks(token: string) {
   return {
     clientId: client.id,
     clientName: client.name,
-    tasks: (result.results ?? []).map(fromRow),
+    tasks: (result.results ?? []).map(fromRow).filter((task: Task) => !isRetiredTask(task)),
   };
 }

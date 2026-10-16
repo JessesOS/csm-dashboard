@@ -66,7 +66,7 @@ function task(
   };
 }
 
-export const bssSeedTasks: Task[] = [
+const allBssTasks: Task[] = [
   // ── Onboarding (Weeks 1–2: onboard, map & evaluate) ──────────────────────
   task(1, "bss-intake", "Voice interview — intake", {
     assignee: "Jesse Allan",
@@ -92,7 +92,6 @@ export const bssSeedTasks: Task[] = [
     assignee: "Jesse Allan",
     dueWindow: "Weeks 1-2",
     priority: "high",
-    dependencies: ["bss-002"],
     portalVisible: true,
     portalConfigured: true,
     portalTitle: "Invite us to your accounts",
@@ -360,6 +359,13 @@ export const bssSeedTasks: Task[] = [
     portalNote: "We review and support through month 8.",
   }),
 ];
+
+// Retired tasks are out of the delivery. New clients don't get them; existing
+// rows are hidden, not deleted, and the id stays valid for the portal sync.
+// bss-002 "Portal setup & kick-off call": Jesse, 2026-10-16, "we don't need this task".
+export const bssRetiredTaskIds = new Set(["bss-002"]);
+
+export const bssSeedTasks: Task[] = allBssTasks.filter((task) => !bssRetiredTaskIds.has(task.id));
 
 // Tasks Fin completes himself in the customer-journey portal (the portal owns
 // these; the team owns the rest). Derived from the flags above so there is one
