@@ -1707,6 +1707,14 @@ const bssInviteAccessWordingFixes: WordingFix[] = [
   { templateId: "bss-003", column: "notes", from: "Client responsibility per the agreement: CRM, GHL sub-account, Calendly account, domain, hosting, socials.", to: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\n- Meta Business Suite, Facebook & Instagram (full control)\n- YouTube (manager)\nNo passwords change hands; anything that won't accept an invite is sorted on a call." },
 ];
 
+// 2026-10-16: Meta Business Suite (Facebook/Instagram) and YouTube are off the
+// bss-003 invite list (matches the portal); five platforms remain.
+const bssInviteListTrimFixes: WordingFix[] = [
+  { templateId: "bss-003", column: "title", from: "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting, Meta, YouTube", to: "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting" },
+  { templateId: "bss-003", column: "portal_note", from: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider, website hosting, Meta Business Suite (Facebook and Instagram) and YouTube. No passwords change hands. Anything that won't accept an invite, we sort out together on a call.", to: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider and website hosting. No passwords change hands. Anything that won't accept an invite, we sort out together on a call." },
+  { templateId: "bss-003", column: "notes", from: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\n- Meta Business Suite, Facebook & Instagram (full control)\n- YouTube (manager)\nNo passwords change hands; anything that won't accept an invite is sorted on a call.", to: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\nNo passwords change hands; anything that won't accept an invite is sorted on a call." },
+];
+
 function wordingMigration(fixes: WordingFix[]) {
   return async () => {
     const d1 = getD1();
@@ -1743,6 +1751,7 @@ const runOnceMigrations: { key: string; run: () => Promise<void> }[] = [
   { key: "2026-10-16-bss-calendly-wording", run: wordingMigration(bssCalendlyWordingFixes) },
   { key: "2026-10-16-bss-003-invite-access", run: wordingMigration(bssInviteAccessWordingFixes) },
   { key: "2026-10-16-bss-002-retired", run: migrateBssRetiredDependencies },
+  { key: "2026-10-16-bss-003-invite-list-trim", run: wordingMigration(bssInviteListTrimFixes) },
 ];
 
 async function runPendingOnceMigrations() {

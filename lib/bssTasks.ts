@@ -88,16 +88,16 @@ const allBssTasks: Task[] = [
     portalTitle: "Kick-off call & portal walkthrough",
     portalNote: "We'll set you up in the portal, walk the journey, and agree next steps.",
   }),
-  task(3, "bss-intake", "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting, Meta, YouTube", {
+  task(3, "bss-intake", "Get invited to Fin's accounts — CRM, GHL, Calendly, domain, hosting", {
     assignee: "Jesse Allan",
     dueWindow: "Weeks 1-2",
     priority: "high",
     portalVisible: true,
     portalConfigured: true,
     portalTitle: "Invite us to your accounts",
-    portalNote: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider, website hosting, Meta Business Suite (Facebook and Instagram) and YouTube. No passwords change hands. Anything that won't accept an invite, we sort out together on a call.",
+    portalNote: "Invite admin@allconvos.ai as an admin on each: your current CRM, GoHighLevel sub-account, Calendly, domain provider and website hosting. No passwords change hands. Anything that won't accept an invite, we sort out together on a call.",
     portalActionRequired: true,
-    notes: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\n- Meta Business Suite, Facebook & Instagram (full control)\n- YouTube (manager)\nNo passwords change hands; anything that won't accept an invite is sorted on a call.",
+    notes: "Invite-based access. Fin invites admin@allconvos.ai on each platform:\n- Current CRM (admin)\n- GoHighLevel sub-account (team member, admin)\n- Calendly (admin)\n- Domain provider (delegate / shared access)\n- Website hosting (admin)\nNo passwords change hands; anything that won't accept an invite is sorted on a call.",
   }),
   task(4, "bss-discovery", "Map & agree the customer journey (before any build)", {
     assignee: "Jesse Allan",
