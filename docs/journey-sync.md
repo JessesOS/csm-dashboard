@@ -155,3 +155,17 @@ Known gap: a push that fails (portal down, bad deploy) is not retried — that
 task only catches up on its next change. A per-client "resync" that pushes all
 41 statuses would close it.
 
+## Changelog — ids, ownership, client-facing wording
+
+Any change here goes to the other session the same day **and** gets a line
+below. Both sessions may append.
+
+| Date | Change | Where |
+|---|---|---|
+| 2026-10-15 | Portal adopts CSM's 41 ids `bss-001…041` and five stages | both |
+| 2026-10-15 | Client-owned set fixed: `bss-001, 003, 004, 014, 015, 016, 027` | both |
+| 2026-10-15 | "RT Digital" removed from BSS | both |
+| 2026-10-16 | Cal.com → **Calendly** (`bss-003, 007, 013, 022`) | both |
+| 2026-10-16 | `bss-003` is **invite-based access**: Fin invites `admin@allconvos.ai` on CRM, GHL, Calendly, domain, hosting, Meta Business Suite, YouTube; no passwords | both |
+| 2026-10-16 | Cross-check: both apps show only `jessetest` (f11ea83a), `bss-001` done with transcript; in sync | both |
+
