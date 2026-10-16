@@ -181,3 +181,4 @@ below. Both sessions may append.
 | 2026-10-16 | `bss-002` "Portal setup & kick-off call" **retired** (Jesse: "we don't need this task"): hidden on both sides, not deleted; id still accepted by the sync. BSS is now **40 tasks** (Onboarding 6). CSM also dropped `bss-003`'s dependency on it | both |
 | 2026-10-16 | `bss-003` invite list trimmed to **five**: CRM, GHL sub-account, Calendly, domain provider, website hosting (Meta Business Suite and YouTube removed). `bss-020` / `bss-021` stay as team tasks | both |
 | 2026-10-16 | **BSS paused** (Jesse): Fin moves to Scale — Meta ads only. Nothing deleted; BSS template, ids, sync and pickup stay as they are | both |
+| 2026-10-16 | New product name aligned (Jesse): portal "BSS Meta ads only" (`bss-meta`) ↔ CSM Scale variant **"BSS Meta ads only"** (`bss_meta`), same Meta-only task set on each side. **No sync** for it (portal `ob-`/`bd-`… vs CSM `scl-`… ids) | both |

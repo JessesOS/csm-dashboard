@@ -11,7 +11,9 @@ Internal CSM/delivery dashboard for RT Digital's two products:
 
 - **Respond** — Voice AI onboarding, delivery, and support workflows
 - **Scale** — Paid media, funnel, AI bot, and go-live operations (variants:
-  `meta`, `google`, `meta_google`)
+  `meta`, `google`, `meta_google`, and `bss_meta` = "BSS Meta ads only", the
+  Meta-only task set under BSS branding — `taskSetForVariant` in
+  `lib/scaleTasks.ts` maps it to `meta`; no sync with the portal)
 
 Also hosts a **client-facing portal** (`/portal/[token]`) as a feature of this
 same app — not a separate project, not a separate database. It reads the same

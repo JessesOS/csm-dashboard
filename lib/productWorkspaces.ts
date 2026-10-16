@@ -92,7 +92,7 @@ export const defaultEnvironment: EnvironmentKey = "demo";
 export const defaultScaleVariant: ScaleVariant = "meta_google";
 
 export function normalizeScaleVariant(value: string | null | undefined): ScaleVariant {
-  return value === "meta" || value === "google" ? value : "meta_google";
+  return value === "meta" || value === "google" || value === "bss_meta" ? value : "meta_google";
 }
 
 export function normalizeProduct(value: string | null | undefined): ProductKey {

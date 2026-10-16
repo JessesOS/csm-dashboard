@@ -1805,12 +1805,23 @@ const googleOnlyCategoryIds = new Set([
   "scale-06-google-ads-strategy-landing-page-funnel-creation",
 ]);
 
+// Which task set a variant gets. "BSS Meta ads only" (bss_meta, 2026-10-16) is
+// the Meta-only delivery under BSS branding, so it gets exactly the Meta-only
+// set; the separate value only keeps the client identifiable as BSS. Every
+// task-set decision goes through here, so bss_meta can't fall into the
+// Google-only branch below.
+function taskSetForVariant(variant: ScaleVariant): "meta" | "google" | "meta_google" {
+  return variant === "bss_meta" ? "meta" : variant;
+}
+
 export function scaleCategoriesForVariant(variant: ScaleVariant = "meta_google") {
-  if (variant === "meta_google") {
+  const taskSet = taskSetForVariant(variant);
+
+  if (taskSet === "meta_google") {
     return scaleCategories;
   }
 
-  if (variant === "meta") {
+  if (taskSet === "meta") {
     return scaleCategories.filter((category) => !googleOnlyCategoryIds.has(category.id));
   }
 
@@ -1820,8 +1831,9 @@ export function scaleCategoriesForVariant(variant: ScaleVariant = "meta_google")
 export function scaleTasksForVariant(variant: ScaleVariant = "meta_google") {
   const allowedCategories = new Set(scaleCategoriesForVariant(variant).map((category) => category.name));
   const tasks = scaleTasks.filter((task) => allowedCategories.has(task.category));
-  // Inject the Google Ads access task (scl-309) for google/meta_google variants only
-  if (variant === "google" || variant === "meta_google") {
+  // Inject the Google Ads access task (scl-309) for google/meta_google task sets only
+  const taskSet = taskSetForVariant(variant);
+  if (taskSet === "google" || taskSet === "meta_google") {
     const googleAdsAccessTask: Task = {
       id: "scl-309",
       title: "Chase the client to provide admin access to Google Ads Manager and Google Analytics.",

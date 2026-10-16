@@ -59,11 +59,14 @@ const scaleVariantOptions: Array<{ key: ScaleVariant; label: string }> = [
   { key: "meta", label: "Scale with Meta ads" },
   { key: "google", label: "Scale with Google ads" },
   { key: "meta_google", label: "Scale with Meta and Google" },
+  // Same title as the customer-journey portal's product (Jesse, 2026-10-16).
+  { key: "bss_meta", label: "BSS Meta ads only" },
 ];
 const scaleVariantLabels: Record<ScaleVariant, string> = {
   meta: "Meta ads",
   google: "Google ads",
   meta_google: "Meta + Google",
+  bss_meta: "BSS Meta ads only",
 };
 const statusColumnDetails: Record<TaskStatus, string> = {
   queued: "Ready to start",
@@ -981,9 +984,9 @@ function ThemeToggle({ theme, onThemeChange }: { theme: ThemeMode; onThemeChange
 }
 
 function promptScaleVariant(defaultValue: ScaleVariant = defaultScaleVariant) {
-  const defaultChoice = defaultValue === "meta" ? "1" : defaultValue === "google" ? "2" : "3";
+  const defaultChoice = defaultValue === "meta" ? "1" : defaultValue === "google" ? "2" : defaultValue === "bss_meta" ? "4" : "3";
   const choice = window.prompt(
-    "Choose the Scale checklist:\n1. Meta ads\n2. Google ads\n3. Meta + Google",
+    "Choose the Scale checklist:\n1. Meta ads\n2. Google ads\n3. Meta + Google\n4. BSS Meta ads only",
     defaultChoice
   );
 
@@ -1004,7 +1007,11 @@ function promptScaleVariant(defaultValue: ScaleVariant = defaultScaleVariant) {
     return "meta_google" satisfies ScaleVariant;
   }
 
-  throw new Error("Choose 1, 2, or 3 for the Scale checklist.");
+  if (normalized === "4" || normalized === "bss_meta" || normalized === "bss meta ads only") {
+    return "bss_meta" satisfies ScaleVariant;
+  }
+
+  throw new Error("Choose 1, 2, 3 or 4 for the Scale checklist.");
 }
 
 function WorkspaceMenu({
