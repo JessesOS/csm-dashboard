@@ -75,6 +75,7 @@ curl -s "$BASE/api/tasks?environment=demo&product=respond&clientId=northlane-hea
 |---|---|
 | `Compatibility flag specified multiple times: nodejs_compat` | vinext injects `nodejs_compat` itself — don't also list it in `vite.config.ts` |
 | `D1_ERROR: Wrong number of parameter bindings` | An INSERT's column list and its values array are out of sync in `lib/taskStore.ts` (this exact bug bit `seedClients` once — count both sides) |
+| A just-deployed change (e.g. a run-once migration) seems not to have applied | For a few seconds after `vinext deploy`, requests can still reach the previous version. Retry after a moment; check `app_meta` `migration:<key>` with `wrangler d1 execute … --remote` |
 | API returns `"error"` + empty tasks | `prepareTaskStorage()` threw mid-seed; check `npx wrangler tail csm-dashboard` while hitting the API |
 | Deploy goes to the wrong account | `npx wrangler logout && npx wrangler login`, then `npx wrangler whoami` |
 
