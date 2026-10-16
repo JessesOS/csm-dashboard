@@ -135,6 +135,15 @@ last sync in each direction — the quick "is it synced?" check.
 
 ## Status
 
+**PAUSED, 2026-10-16** (Jesse, relayed by the portal session): the BSS journey
+felt clunky next to Scale, so Fin goes on **Scale — Meta ads only** in the
+portal instead. Nothing is deleted on either side: the template, the ids, the
+two-way sync and the client pickup all stay live but idle, ready if BSS comes
+back. No real Fin client is to be created or linked under BSS. Scale clients
+don't sync between the apps (different task ids: portal `ob-`/`bd-`… vs CSM
+`scl-`…), so Fin on Scale would be added to the CSM board by hand.
+
+
 **Live and verified in production, 2026-10-15** (CSM version `7c7fdd91`, portal
 `8867f9f3`). Test link: CSM demo client `bss-fin-creighton-demo` ↔ portal
 "Fin Test" `90a39b38-0312-4143-b6bf-b58b1b27b579`. Confirmed both ways on the
@@ -171,3 +180,4 @@ below. Both sessions may append.
 | 2026-10-16 | Portal strips the voice's bracketed delivery cues (e.g. `[warmly]`, ≤30 chars) from interview transcripts before saving, so `bss-001` notes arrive clean; jessetest's earlier note still has them (test data) | portal |
 | 2026-10-16 | `bss-002` "Portal setup & kick-off call" **retired** (Jesse: "we don't need this task"): hidden on both sides, not deleted; id still accepted by the sync. BSS is now **40 tasks** (Onboarding 6). CSM also dropped `bss-003`'s dependency on it | both |
 | 2026-10-16 | `bss-003` invite list trimmed to **five**: CRM, GHL sub-account, Calendly, domain provider, website hosting (Meta Business Suite and YouTube removed). `bss-020` / `bss-021` stay as team tasks | both |
+| 2026-10-16 | **BSS paused** (Jesse): Fin moves to Scale — Meta ads only. Nothing deleted; BSS template, ids, sync and pickup stay as they are | both |
