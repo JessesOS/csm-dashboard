@@ -1657,8 +1657,74 @@ async function prepareTaskStorage() {
   await markStoragePrepared(d1);
 }
 
+// Wording fixes for BSS tasks that already exist. Each applies only where the
+// field still holds the old template text, so anything written since (e.g. a
+// note Fin added on bss-003) is never overwritten.
+const bssWordingFixes: { templateId: string; column: "title" | "notes" | "portal_note"; from: string; to: string }[] = [
+  // 2026-10-16: Fin uses Calendly, not Cal.com (the agreement is out of date).
+  { templateId: "bss-003", column: "title", from: "Collect access — CRM, GHL, Cal.com, domain, hosting, socials", to: "Collect access — CRM, GHL, Calendly, domain, hosting, socials" },
+  {
+    templateId: "bss-003",
+    column: "portal_note",
+    from: "Give us access to your existing CRM, GoHighLevel sub-account, Cal.com (admin), domain, hosting, and social accounts.",
+    to: "Give us access to your existing CRM, GoHighLevel sub-account, your Calendly account, domain, hosting, and social accounts.",
+  },
+  {
+    templateId: "bss-003",
+    column: "notes",
+    from: "Client responsibility per the agreement: CRM, GHL sub-account, Cal.com admin, domain, hosting, socials.",
+    to: "Client responsibility per the agreement: CRM, GHL sub-account, Calendly account, domain, hosting, socials.",
+  },
+  { templateId: "bss-007", column: "title", from: "Map partner / payment / webinar / Cal.com setup", to: "Map partner / payment / webinar / Calendly setup" },
+  {
+    templateId: "bss-007",
+    column: "notes",
+    from: "Map the current partner, commission and payout setup; the payment method taken after sales calls; the webinar platform; and Cal.com.",
+    to: "Map the current partner, commission and payout setup; the payment method taken after sales calls; the webinar platform; and Calendly.",
+  },
+  {
+    templateId: "bss-013",
+    column: "notes",
+    from: "Connected to Cal.com without duplicate reminders; needs Cal.com admin access.",
+    to: "Connected to Calendly without duplicate reminders; needs access to the Calendly account.",
+  },
+  {
+    templateId: "bss-022",
+    column: "notes",
+    from: "5-day booking window, short-notice bookings, reschedules and cancellations, no duplicate Cal.com reminders.",
+    to: "5-day booking window, short-notice bookings, reschedules and cancellations, no duplicate Calendly reminders.",
+  },
+];
+
+async function migrateBssWording() {
+  const d1 = getD1();
+  await d1.batch(
+    bssWordingFixes.map((fix) =>
+      d1.prepare(`UPDATE tasks SET ${fix.column} = ? WHERE product = 'bss' AND template_id = ? AND ${fix.column} = ?`).bind(fix.to, fix.templateId, fix.from)
+    )
+  );
+}
+
+// One-off data fixes that must reach existing databases even when the schema
+// doesn't change (prepareTaskStorage only re-runs on a shape change). Each runs
+// once per database, recorded in app_meta as "migration:<key>". Append only.
+const runOnceMigrations: { key: string; run: () => Promise<void> }[] = [{ key: "2026-10-16-bss-calendly-wording", run: migrateBssWording }];
+
+async function runPendingOnceMigrations() {
+  for (const migration of runOnceMigrations) {
+    const metaKey = `migration:${migration.key}`;
+
+    if (await getMetaValue(metaKey)) {
+      continue;
+    }
+
+    await migration.run();
+    await setMetaValue(metaKey, new Date().toISOString());
+  }
+}
+
 export async function ensureTaskStorage() {
-  storageReadyPromise ??= prepareTaskStorage().catch((error) => {
+  storageReadyPromise ??= prepareTaskStorage().then(runPendingOnceMigrations).catch((error) => {
     storageReadyPromise = null;
     throw error;
   });

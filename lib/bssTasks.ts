@@ -88,7 +88,7 @@ export const bssSeedTasks: Task[] = [
     portalTitle: "Kick-off call & portal walkthrough",
     portalNote: "We'll set you up in the portal, walk the journey, and agree next steps.",
   }),
-  task(3, "bss-intake", "Collect access — CRM, GHL, Cal.com, domain, hosting, socials", {
+  task(3, "bss-intake", "Collect access — CRM, GHL, Calendly, domain, hosting, socials", {
     assignee: "Jesse Allan",
     dueWindow: "Weeks 1-2",
     priority: "high",
@@ -96,9 +96,9 @@ export const bssSeedTasks: Task[] = [
     portalVisible: true,
     portalConfigured: true,
     portalTitle: "Share your access",
-    portalNote: "Give us access to your existing CRM, GoHighLevel sub-account, Cal.com (admin), domain, hosting, and social accounts.",
+    portalNote: "Give us access to your existing CRM, GoHighLevel sub-account, your Calendly account, domain, hosting, and social accounts.",
     portalActionRequired: true,
-    notes: "Client responsibility per the agreement: CRM, GHL sub-account, Cal.com admin, domain, hosting, socials.",
+    notes: "Client responsibility per the agreement: CRM, GHL sub-account, Calendly account, domain, hosting, socials.",
   }),
   task(4, "bss-discovery", "Map & agree the customer journey (before any build)", {
     assignee: "Jesse Allan",
@@ -119,11 +119,11 @@ export const bssSeedTasks: Task[] = [
     dueWindow: "Weeks 1-2",
     dependencies: ["bss-003"],
   }),
-  task(7, "bss-discovery", "Map partner / payment / webinar / Cal.com setup", {
+  task(7, "bss-discovery", "Map partner / payment / webinar / Calendly setup", {
     assignee: "Jesse Allan",
     dueWindow: "Weeks 1-2",
     dependencies: ["bss-003"],
-    notes: "Map the current partner, commission and payout setup; the payment method taken after sales calls; the webinar platform; and Cal.com.",
+    notes: "Map the current partner, commission and payout setup; the payment method taken after sales calls; the webinar platform; and Calendly.",
   }),
 
   // ── Build (Weeks 2–5: CRM, website, connect) ─────────────────────────────
@@ -157,7 +157,7 @@ export const bssSeedTasks: Task[] = [
     assignee: "Jesse Allan",
     dueWindow: "Weeks 2-4",
     dependencies: ["bss-008"],
-    notes: "Connected to Cal.com without duplicate reminders; needs Cal.com admin access.",
+    notes: "Connected to Calendly without duplicate reminders; needs access to the Calendly account.",
   }),
   task(14, "bss-website", "Build 8 core pages (desktop + mobile)", {
     assignee: "Jesse Allan",
@@ -228,7 +228,7 @@ export const bssSeedTasks: Task[] = [
     dueWindow: "Week 6",
     priority: "high",
     dependencies: ["bss-013", "bss-018"],
-    notes: "5-day booking window, short-notice bookings, reschedules and cancellations, no duplicate Cal.com reminders.",
+    notes: "5-day booking window, short-notice bookings, reschedules and cancellations, no duplicate Calendly reminders.",
   }),
   task(23, "bss-testing", "Test new-lead warm-up (6 emails + texts)", {
     assignee: "Jesse Allan",
